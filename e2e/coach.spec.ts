@@ -60,6 +60,82 @@ async function saved(page: Page) {
     page.getByText("Shranjeno v tej napravi", { exact: true }),
   ).toBeAttached();
 }
+test("trainer fills starter templates through one equipment review without replacing custom exercises", async ({
+  page,
+}) => {
+  const s = legacy();
+  s.templates.find((t) => t.name === "Upper")!.exercises = [
+    newExercise("Moja ročna vaja"),
+  ];
+  await put(page, s);
+  await page.getByRole("button", { name: "Trening", exact: true }).click();
+  await expect(page.getByLabel("Programi trenerja")).toContainText("Leg Press");
+  await page
+    .getByRole("button", { name: "Pripravi moje treninge", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog");
+  for (const name of ["Kolena", "Hrbet", "Ramena"])
+    await dialog
+      .getByRole("combobox", { name, exact: true })
+      .selectOption("none");
+  await dialog
+    .getByRole("button", { name: "Potrdi naprave in omejitve" })
+    .click();
+  await saved(page);
+  const actual = await read(page);
+  expect(
+    actual.templates
+      .filter((t) => t.name !== "Upper")
+      .every((t) => t.exercises.length > 0),
+  ).toBe(true);
+  expect(actual.templates.find((t) => t.name === "Upper")!.exercises).toEqual(
+    s.templates.find((t) => t.name === "Upper")!.exercises,
+  );
+  expect(actual.measurements).toEqual(s.measurements);
+  await page.reload();
+  expect((await read(page)).templates).toEqual(actual.templates);
+  // Existing installations can already have confirmed equipment but empty saved programs.
+  actual.coach!.programs = { lower: [], upper: [], full: [] };
+  actual.templates.find((t) => t.name === "Legs")!.exercises = [];
+  await put(page, actual);
+  await page
+    .getByRole("button", { name: "Pripravi moje treninge", exact: true })
+    .click();
+  await saved(page);
+  const repaired = await read(page);
+  expect(
+    repaired.templates.find((t) => t.name === "Legs")!.exercises.length,
+  ).toBeGreaterThan(0);
+  expect(repaired.templates.find((t) => t.name === "Upper")!.exercises).toEqual(
+    s.templates.find((t) => t.name === "Upper")!.exercises,
+  );
+  expect(repaired.coach!.programs.lower!.length).toBeGreaterThan(0);
+});
+test("the standalone update page preserves all saved data", async ({
+  page,
+}) => {
+  const original = legacy();
+  await put(page, original);
+  page.on("pageerror", (error) =>
+    console.log("Synthetic update page diagnostic:", error.message),
+  );
+  await page.goto("./posodobi.html");
+  await page.getByRole("button", { name: "Posodobi in odpri TEŽIŠČE" }).click();
+  await expect
+    .poll(
+      async () => {
+        if (await page.getByRole("heading", { name: /Tvoj tempo/ }).isVisible())
+          return "ready";
+        return await page
+          .locator("#status")
+          .textContent({ timeout: 500 })
+          .catch(() => "loading");
+      },
+      { timeout: 45000 },
+    )
+    .toBe("ready");
+  expect(await read(page)).toEqual(original);
+});
 test("old IndexedDB record survives without coach fields or measurements being rewritten", async ({
   page,
 }) => {
@@ -319,7 +395,9 @@ test("Shortcuts intake requires local consent, clears health URLs and updates on
     .toBe(true);
   const token = (await read(page)).healthBridge!.token;
   await page
-    .getByText("Enkratna nastavitev Bližnjice na iPhonu", { exact: true })
+    .getByText("Ročna nastavitev na iPhonu, če nimaš Maca z iCloudom", {
+      exact: true,
+    })
     .click();
   expect(
     await page.evaluate(

@@ -9,6 +9,7 @@ import {
   type State,
   type Workout,
   type LiftSet,
+  type Template,
 } from "./model";
 export type Group = "lower" | "upper" | "full";
 export type Readiness = "unknown" | "good" | "poor";
@@ -657,6 +658,74 @@ export function createProgram(s: State, group: Group): ProgramSlot[] {
       : [];
   });
 }
+/** A starting selection for review, never evidence that a particular gym has this equipment. */
+export const suggestedGymEquipment = [
+  "leg_press",
+  "seated_leg_curl",
+  "leg_extension",
+  "glute_drive",
+  "seated_calf",
+  "machine_chest_press",
+  "chest_supported_row",
+  "lat_pulldown",
+  "reverse_fly",
+  "cable_lateral_raise",
+  "tricep_pushdown",
+  "cable_biceps",
+  "pallof_press",
+];
+export function preparedCoachState(s: State): State {
+  const c = getCoach(s);
+  const coach = {
+    ...c,
+    programs: Object.fromEntries(
+      (["lower", "upper", "full"] as Group[]).map((g) => [
+        g,
+        c.programs[g]?.length ? c.programs[g] : createProgram(s, g),
+      ]),
+    ),
+  };
+  const ready = { ...s, coach };
+  const groups: Record<string, { group: Group; patterns?: string[] }> = {
+    legs: { group: "lower" },
+    push: {
+      group: "upper",
+      patterns: [
+        "horizontal-push",
+        "vertical-push",
+        "chest-fly",
+        "elbow-extension",
+        "lateral-raise",
+      ],
+    },
+    pull: {
+      group: "upper",
+      patterns: [
+        "horizontal-pull",
+        "vertical-pull",
+        "rear-delt",
+        "elbow-flexion",
+      ],
+    },
+    upper: { group: "upper" },
+  };
+  // Only fill empty starter templates. Every user-authored template and all records remain intact.
+  const templates: Template[] = s.templates.map((t) => {
+    const spec = groups[t.name.trim().toLowerCase()];
+    if (t.exercises.length || !spec) return t;
+    const slots = (coach.programs[spec.group] ?? []).filter(
+      (slot) =>
+        allowed(coach, slot.catalogId) &&
+        (!spec.patterns ||
+          spec.patterns.includes(byId(slot.catalogId)!.pattern)),
+    );
+    return {
+      ...t,
+      exercises: slots.map((slot) => exerciseForSlot(ready, slot, spec.group)),
+    };
+  });
+  return { ...ready, templates };
+}
 export function dayCheckIn(s: State, today = localDate()): CheckIn {
   const c = getCoach(s);
   if (c.checkIn?.date === today) return c.checkIn;
@@ -988,10 +1057,7 @@ export function planDay(s: State, today = localDate()): DayPlan {
   const base = c.programs[group] ?? createProgram(s, group);
   const reserve = check.choice === "mixed" ? mixedCardioMinutes(check) : 0;
   const perSet = extended ? 3.5 : 3;
-  let remaining = Math.max(
-    0,
-    Math.min(check.minutes - reserve, c.weekdayMinutes) - (extended ? 12 : 8),
-  );
+  let remaining = Math.max(0, check.minutes - reserve - (extended ? 12 : 8));
   const slots: ProgramSlot[] = [];
   if (mode !== "rest" && mode !== "cardio")
     for (const slot of base) {

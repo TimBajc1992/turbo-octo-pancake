@@ -742,6 +742,13 @@ export default function App() {
                     <ShieldCheck size={18} />
                   </div>
                   <p>
+                    Različica 0.2 · pripravljene predloge in povezava naprav
+                  </p>
+                  <PwaUpdate
+                    saved={storage === "Shranjeno v tej napravi"}
+                    manual
+                  />
+                  <p>
                     Vsi podatki so shranjeni v brskalniku te naprave
                     (IndexedDB). Šifrirano sinhronizacijo med napravami lahko
                     omogočiš spodaj. Brisanje podatkov brskalnika jih lahko
@@ -1196,8 +1203,10 @@ export default function App() {
                 )}
               </section>
               <div className="bottom-note">
-                <ShieldCheck size={14} /> Lokalno shranjeno. Brez samodejne
-                sinhronizacije med napravami.
+                <ShieldCheck size={14} />{" "}
+                {cloudSync.device
+                  ? cloudSync.status
+                  : "Lokalno shranjeno · naprave poveži v nastavitvah."}
               </div>
             </>
           ) : tab === "training" ? (
@@ -1209,7 +1218,7 @@ export default function App() {
                   <p>
                     {state.active
                       ? "Načrt ni rezultat. Potrdi vsako opravljeno serijo."
-                      : "Legs, Push, Pull in Upper so izhodišča za ročno sestavljanje."}
+                      : "Trener pripravi vaje, serije in ponovitve glede na tvojo opremo in današnji čas."}
                   </p>
                 </div>
                 {!state.active && (
@@ -1393,6 +1402,16 @@ export default function App() {
                 </>
               ) : (
                 <>
+                  <CoachPanel
+                    state={state}
+                    update={update}
+                    programs
+                    editProfile={() => setModal("profile")}
+                    start={(w) => {
+                      update((s) => ({ ...s, active: w }));
+                      setTab("training");
+                    }}
+                  />
                   {!state.profile.confirmed && (
                     <div className="notice">
                       <Info size={18} />
@@ -2395,8 +2414,8 @@ function ProfileForm({
       }}
     >
       <p>
-        Podatke potrdi pred uporabo pri osebnih predlogih. Program si za zdaj
-        sestaviš ročno.
+        Potrdi profil, nato bo Moj trener pripravil trening glede na tvojo
+        opremo, razpoložljivi čas in počutje.
       </p>
       <label>
         Kako te kličemo?

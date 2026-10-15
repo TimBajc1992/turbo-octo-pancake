@@ -47,6 +47,8 @@ import {
   loadProposal,
   planDay,
   preference,
+  preparedCoachState,
+  suggestedGymEquipment,
   weeklyVolume,
   type CoachConfig,
   type CheckIn,
@@ -97,11 +99,13 @@ export function CoachPanel({
   update,
   start,
   editProfile,
+  programs = false,
 }: {
   state: State;
   update: Update;
   start: (w: Workout) => void;
   editProfile: () => void;
+  programs?: boolean;
 }) {
   const [settings, setSettings] = useState(false),
     [checkOpen, setCheckOpen] = useState(false),
@@ -185,6 +189,103 @@ export function CoachPanel({
           <li key={i}>{r}</li>
         ))}
       </ul>
+      {(!c.available.length ||
+        state.templates.some(
+          (t) =>
+            !t.exercises.length &&
+            ["legs", "push", "pull", "upper"].includes(
+              t.name.trim().toLowerCase(),
+            ),
+        )) && (
+        <div className="notice">
+          <div>
+            <strong>Trener pripravi vaje namesto tebe.</strong>
+            <p>
+              {c.confirmed
+                ? "Iz potrjene opreme pripravi Legs, Push, Pull in Upper. Zapolnijo se samo prazne začetne predloge; tvoje obstoječe vaje ostanejo shranjene."
+                : "Izberi predlog opreme za običajen fitnes, odstrani naprave, ki jih nimaš, in potrdi omejitve. Trener nato sestavi Legs, Push, Pull in Upper."}
+            </p>
+            <button
+              className="button"
+              onClick={() => {
+                if (c.confirmed) {
+                  update(preparedCoachState);
+                  return;
+                }
+                if (c.available.length) {
+                  setSettings(true);
+                  return;
+                }
+                setCoach(update, (config) => ({
+                  ...config,
+                  available: [...suggestedGymEquipment],
+                  confirmed: false,
+                }));
+                setSettings(true);
+              }}
+            >
+              Pripravi moje treninge
+            </button>
+          </div>
+        </div>
+      )}
+      {programs && (
+        <div className="program-grid" aria-label="Programi trenerja">
+          {(["lower", "upper", "full"] as Group[]).map((group) => {
+            const preview = c.available.length
+              ? state
+              : { ...state, coach: { ...c, available: suggestedGymEquipment } };
+            const slots = c.programs[group]?.length
+              ? c.programs[group]!
+              : createProgram(preview, group);
+            return (
+              <section className="panel program-card" key={group}>
+                <h3>{groupName(group)}</h3>
+                <p>
+                  {!c.confirmed
+                    ? "Predogled · najprej potrdi opremo"
+                    : "Samodejno sestavljena osnova"}
+                </p>
+                <div className="program-exercises">
+                  {slots.map((slot) => (
+                    <span key={slot.id}>
+                      {byId(slot.catalogId)?.name} · {slot.sets} ×{" "}
+                      {slot.minReps}–{slot.maxReps}
+                    </span>
+                  ))}
+                </div>
+                <button
+                  className="button secondary"
+                  onClick={() => {
+                    if (!c.confirmed) {
+                      setSettings(true);
+                      return;
+                    }
+                    update((s) =>
+                      preparedCoachState({
+                        ...s,
+                        coach: {
+                          ...getCoach(s),
+                          checkIn: {
+                            ...dayCheckIn(s),
+                            group,
+                            confirmed: false,
+                          },
+                        },
+                      }),
+                    );
+                    setCheckOpen(true);
+                  }}
+                >
+                  {c.confirmed
+                    ? "Pripravi današnji trening"
+                    : "Potrdi opremo in pripravi"}
+                </button>
+              </section>
+            );
+          })}
+        </div>
+      )}
       {!state.profile.confirmed && (
         <button className="text-button" onClick={editProfile}>
           Najprej potrdi osebni profil <ArrowRight size={14} />
@@ -696,22 +797,33 @@ function CoachSettings({
           setError("Potrdi stanje kolen, hrbta in ramen.");
           return;
         }
-        setCoach(update, (config, s) => ({
-          ...config,
-          confirmed: true,
-          programs: Object.fromEntries(
-            (["lower", "upper", "full"] as Group[]).map((g) => [
-              g,
-              config.programs[g] ?? createProgram(s, g),
-            ]),
-          ),
-        }));
+        update((s) =>
+          preparedCoachState({
+            ...s,
+            coach: { ...getCoach(s), confirmed: true },
+          }),
+        );
         done();
       }}
     >
       <p>
-        To je knjižnica kandidatov, ne seznam vaj za en trening. Za primerjavo
-        kilogramov potrdi točno napravo, način zapisa in izvedbo.
+        Trener bo iz razpoložljive opreme pripravil programe in zapolnil prazne
+        začetne predloge. Obstoječe vaje v tvojih predlogah ostanejo shranjene.
+      </p>
+      <button
+        className="button secondary"
+        type="button"
+        onClick={() =>
+          patch({
+            available: [...new Set([...c.available, ...suggestedGymEquipment])],
+          })
+        }
+      >
+        Predlagaj naprave za običajen fitnes
+      </button>
+      <p>
+        Preglej označene naprave in odstrani tiste, ki jih nimaš. Obremenitev se
+        določi iz primerljive zgodovine ali pri prvi izvedbi.
       </p>
       <div className="field-grid">
         {(["knees", "back", "shoulders"] as const).map((j) => (

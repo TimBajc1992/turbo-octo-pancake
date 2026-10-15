@@ -25,6 +25,12 @@ Nastavitve GitHub Pages ostanejo na `gh-pages`. Prejšnji workflow Pages na `mai
 
 ## Povezava naprav
 
+Naslov strežnika je že izpolnjen: `https://tezisce-sync.tim-bajc.workers.dev`. Gumb **Preveri povezavo s strežnikom** preveri storitev iz tega brskalnika. Poskus brez privolitve ali kode pokaže vidno sporočilo in ga pomakne v pogled. Napake omrežja Safari so prevedene v navodilo za ponovitev. HTTP zahteve uporabljajo `AbortController`, zato ne zahtevajo novejšega `AbortSignal.timeout`.
+
+Namestitvena koda se za prenos v glavi HTTP URL-kodira. Tako delujejo tudi šumniki in presledki; neposredno pošiljanje znakov izven Latin-1 bi brskalnik zavrnil pred omrežno zahtevo. Strežnik sprejme novo kodirano vrednost in še naprej tudi dobesedne ključe starejših odjemalcev. Kode zaradi tega ni treba spreminjati.
+
+Na povezanih napravah je vidna neskrivna oznaka **Skupna shramba**. Oznaki morata biti enaki: ustvarjanje prve shrambe na obeh napravah naredi dve ločeni zbirki. Za drugo napravo je treba uporabiti povezovalno kodo iz prve. Ohranita se varnostna kopija pred prevzemom in izrecna privolitev.
+
 1. Na telefonu, kjer so pravilni obstoječi podatki, izvozi varnostno kopijo. Odpri **Nastavitve → Telefon in računalnik**.
 2. Izberi **Prva naprava**, vnesi dejanski naslov Workerja in namestitveno kodo (ne Cloudflare API žetona). Potrdi šifrirano spletno shranjevanje. **Ustvari šifrirano shrambo** ustvari naključni ID, ločen dostopni ključ in šifrirni ključ v tvojem brskalniku.
 3. Prikaži in zasebno shrani **kodo za drugo napravo**. Ta koda vsebuje dostop in dešifrirni ključ. Ne pošiljaj je v klepet, GitHub, javne povezave ali posnetke zaslona. Ni je mogoče obnoviti samo iz podatkov na strežniku.
@@ -53,6 +59,8 @@ Meja ene kopije je 1 MiB nešifriranega JSON; šifrirani paket mora biti manjši
 - **Odklopi to napravo** odstrani samo lokalno povezavo. Ne briše podatkov in ne prekliče že razdeljenih kod. Za preklic izgubljene kode je treba ustvariti novo shrambo ter prek pooblaščenega skrbnika odstraniti staro; stari dostop ne sme veljati za nove podatke.
 - Pomočnik z omejenim žetonom lahko vzdržuje kodo, Worker in D1, ne more pa brati šifriranih podatkov brez tvoje zasebne kode. Skrbniška infrastruktura lahko še vedno izbriše ali poškoduje šifrirano vsebino, zato ostanejo zasebne kopije pomembne.
 
-Lokalno so preverjeni šifriranje/dešifriranje, napačen ključ in spremenjeno šifrirano besedilo, združevanje/konflikti, dejanski lokalni runtime Worker+D1, avtorizacija, prevelike zahteve, revizije in brskalniški tok dveh naprav s testnim strežnikom. Živa objava Cloudflare in preizkus dejanskega računa zahtevata začetne poverilnice; dokler nista opravljena, se ne prikazuje izmišljena uspešna povezava.
+Objavni postopek poleg `/health`, D1 in CORS preveri tudi vpis nove šifrirane testne shrambe s pravo nastavitveno kodo, branje in dešifriranje na drugi napravi, posodobitev, ponovni prevzem ter zavrnitev zastarele različice. Uporabi samo svež naključen testni ID in ključ; po preizkusu odstrani le svoje testne vrstice, omejeno hkrati na ID in odtis svojega ključa. Osebnih shramb ne išče ali bere. Namestitvena koda se pred nastavitvijo Workerja očisti obdajajočih presledkov in prelomov vrstic enako kot pri vnosu v brskalniku.
+
+Preverjeni so tudi šifriranje/dešifriranje, napačen ključ in spremenjeno šifrirano besedilo, združevanje/konflikti, lokalni runtime Worker+D1, prevelike zahteve in brskalniški tok dveh naprav. Uspeh tehničnih preizkusov ne pomeni, da je uporabnik že povezal svoji osebni napravi.
 
 Uradna dokumentacija, pregledana 15. 10. 2026: [Cloudflare D1 omejitve](https://developers.cloudflare.com/d1/platform/limits/), [Workers zunanji CI/CD](https://developers.cloudflare.com/workers/ci-cd/external-cicd/), [Wrangler API](https://developers.cloudflare.com/workers/wrangler/api/).

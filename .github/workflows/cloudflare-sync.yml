@@ -7,6 +7,7 @@ on:
       - "cloudflare/**"
       - "scripts/deploy-cloudflare.mjs"
       - "scripts/cloudflare-token.mjs"
+      - "scripts/check-cloudflare-sync.mjs"
       - ".github/workflows/cloudflare-sync.yml"
       - "package.json"
       - "package-lock.json"

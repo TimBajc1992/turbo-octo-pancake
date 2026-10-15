@@ -44,11 +44,39 @@ async function seed(page: Page, name: string) {
   await page.getByRole("heading", { name: /Tvoj tempo/ }).waitFor();
   await page.getByRole("button", { name: "Nastavitve in profil" }).click();
 }
+test("connection attempts always show feedback, including missing consent and Safari network failure", async ({
+  page,
+}) => {
+  await seed(page, "Lokalni podatki");
+  const panel = page.getByRole("region", { name: "Sinhronizacija naprav" });
+  await panel
+    .getByRole("button", { name: "Ustvari šifrirano shrambo" })
+    .click();
+  await expect(panel.getByRole("alert")).toContainText("Najprej označi");
+  await panel.getByRole("checkbox", { name: /Dovolim šifrirano/ }).check();
+  await panel
+    .getByRole("button", { name: "Ustvari šifrirano shrambo" })
+    .click();
+  await expect(panel.getByRole("alert")).toContainText("namestitveno kodo");
+  await page.route("https://tezisce-sync.tim-bajc.workers.dev/**", (route) =>
+    route.abort(),
+  );
+  await panel
+    .getByRole("button", { name: "Preveri povezavo s strežnikom" })
+    .click();
+  await expect(panel.getByRole("alert")).toContainText("Safari ni uspel");
+  expect((await get(page)).profile.name).toBe("Lokalni podatki");
+});
 test("two devices share encrypted data and preserve the previous local collection", async ({
   browser,
 }) => {
-  const a = await browser.newContext({ viewport: { width: 390, height: 844 } }),
-    b = await browser.newContext();
+  // Network routing cannot reliably intercept requests controlled by a service worker in WebKit.
+  // The independent PWA/offline regression keeps service workers enabled.
+  const a = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      serviceWorkers: "block",
+    }),
+    b = await browser.newContext({ serviceWorkers: "block" });
   let remote: any,
     auth = "",
     id = "",
@@ -115,7 +143,50 @@ test("two devices share encrypted data and preserve the previous local collectio
     );
   const phone = await a.newPage(),
     desktop = await b.newPage();
+  phone.on("console", (message) => {
+    if (message.type() === "error")
+      console.log("Synthetic WebKit connection diagnostic:", message.text());
+  });
+  phone.on("requestfailed", (request) =>
+    console.log(
+      "Synthetic request failure:",
+      request.method(),
+      new URL(request.url()).hostname,
+      request.failure()?.errorText,
+    ),
+  );
   await seed(phone, "Zasebni telefon");
+  console.log(
+    "Synthetic crypto capability:",
+    await phone.evaluate(async () => {
+      try {
+        const key = await crypto.subtle.importKey(
+          "raw",
+          new Uint8Array(32),
+          "AES-GCM",
+          false,
+          ["encrypt", "decrypt"],
+        );
+        await crypto.subtle.encrypt(
+          {
+            name: "AES-GCM",
+            iv: new Uint8Array(12),
+            additionalData: new TextEncoder().encode(
+              "tezisce-encrypted-sync:v1",
+            ),
+          },
+          key,
+          new TextEncoder().encode("test"),
+        );
+        return { secure: isSecureContext, encrypted: true };
+      } catch (error) {
+        return {
+          secure: isSecureContext,
+          error: (error as Error).name + ": " + (error as Error).message,
+        };
+      }
+    }),
+  );
   const panel = phone.getByRole("region", { name: "Sinhronizacija naprav" });
   await panel
     .getByLabel("Naslov strežnika Cloudflare")
@@ -127,7 +198,14 @@ test("two devices share encrypted data and preserve the previous local collectio
   await panel
     .getByRole("button", { name: "Ustvari šifrirano shrambo" })
     .click();
-  await expect.poll(() => revision).toBe(1);
+  await expect
+    .poll(
+      async () =>
+        revision ||
+        (await panel.getByRole("alert").allTextContents()).join(" ") ||
+        0,
+    )
+    .toBe(1);
   await expect(
     panel.getByRole("button", { name: "Pokaži kodo za drugo napravo" }),
   ).toBeVisible();
