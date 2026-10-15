@@ -1,3 +1,4 @@
+import { BoundedNumberInput } from "./BoundedNumberInput";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   ArrowRight,
@@ -417,17 +418,11 @@ export function CoachPanel({
             <div className="field-grid">
               <label>
                 Čas danes (min)
-                <input
-                  type="number"
-                  required
-                  min="10"
-                  max="180"
+                <BoundedNumberInput
+                  min={10}
+                  max={180}
                   value={check.minutes}
-                  onChange={(e) =>
-                    changeCheck({
-                      minutes: Math.max(10, Math.min(180, +e.target.value)),
-                    })
-                  }
+                  onChange={(value) => changeCheck({ minutes: value })}
                 />
               </label>
               <label>
@@ -744,44 +739,29 @@ function CoachSettings({
       <div className="field-grid">
         <label>
           Delovnik (min)
-          <input
-            type="number"
-            min="15"
-            max="180"
+          <BoundedNumberInput
+            min={15}
+            max={180}
             value={c.weekdayMinutes}
-            onChange={(e) =>
-              patch({
-                weekdayMinutes: Math.max(15, Math.min(180, +e.target.value)),
-              })
-            }
+            onChange={(value) => patch({ weekdayMinutes: value })}
           />
         </label>
         <label>
           Sobota (min)
-          <input
-            type="number"
-            min="15"
-            max="180"
+          <BoundedNumberInput
+            min={15}
+            max={180}
             value={c.saturdayMinutes ?? c.weekendMinutes}
-            onChange={(e) =>
-              patch({
-                saturdayMinutes: Math.max(15, Math.min(180, +e.target.value)),
-              })
-            }
+            onChange={(value) => patch({ saturdayMinutes: value })}
           />
         </label>
         <label>
           Nedelja (min)
-          <input
-            type="number"
-            min="15"
-            max="180"
+          <BoundedNumberInput
+            min={15}
+            max={180}
             value={c.sundayMinutes ?? c.weekendMinutes}
-            onChange={(e) =>
-              patch({
-                sundayMinutes: Math.max(15, Math.min(180, +e.target.value)),
-              })
-            }
+            onChange={(value) => patch({ sundayMinutes: value })}
           />
         </label>
         <label>

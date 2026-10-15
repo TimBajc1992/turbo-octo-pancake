@@ -241,3 +241,62 @@ test("standalone cardio finishes without advancing strength; manually rejected a
   });
   expect(result.measurements).toEqual(s.measurements);
 });
+
+test("trainer time accepts individual keystrokes, deletion and persists minutes", async ({
+  page,
+}) => {
+  const state = legacy();
+  state.coach = {
+    ...defaultCoach(),
+    confirmed: true,
+    available: [],
+    cardioEquipment: ["bike"],
+    joints: { knees: "none", back: "none", shoulders: "none" },
+  };
+  await put(page, state);
+  await page.getByRole("button", { name: "Nastavitve trenerja" }).click();
+  const dialog = page.getByRole("dialog");
+  for (const [label, minutes] of [
+    ["Delovnik (min)", "60"],
+    ["Sobota (min)", "90"],
+    ["Nedelja (min)", "120"],
+  ]) {
+    const input = dialog.getByLabel(label, { exact: true });
+    await input.fill("");
+    await expect(input).toHaveValue("");
+    await input.pressSequentially(minutes.slice(0, 1));
+    await expect(input).toHaveValue(minutes.slice(0, 1));
+    await input.pressSequentially(minutes.slice(1));
+    await expect(input).toHaveValue(minutes);
+    await input.press("Tab");
+  }
+  const weekday = dialog.getByLabel("Delovnik (min)", { exact: true });
+  await weekday.fill("");
+  await weekday.press("Tab");
+  await expect(weekday).toHaveValue("60");
+  await weekday.fill("200");
+  await expect(weekday).toHaveValue("200");
+  await weekday.press("Tab");
+  await expect(weekday).toHaveValue("180");
+  await weekday.fill("");
+  await weekday.pressSequentially("60");
+  await dialog
+    .getByRole("button", { name: "Potrdi naprave in omejitve" })
+    .click();
+  await saved(page);
+  await page.reload();
+  const stored = await read(page);
+  expect(stored.coach?.weekdayMinutes).toBe(60);
+  expect(stored.coach?.saturdayMinutes).toBe(90);
+  expect(stored.coach?.sundayMinutes).toBe(120);
+  expect(stored.measurements).toEqual(state.measurements);
+  await page.getByRole("button", { name: "Kako si danes?" }).click();
+  const today = page.getByLabel("Čas danes (min)", { exact: true });
+  await today.fill("");
+  await today.pressSequentially("60");
+  await expect(today).toHaveValue("60");
+  await page.getByRole("button", { name: "Potrdi današnje počutje" }).click();
+  await saved(page);
+  await page.reload();
+  expect((await read(page)).coach?.checkIn?.minutes).toBe(60);
+});
