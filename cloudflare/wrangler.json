@@ -4,6 +4,7 @@
   "main": "worker.ts",
   "compatibility_date": "2026-10-15",
   "workers_dev": true,
+  "preview_urls": false,
   "vars": { "ALLOWED_ORIGIN": "https://timbajc1992.github.io" },
   "d1_databases": [{ "binding": "DB", "database_name": "tezisce-sync" }],
   "observability": { "enabled": false }

@@ -13,7 +13,11 @@ for (const name of [
       `Missing configured secret: ${name}. No deployment was attempted.`,
     );
 }
-const deployEnv = { ...process.env, CLOUDFLARE_API_TOKEN: cloudflareToken(process.env.CLOUDFLARE_API_TOKEN), CLOUDFLARE_ACCOUNT_ID: process.env.CLOUDFLARE_ACCOUNT_ID.trim() };
+const deployEnv = {
+  ...process.env,
+  CLOUDFLARE_API_TOKEN: cloudflareToken(process.env.CLOUDFLARE_API_TOKEN),
+  CLOUDFLARE_ACCOUNT_ID: process.env.CLOUDFLARE_ACCOUNT_ID.trim(),
+};
 if (!/^[a-f0-9]{32}$/i.test(deployEnv.CLOUDFLARE_ACCOUNT_ID))
   throw Error("Invalid configured Cloudflare account ID.");
 if (process.env.TEZISCE_SYNC_SETUP_KEY.length < 32)
@@ -47,7 +51,6 @@ let databases = JSON.parse(
 );
 if (!Array.isArray(databases)) throw Error("Unexpected D1 list response.");
 let db = databases.find((d) => d.name === "tezisce-sync");
-const createdNewDatabase = !db;
 if (!db) {
   await wrangler([
     "d1",
@@ -69,8 +72,6 @@ const config = JSON.parse(
   await readFile(path.join(root, "cloudflare/wrangler.json"), "utf8"),
 );
 config.d1_databases[0].database_id = id;
-const jurisdiction = db.jurisdiction ?? (createdNewDatabase ? "eu" : undefined);
-if (jurisdiction) config.d1_databases[0].jurisdiction = jurisdiction;
 await writeFile(configPath, JSON.stringify(config, null, 2) + "\n");
 await wrangler([
   "d1",
@@ -95,11 +96,57 @@ if (!url)
   throw Error(
     "Deployment returned no workers.dev URL. Check the Cloudflare dashboard before retrying.",
   );
-const health = await fetch(url + "/health", {
-  signal: AbortSignal.timeout(20000),
+console.log(`Checking deployed sync endpoint: ${url}`);
+// The public route can briefly serve the placeholder created by `secret put`.
+// Wait for the deployed version rather than treating its first response as final.
+let healthy = false;
+for (let attempt = 0; attempt < 8; attempt++) {
+  try {
+    const health = await fetch(url + "/health", {
+      signal: AbortSignal.timeout(10000),
+      cache: "no-store",
+    });
+    const body = await health.json().catch(() => null);
+    healthy =
+      health.ok &&
+      body?.service === "tezisce-encrypted-sync" &&
+      body?.version === 1;
+    if (healthy) break;
+    console.log(
+      `Health check ${attempt + 1}/8: HTTP ${health.status}; expected service not yet available.`,
+    );
+  } catch {
+    console.log(`Health check ${attempt + 1}/8: endpoint not yet reachable.`);
+  }
+  if (attempt < 7) await new Promise((resolve) => setTimeout(resolve, 3000));
+}
+if (!healthy)
+  throw Error(
+    "The deployed health endpoint did not pass verification after retries.",
+  );
+// Exercise the real D1 read path and browser CORS without creating a personal vault.
+const denied = await fetch(`${url}/v1/vaults/${"A".repeat(43)}`, {
+  headers: { Authorization: `Bearer ${"B".repeat(43)}` },
+  signal: AbortSignal.timeout(10000),
 });
-if (!health.ok || (await health.json()).service !== "tezisce-encrypted-sync")
-  throw Error("The deployed health endpoint did not pass verification.");
+if (denied.status !== 401)
+  throw Error(
+    `The deployed D1 authorization check returned HTTP ${denied.status}, expected 401.`,
+  );
+const preflight = await fetch(url + "/v1/vaults/" + "A".repeat(43), {
+  method: "OPTIONS",
+  headers: {
+    Origin: config.vars.ALLOWED_ORIGIN,
+    "Access-Control-Request-Method": "PUT",
+  },
+  signal: AbortSignal.timeout(10000),
+});
+if (
+  preflight.status !== 204 ||
+  preflight.headers.get("Access-Control-Allow-Origin") !==
+    config.vars.ALLOWED_ORIGIN
+)
+  throw Error("The deployed browser CORS check failed.");
 console.log(`Verified sync endpoint: ${url}`);
 if (process.env.GITHUB_OUTPUT)
   await appendFile(process.env.GITHUB_OUTPUT, `url=${url}\n`);
