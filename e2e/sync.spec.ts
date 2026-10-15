@@ -138,7 +138,50 @@ test("two devices share encrypted data and preserve the previous local collectio
     );
   const phone = await a.newPage(),
     desktop = await b.newPage();
+  phone.on("console", (message) => {
+    if (message.type() === "error")
+      console.log("Synthetic WebKit connection diagnostic:", message.text());
+  });
+  phone.on("requestfailed", (request) =>
+    console.log(
+      "Synthetic request failure:",
+      request.method(),
+      new URL(request.url()).hostname,
+      request.failure()?.errorText,
+    ),
+  );
   await seed(phone, "Zasebni telefon");
+  console.log(
+    "Synthetic crypto capability:",
+    await phone.evaluate(async () => {
+      try {
+        const key = await crypto.subtle.importKey(
+          "raw",
+          new Uint8Array(32),
+          "AES-GCM",
+          false,
+          ["encrypt", "decrypt"],
+        );
+        await crypto.subtle.encrypt(
+          {
+            name: "AES-GCM",
+            iv: new Uint8Array(12),
+            additionalData: new TextEncoder().encode(
+              "tezisce-encrypted-sync:v1",
+            ),
+          },
+          key,
+          new TextEncoder().encode("test"),
+        );
+        return { secure: isSecureContext, encrypted: true };
+      } catch (error) {
+        return {
+          secure: isSecureContext,
+          error: (error as Error).name + ": " + (error as Error).message,
+        };
+      }
+    }),
+  );
   const panel = phone.getByRole("region", { name: "Sinhronizacija naprav" });
   await panel
     .getByLabel("Naslov strežnika Cloudflare")
