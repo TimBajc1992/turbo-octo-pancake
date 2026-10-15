@@ -189,18 +189,33 @@ export function CoachPanel({
           <li key={i}>{r}</li>
         ))}
       </ul>
-      {!c.available.length && (
+      {(!c.available.length ||
+        state.templates.some(
+          (t) =>
+            !t.exercises.length &&
+            ["legs", "push", "pull", "upper"].includes(
+              t.name.trim().toLowerCase(),
+            ),
+        )) && (
         <div className="notice">
           <div>
             <strong>Trener pripravi vaje namesto tebe.</strong>
             <p>
-              Izberi predlog opreme za običajen fitnes, odstrani naprave, ki jih
-              nimaš, in potrdi omejitve. Trener nato sestavi Legs, Push, Pull in
-              Upper.
+              {c.confirmed
+                ? "Iz potrjene opreme pripravi Legs, Push, Pull in Upper. Zapolnijo se samo prazne začetne predloge; tvoje obstoječe vaje ostanejo shranjene."
+                : "Izberi predlog opreme za običajen fitnes, odstrani naprave, ki jih nimaš, in potrdi omejitve. Trener nato sestavi Legs, Push, Pull in Upper."}
             </p>
             <button
               className="button"
               onClick={() => {
+                if (c.confirmed) {
+                  update(preparedCoachState);
+                  return;
+                }
+                if (c.available.length) {
+                  setSettings(true);
+                  return;
+                }
                 setCoach(update, (config) => ({
                   ...config,
                   available: [...suggestedGymEquipment],
@@ -246,7 +261,19 @@ export function CoachPanel({
                       setSettings(true);
                       return;
                     }
-                    changeCheck({ group });
+                    update((s) =>
+                      preparedCoachState({
+                        ...s,
+                        coach: {
+                          ...getCoach(s),
+                          checkIn: {
+                            ...dayCheckIn(s),
+                            group,
+                            confirmed: false,
+                          },
+                        },
+                      }),
+                    );
                     setCheckOpen(true);
                   }}
                 >

@@ -94,6 +94,34 @@ test("trainer fills starter templates through one equipment review without repla
   expect(actual.measurements).toEqual(s.measurements);
   await page.reload();
   expect((await read(page)).templates).toEqual(actual.templates);
+  // Existing installations can already have confirmed equipment but empty saved programs.
+  actual.coach!.programs = { lower: [], upper: [], full: [] };
+  actual.templates.find((t) => t.name === "Legs")!.exercises = [];
+  await put(page, actual);
+  await page
+    .getByRole("button", { name: "Pripravi moje treninge", exact: true })
+    .click();
+  await saved(page);
+  const repaired = await read(page);
+  expect(
+    repaired.templates.find((t) => t.name === "Legs")!.exercises.length,
+  ).toBeGreaterThan(0);
+  expect(repaired.templates.find((t) => t.name === "Upper")!.exercises).toEqual(
+    s.templates.find((t) => t.name === "Upper")!.exercises,
+  );
+  expect(repaired.coach!.programs.lower!.length).toBeGreaterThan(0);
+});
+test("the standalone update page preserves all saved data", async ({
+  page,
+}) => {
+  const original = legacy();
+  await put(page, original);
+  await page.goto("./posodobi.html");
+  await page.getByRole("button", { name: "Posodobi in odpri TEŽIŠČE" }).click();
+  await expect(page.getByRole("heading", { name: /Tvoj tempo/ })).toBeVisible({
+    timeout: 45000,
+  });
+  expect(await read(page)).toEqual(original);
 });
 test("old IndexedDB record survives without coach fields or measurements being rewritten", async ({
   page,
@@ -354,7 +382,9 @@ test("Shortcuts intake requires local consent, clears health URLs and updates on
     .toBe(true);
   const token = (await read(page)).healthBridge!.token;
   await page
-    .getByText("Ročna nastavitev na iPhonu, če nimaš Maca z iCloudom", { exact: true })
+    .getByText("Ročna nastavitev na iPhonu, če nimaš Maca z iCloudom", {
+      exact: true,
+    })
     .click();
   expect(
     await page.evaluate(
