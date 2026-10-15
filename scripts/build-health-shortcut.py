@@ -1,0 +1,141 @@
+"""Build a read-only Apple Health shortcut. Apple signs this generic file in CI.
+
+No personal token, health data, or account credential is present in this source.
+The import question supplies the browser-local receiving token on the iPhone.
+Health filter shapes follow an exported iOS shortcut and the current locked Type
+predicate documented by viticci/shortcuts-playground-plugin (HEALTHKIT.md).
+"""
+import pathlib
+import plistlib
+import sys
+import uuid
+
+actions = []
+NAMESPACE = uuid.UUID("3b5ced46-f5c9-4fbb-983a-11382d213ca4")
+
+
+def add(kind, **params):
+    identifier = str(uuid.uuid5(NAMESPACE, str(len(actions)) + kind)).upper()
+    params["UUID"] = identifier
+    actions.append({"WFWorkflowActionIdentifier": "is.workflow.actions." + kind,
+                    "WFWorkflowActionParameters": params})
+    return identifier
+
+
+def output(identifier, name):
+    return {"Type": "ActionOutput", "OutputUUID": identifier, "OutputName": name}
+
+
+def variable(name):
+    return {"Type": "Variable", "VariableName": name}
+
+
+def token(value):
+    return {"Value": value, "WFSerializationType": "WFTextTokenAttachment"}
+
+
+def text(*parts):
+    value, attachments = "", {}
+    for part in parts:
+        if isinstance(part, str):
+            value += part
+        else:
+            position = len(value.encode("utf-16-le")) // 2
+            attachments[f"{{{position}, 1}}"] = part
+            value += "\ufffc"
+    return {"Value": {"string": value, "attachmentsByRange": attachments},
+            "WFSerializationType": "WFTextTokenString"}
+
+
+def setvar(name, value):
+    return add("setvariable", WFVariableName=name, WFInput=token(value))
+
+
+def predicate(prop, operator, values, removable=False):
+    return {"Property": prop, "Operator": operator, "Values": values,
+            "Removable": removable, "Bounded": True}
+
+
+def samples(kind, unit, source):
+    state = lambda value: {"Value": value, "WFSerializationType": "WFStringSubstitutableState"}
+    filters = [predicate("Type", 4, {"Enumeration": state(kind)}),
+               predicate("Start Date", 1002, {"Number": "7", "Unit": 16}),
+               predicate("Source", 4, {"Enumeration": state(token(source)), "Unit": 4}, True)]
+    return add("filter.health.quantity", WFContentItemFilter={
+        "Value": {"WFActionParameterFilterPrefix": 1, "WFContentPredicateBoundedDate": False,
+                  "WFActionParameterFilterTemplates": filters},
+        "WFSerializationType": "WFContentPredicateTableTemplate"},
+        WFContentItemLimitEnabled=False, WFHKSampleFilteringUnit=unit)
+
+
+def sum_samples(identifier):
+    values = add("properties.health.quantity", WFContentItemPropertyName="Value",
+                 WFInput=token(output(identifier, "Health Samples")))
+    return add("statistics", WFStatisticsOperation="Sum", Input=token(output(values, "Value")))
+
+
+def if_positive(identifier):
+    count = add("count", Input=token(output(identifier, "Health Samples")), WFCountType="Items")
+    group = str(uuid.uuid5(NAMESPACE, "if-" + identifier)).upper()
+    add("conditional", GroupingIdentifier=group, WFControlFlowMode=0, WFCondition=2,
+        WFInput=token(output(count, "Count")), WFNumberValue=0)
+    return group
+
+
+add("comment", WFCommentActionText="TEŽIŠČE · samo branje Apple Health. Po dodajanju v prvem dejanju Poišči zdravstvene vzorce pri Izvor izberi svojo Apple Watch namesto Vprašaj vsakič. Ostali poizvedbi uporabita isti izvor. Če ni korakov, se prenos ustavi. Podatki odprejo TEŽIŠČE v Safariju; samodejni zagon nastavi po prvem preizkusu.")
+receiving_token_index = len(actions)
+receiving_token = add("gettext", WFTextActionText="VNESI_KODO_IZ_TEZISCA")
+now = add("date", WFDateActionMode="Current Date")
+day = add("format.date", WFDate=token(output(now, "Date")), WFDateFormatStyle="Custom", WFDateFormat="yyyy-MM-dd")
+updated = add("format.date", WFDate=token(output(now, "Date")), WFDateFormatStyle="Custom", WFDateFormat="yyyy-MM-dd'T'HH:mm:ssZZZZZ")
+steps = samples("Steps", "count", {"Type": "Ask"})
+group = if_positive(steps)
+steps_total = sum_samples(steps)
+setvar("Koraki", output(steps_total, "Sum"))
+first = add("getitemfromlist", WFInput=token(output(steps, "Health Samples")), WFItemSpecifier="First Item")
+source = add("properties.health.quantity", WFContentItemPropertyName="Source", WFInput=token(output(first, "Item from List")))
+setvar("Izvor", output(source, "Source"))
+add("conditional", GroupingIdentifier=group, WFControlFlowMode=1)
+add("alert", WFAlertActionTitle="Ni podatkov za prenos", WFAlertActionMessage="Dovoli branje korakov v Zdravje → Dovoljenja za Bližnjice ter v prvem iskanju izberi izvor svoje ure. Če danes še ni vzorcev, poskusi pozneje. Ničle ne bomo poslali kot dejanske meritve.", WFAlertActionCancelButtonShown=False)
+add("exit")
+add("conditional", GroupingIdentifier=group, WFControlFlowMode=2)
+
+for label, unit, field, name in [("Active Calories", "kcal", "moveKcal", "Energija"),
+                                ("Exercise Minutes", "min", "exerciseMin", "Vadba")]:
+    empty = add("gettext", WFTextActionText="")
+    setvar(name, output(empty, "Text"))
+    found = samples(label, unit, variable("Izvor"))
+    conditional = if_positive(found)
+    total = sum_samples(found)
+    fragment = add("gettext", WFTextActionText=text(',"' + field + '":"', output(total, "Sum"), '"'))
+    setvar(name, output(fragment, "Text"))
+    add("conditional", GroupingIdentifier=conditional, WFControlFlowMode=2)
+
+packet = add("gettext", WFTextActionText=text(
+    '{"format":"tezisce-health-shortcuts","version":1,"token":"', output(receiving_token, "Text"),
+    '","source":"Apple Watch","date":"', output(day, "Formatted Date"),
+    '","updatedAt":"', output(updated, "Formatted Date"), '","steps":"', variable("Koraki"),
+    '"', variable("Energija"), variable("Vadba"), '}'))
+encoded = add("urlencode", WFEncodeMode="Encode", WFInput=token(output(packet, "Text")))
+link = add("gettext", WFTextActionText=text("https://timbajc1992.github.io/turbo-octo-pancake/#health=", output(encoded, "URL Encoded Text")))
+add("openurl", WFInput=token(output(link, "Text")))
+
+workflow = {
+    "WFWorkflowActions": actions,
+    "WFWorkflowClientVersion": "2600",
+    "WFWorkflowMinimumClientVersion": 900,
+    "WFWorkflowMinimumClientVersionString": "900",
+    "WFWorkflowIcon": {"WFWorkflowIconStartColor": 4282601983, "WFWorkflowIconGlyphNumber": 59755},
+    "WFWorkflowImportQuestions": [{"ActionIndex": receiving_token_index, "Category": "Parameter",
+        "ParameterKey": "WFTextActionText", "DefaultValue": "",
+        "Text": "Prilepi sprejemno kodo iz TEŽIŠČE → Nastavitve → Apple Health → Kopiraj kodo za Bližnjico. To ni namestitvena koda Cloudflare."}],
+    "WFWorkflowInputContentItemClasses": [],
+    "WFWorkflowTypes": [],
+    "WFWorkflowHasShortcutInputVariables": False,
+}
+destination = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "work/TEZISCE Apple Health.shortcut")
+destination.parent.mkdir(parents=True, exist_ok=True)
+destination.write_bytes(plistlib.dumps(workflow, fmt=plistlib.FMT_BINARY, sort_keys=False))
+assert all("health.quantity.log" not in item["WFWorkflowActionIdentifier"] for item in actions)
+assert all("downloadurl" not in item["WFWorkflowActionIdentifier"] for item in actions)
+print(f"Built read-only shortcut: {len(actions)} actions; no credentials embedded.")
