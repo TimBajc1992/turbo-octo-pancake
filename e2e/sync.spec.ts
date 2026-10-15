@@ -70,8 +70,13 @@ test("connection attempts always show feedback, including missing consent and Sa
 test("two devices share encrypted data and preserve the previous local collection", async ({
   browser,
 }) => {
-  const a = await browser.newContext({ viewport: { width: 390, height: 844 } }),
-    b = await browser.newContext();
+  // Network routing cannot reliably intercept requests controlled by a service worker in WebKit.
+  // The independent PWA/offline regression keeps service workers enabled.
+  const a = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      serviceWorkers: "block",
+    }),
+    b = await browser.newContext({ serviceWorkers: "block" });
   let remote: any,
     auth = "",
     id = "",
