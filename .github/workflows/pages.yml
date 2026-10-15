@@ -1,0 +1,50 @@
+name: Objavi TEŽIŠČE na GitHub Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      VITE_BASE_PATH: /${{ github.event.repository.name }}/
+      TEST_BASE_PATH: /${{ github.event.repository.name }}/
+    steps:
+      - name: Prevzemi kodo
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Pripravi Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Namesti odvisnosti
+        run: npm ci
+      - name: Preveri podatkovni sloj
+        run: npm test
+      - name: Zgradi aplikacijo
+        run: npm run build
+      - name: Pripravi brskalnik za preizkus
+        run: npx playwright install --with-deps chromium
+      - name: Preveri PWA na poti repozitorija
+        run: npm run test:e2e
+      - name: Nastavi Pages
+        uses: actions/configure-pages@v5
+      - name: Pripravi samo javno gradnjo
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Objavi aplikacijo
+        id: deployment
+        uses: actions/deploy-pages@v5

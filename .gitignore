@@ -1,0 +1,12 @@
+node_modules/
+dist/
+*.local
+.DS_Store
+playwright-report/
+test-results/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+pulse-zgodovina.json
+tezisce-varnostna-kopija-*.json

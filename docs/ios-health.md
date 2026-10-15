@@ -1,0 +1,14 @@
+# Prihodnja iOS integracija (še ni izvedena)
+
+PWA ne dostopa do HealthKit. UI vedno kaže »Ni povezano«. Stari vir z dovoljenjem `manual` se ne obravnava kot Apple Health. Integracija zahteva ločeno iOS aplikacijo ali iOS ovoj z dejansko native komponento.
+
+Pred implementacijo preveri aktualno uradno dokumentacijo Apple za HealthKit, HealthKit Authorization, HKAnchoredObjectQuery, HKObserverQuery, HKWorkout in WatchConnectivity ter veljavne zahteve App Store. Ta dokument ni trditev, da je bila povezava že preizkušena.
+
+1. Ustvari iOS target z ustreznim App ID, podpisovanjem in HealthKit capability. Dodaj utemeljitve dovoljenj za branje/pisanje ter zahtevaj samo izbrane tipe. Uporabnik lahko dovoli vsak tip posebej. Zavrnitev ali odsotnost podatkov ne pomeni ničelne aktivnosti.
+2. Predvideni podatki: koraki, vadbe, srčni utrip, aktivna energija, telesna masa, neobvezno spanje. Določi enote, časovna območja in časovne intervale; loči koledarski datum od časovnega trenutka.
+3. Ločen adapter pretvori native podatke v model aplikacije. `Provenance` že predvideva `source`, `externalId`, `measuredAt`, `syncedAt`, izvorni paket in surove podatke. Dopolni model z izvorno napravo, začetkom/koncem intervala, revizijo in izbrisi.
+4. Uporabi stabilen ključ `(source, externalId)` ter hrani HealthKit query anchors. Sinhronizacija naj podpira ponovitev, spremenjene podatke in izbrise. Pri agregacijah prepreči dvojno štetje prekrivajočih se virov (ura, telefon, ročni vnos).
+5. App workout UUID poveži z zunanjim HKWorkout UUID v povezovalni tabeli. En trening ostane ena logična vadba: aplikacija je vir podrobnosti serij, HealthKit lahko doda meritve aktivnosti. Ne združuj po podobnem imenu ali datumu brez preverjanja prekrivanja in uporabniške razrešitve.
+6. Če želimo Watch aplikacijo, dodaj watchOS target in preveri dovoljenja, workout sessions in prenos v iPhone. Odprta PWA ni dokaz povezave z uro.
+7. Brez ločene izrecne uporabniške izbire zdravstveni podatki ne gredo v oblak ali zunanji AI. V ločeni fazi opredeli šifriranje, izvoz/izbris, prijavo, pravila konfliktov in opt-in sinhronizacijo.
+8. Integracijsko preveri na resničnih napravah: delna/zavrnjena dovoljenja, prazni podatki, več virov, časovni pasovi, poletni čas, ponovno nalaganje, izbrisi, prekinitve in isti trening v obeh sistemih. Podpisovanje, Apple Developer račun in uporabnikova dovoljenja so zunanje predpostavke te prihodnje faze.
