@@ -1619,8 +1619,9 @@ function Evidence() {
         zate osebno; merila aplikacije niso razvrstitev po EMG ali kalorijah.
       </p>
       <p>
-        Preverjanje vsebine teh virov je še v teku zaradi omejenega omrežnega
-        dostopa. Pragovi v aplikaciji so označena praktična pravila.
+        Viri pregledani 15. 10. 2026. Pragovi za RIR, premor, spremembo teže,
+        tedenski obseg in osebno izhodišče HRV ostajajo praktična pravila
+        aplikacije; ti viri jih ne potrjujejo kot osebne ali klinične meje.
       </p>
       <ul>
         <li>
@@ -1631,6 +1632,11 @@ function Evidence() {
           >
             ACSM · smernice 2026 ↗
           </a>
+          <p>
+            Rednost in individualna prilagoditev sta pomembni. Za hipertrofijo
+            omenjajo približno 10 serij na mišično skupino tedensko; začetnih 8
+            v aplikaciji je uredljiva produktna nastavitev.
+          </p>
         </li>
         <li>
           <a
@@ -1640,6 +1646,10 @@ function Evidence() {
           >
             Haugen in sod. · naprave in proste uteži ↗
           </a>
+          <p>
+            Metaanaliza ni zaznala razlike v hipertrofiji; prirast moči je
+            specifičen načinu vadbe. Kilogramov med napravami ne pretvarjamo.
+          </p>
         </li>
         <li>
           <a
@@ -1649,6 +1659,11 @@ function Evidence() {
           >
             Currier in sod. · obremenitve, serije in frekvenca ↗
           </a>
+          <p>
+            Različni programi izboljšajo moč in mišično maso glede na nevadbo;
+            višje obremenitve izstopajo pri moči, več serij pri hipertrofiji. To
+            ni en optimalen osebni program.
+          </p>
         </li>
         <li>
           <a
@@ -1658,6 +1673,11 @@ function Evidence() {
           >
             Maeo in sod. · upogib kolen ↗
           </a>
+          <p>
+            V 12-tedenski raziskavi pri 20 zdravih odraslih je sedeči upogib
+            bolj povečal volumen zadnjih stegenskih mišic kot ležeči. To ne
+            dokazuje najboljše ali najvarnejše vaje za posameznika.
+          </p>
         </li>
         <li>
           <a
@@ -1667,6 +1687,11 @@ function Evidence() {
           >
             Apple HealthKit · HRV SDNN ↗
           </a>
+          <p>
+            HealthKit beleži SDNN iz intervalov med normalnimi utripi, običajno
+            v milisekundah. Ta PWA ni povezana z Apple Health in ne izračunava
+            regeneracije.
+          </p>
         </li>
       </ul>
     </details>
