@@ -1,3 +1,4 @@
+import type { CoachConfig, CheckIn } from "./coach";
 export type LoadMode =
   "unknown" | "barbell" | "dumbbell" | "machine" | "bodyweight" | "assisted";
 export type SetKind = "unknown" | "warmup" | "work";
@@ -8,6 +9,7 @@ export interface LiftSet {
   done: boolean;
   kind: SetKind;
   rir?: number;
+  loadPending?: boolean;
 }
 export interface Exercise {
   id: string;
@@ -23,6 +25,27 @@ export interface Exercise {
   rest: number;
   confirmed: boolean;
   cardio?: boolean;
+  coach?: {
+    catalogId: string;
+    slotId: string;
+    group: "lower" | "upper" | "full";
+    rom: string;
+    seat: string;
+    reason: string;
+    calibration: boolean;
+    convention?: string;
+    stepConfirmed?: boolean;
+    trialDraft?: {
+      weight?: number;
+      reps?: number;
+      rir?: number;
+      formGood?: boolean;
+      pain?: boolean;
+    };
+    trialLogged?: boolean;
+    retired?: boolean;
+    formGood?: boolean;
+  };
 }
 export interface Provenance {
   source?: "manual" | "pulse-v3" | "healthkit";
@@ -35,6 +58,22 @@ export interface Provenance {
   modifiedAt?: string;
 }
 export interface Workout extends Provenance {
+  coach?: {
+    group: "lower" | "upper" | "full";
+    mode: string;
+    reason: string;
+    checkIn: CheckIn;
+    generatedAt: string;
+  };
+  cardioPlan?: {
+    type: string;
+    minutes: number;
+    warmup: number;
+    cooldown: number;
+    incline: number;
+    intervals: boolean;
+    intensity: string;
+  };
   id: string;
   date: string;
   name: string;
@@ -115,6 +154,7 @@ export interface State {
   restUntil?: number;
   imports: ImportBatch[];
   nextTemplate: number;
+  coach?: CoachConfig;
 }
 export const uid = () => crypto.randomUUID();
 export function localDate(d = new Date()) {
@@ -161,6 +201,25 @@ export function newExercise(name = "Nova vaja"): Exercise {
     confirmed: false,
   };
 }
+/** Copy a plan without carrying proof of performance into a new workout. */
+export function plannedExercise(e: Exercise): Exercise {
+  return {
+    ...structuredClone(e),
+    note: "",
+    pain: false,
+    coach: e.coach
+      ? {
+          ...e.coach,
+          slotId: uid(),
+          formGood: false,
+          retired: false,
+          trialDraft: undefined,
+          trialLogged: false,
+        }
+      : undefined,
+    sets: e.sets.map((s) => ({ ...s, id: uid(), done: false, rir: undefined })),
+  };
+}
 export const initialState = (): State => ({
   schema: 1,
   profile: {
@@ -194,6 +253,10 @@ export function comparable(a: Exercise, b: Exercise) {
     b.mode !== "unknown" &&
     !!a.equipment.trim() &&
     !!b.equipment.trim() &&
+    (!(a.coach || b.coach) ||
+      (!!a.coach?.rom &&
+        a.coach.rom === b.coach?.rom &&
+        a.coach.convention === b.coach?.convention)) &&
     a.id === b.id &&
     a.mode === b.mode &&
     a.equipment === b.equipment
@@ -354,6 +417,14 @@ export function streak(workouts: Workout[]) {
   }
   return n;
 }
+export const exerciseComparisonKey = (e: Exercise) =>
+  JSON.stringify([
+    e.id,
+    e.mode,
+    e.equipment,
+    e.coach?.rom ?? "",
+    e.coach?.convention ?? "",
+  ]);
 export function records(state: State) {
   const map = new Map<
     string,
@@ -366,7 +437,7 @@ export function records(state: State) {
         e.sets
           .filter((s) => s.done)
           .forEach((s) => {
-            const key = JSON.stringify([e.id, e.mode, e.equipment, s.reps]);
+            const key = exerciseComparisonKey(e) + ":" + s.reps;
             const prev = map.get(key);
             if (
               !prev ||
