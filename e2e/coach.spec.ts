@@ -116,11 +116,24 @@ test("the standalone update page preserves all saved data", async ({
 }) => {
   const original = legacy();
   await put(page, original);
+  page.on("pageerror", (error) =>
+    console.log("Synthetic update page diagnostic:", error.message),
+  );
   await page.goto("./posodobi.html");
   await page.getByRole("button", { name: "Posodobi in odpri TEŽIŠČE" }).click();
-  await expect(page.getByRole("heading", { name: /Tvoj tempo/ })).toBeVisible({
-    timeout: 45000,
-  });
+  await expect
+    .poll(
+      async () => {
+        if (await page.getByRole("heading", { name: /Tvoj tempo/ }).isVisible())
+          return "ready";
+        return await page
+          .locator("#status")
+          .textContent({ timeout: 500 })
+          .catch(() => "loading");
+      },
+      { timeout: 45000 },
+    )
+    .toBe("ready");
   expect(await read(page)).toEqual(original);
 });
 test("old IndexedDB record survives without coach fields or measurements being rewritten", async ({
