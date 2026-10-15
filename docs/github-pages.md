@@ -2,11 +2,11 @@
 
 Aplikacija uporablja obstoječi repozitorij `TimBajc1992/turbo-octo-pancake` in naslov https://timbajc1992.github.io/turbo-octo-pancake/.
 
-Objava nadgradnje Moj trener uporablja `.github/workflows/pages.yml` in **Settings → Pages → Source: GitHub Actions** namesto prejšnje veje `gh-pages`. Naslov, izvor in pot ostanejo isti, zato lokalna zbirka v obstoječem brskalniku ostane dosegljiva. Stara veja ostane ohranjena.
+Objava nadgradnje Moj trener uporablja obstoječi **Settings → Pages → Source: veja `gh-pages`, mapa `/`**. Naslov, izvor in pot ostanejo isti, zato lokalna zbirka v obstoječem brskalniku ostane dosegljiva. Objavljena je preverjena produkcijska gradnja iz PR #1 (`6bf77e2`), brez spremembe podatkovne sheme. Stare zgoščene datoteke v `assets/` so ohranjene tudi za že odprte odjemalce.
 
-Ob potisku na `main` (ali ročnem zagonu workflowa) se izvedejo `npm ci`, podatkovni testi, produkcijska gradnja s predpono repozitorija in brskalniški testi. Objavi se samo `dist/`, brez osebnih podatkov, raziskovalnih delovnih datotek ali izvorne datoteke Pulse. Workflow uporablja začasni GitHubov `GITHUB_TOKEN` in OIDC; osebni žeton ni del kode.
+Pripravljeni `.github/workflows/pages.yml` predvideva GitHub Actions kot vir Pages, vendar ta preklop ni omogočen: API je vrnil 403 »Resource not accessible by integration«, zagon ob združitvi PR #1 pa je odpovedal pred prvim korakom. Zato je bila 15. 10. 2026 po uspešnih 38 podatkovnih testih, produkcijski gradnji in 5 brskalniških testih vsebina `dist/` objavljena v obstoječo vejo `gh-pages`. V javni gradnji ni osebnih podatkov, raziskovalnih delovnih datotek ali izvorne datoteke Pulse. Za prihodnje objave uporabi isti preverjeni postopek ali z ustreznimi pravicami omogoči Actions kot vir Pages. Osebni žeton ni del kode.
 
-Po objavi preveri uspešno opravilo Actions in dejanski HTTPS naslov. Nameščena PWA lahko ponudi **Nova različica · Posodobi**, ko so trenutne spremembe shranjene. Posodobitev service workerja zamenja predpomnilnik aplikacije, ne briše IndexedDB. Na pravem iPhonu ostaja potrebno preverjanje Safarija, namestitve in vedenja v ozadju.
+Po objavi preveri uspešno opravilo »pages build and deployment« in dejanski HTTPS naslov. Nameščena PWA lahko ponudi **Nova različica · Posodobi**, ko so trenutne spremembe shranjene. Posodobitev service workerja zamenja predpomnilnik aplikacije, ne briše IndexedDB. Na pravem iPhonu ostaja potrebno preverjanje Safarija, namestitve in vedenja v ozadju.
 
 ## Lokalno preverjanje poti GitHub Pages
 
