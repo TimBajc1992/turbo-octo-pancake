@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   initialState,
+  newExercise,
   records,
   plannedExercise,
   localDate,
@@ -26,6 +27,8 @@ import {
   historyKey,
   loadProposal,
   planDay,
+  preparedCoachState,
+  suggestedGymEquipment,
   reconcileExercise,
   replaceDevice,
   weeklyVolume,
@@ -90,6 +93,45 @@ const slot = (id = "leg_press", count = 3): ProgramSlot => ({
   sets: count,
   minReps: 8,
   maxReps: 12,
+});
+describe("ready trainer templates", () => {
+  it("fills the empty starter templates while preserving custom work, history and an active workout", () => {
+    const s = ready();
+    s.coach!.available = [...suggestedGymEquipment];
+    s.coach!.programs = { lower: [], upper: [] };
+    const custom = newExercise("Moja obstoječa vaja");
+    s.templates.find((t) => t.name === "Upper")!.exercises = [custom];
+    const before = structuredClone(s);
+    const result = preparedCoachState(s);
+    expect(
+      result.templates
+        .filter((t) => t.name !== "Upper")
+        .every((t) => t.exercises.length > 0),
+    ).toBe(true);
+    expect(result.templates.find((t) => t.name === "Upper")!.exercises).toEqual(
+      [custom],
+    );
+    expect(result.coach!.programs.lower!.length).toBeGreaterThan(0);
+    expect(result.workouts).toEqual(before.workouts);
+    expect(result.measurements).toEqual(before.measurements);
+    expect(result.templates.map((t) => t.id)).toEqual(
+      before.templates.map((t) => t.id),
+    );
+    expect(s).toEqual(before);
+    expect(preparedCoachState(result)).toEqual(result);
+  });
+  it("uses the selected daily minutes instead of capping every day at weekday minutes", () => {
+    const s = ready();
+    s.coach!.available = [...suggestedGymEquipment];
+    s.coach!.weekdayMinutes = 45;
+    s.coach!.checkIn!.minutes = 45;
+    const short = planDay(s);
+    s.coach!.checkIn!.minutes = 75;
+    const long = planDay(s);
+    expect(long.slots.length).toBeGreaterThan(short.slots.length);
+    expect(long.estimatedMinutes).toBeGreaterThan(45);
+    expect(long.estimatedMinutes).toBeLessThanOrEqual(75);
+  });
 });
 function result(s: State, id: string, weights: number[], days = 1): Workout {
   const e = exerciseForSlot(s, slot(id, weights.length), "lower");

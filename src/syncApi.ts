@@ -1,5 +1,51 @@
 import { type State } from "./model";
 import { createSyncSecret, type EncryptedSnapshot } from "./syncCore";
+export const defaultSyncURL = "https://tezisce-sync.tim-bajc.workers.dev";
+export function syncError(error: unknown): string {
+  if (typeof navigator !== "undefined" && navigator.onLine === false)
+    return "Ni internetne povezave. Podatki so shranjeni v tej napravi; po povezavi poskusi znova.";
+  if (
+    error instanceof Error &&
+    ["TimeoutError", "AbortError"].includes(error.name)
+  )
+    return "Strežnik se ni odzval v 20 sekundah. Poskusi znova; lokalni podatki so ohranjeni.";
+  if (error instanceof TypeError)
+    return "Safari ni uspel vzpostaviti povezave s shrambo. Preveri internet in uporabi Preveri povezavo s strežnikom. Lokalni podatki so ohranjeni.";
+  return error instanceof Error
+    ? error.message
+    : "Povezava ni uspela. Lokalni podatki so ohranjeni.";
+}
+async function fetchSync(url: string, options: RequestInit = {}) {
+  // AbortSignal.timeout is absent on older Safari versions; use the widely supported controller.
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 20000);
+  try {
+    return await fetch(url, {
+      ...options,
+      signal: controller.signal,
+      cache: "no-store",
+      credentials: "omit",
+      referrerPolicy: "no-referrer",
+    });
+  } catch (error) {
+    throw Error(syncError(error));
+  } finally {
+    clearTimeout(timer);
+  }
+}
+export async function checkSyncService(url: string): Promise<void> {
+  const c = createSyncConnection(url);
+  const response = await fetchSync(c.url + "/health");
+  const body = await response.json().catch(() => null);
+  if (
+    !response.ok ||
+    body?.service !== "tezisce-encrypted-sync" ||
+    body?.version !== 1
+  )
+    throw Error(
+      `Na tem naslovu ni dosegljive storitve TEŽIŠČE (HTTP ${response.status}).`,
+    );
+}
 export interface SyncConnection {
   url: string;
   id: string;
@@ -62,7 +108,7 @@ async function request(
   expected?: number,
   setup?: string,
 ) {
-  const response = await fetch(c.url + "/v1/vaults/" + c.id, {
+  const response = await fetchSync(c.url + "/v1/vaults/" + c.id, {
     method,
     headers: {
       Authorization: "Bearer " + c.auth,
@@ -71,10 +117,6 @@ async function request(
       ...(setup ? { "X-Setup-Key": setup } : {}),
     },
     body: payload ? JSON.stringify(payload) : undefined,
-    cache: "no-store",
-    credentials: "omit",
-    referrerPolicy: "no-referrer",
-    signal: AbortSignal.timeout(20000),
   });
   if (!response.ok) {
     if (response.status === 409)

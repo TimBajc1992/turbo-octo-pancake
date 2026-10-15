@@ -44,6 +44,29 @@ async function seed(page: Page, name: string) {
   await page.getByRole("heading", { name: /Tvoj tempo/ }).waitFor();
   await page.getByRole("button", { name: "Nastavitve in profil" }).click();
 }
+test("connection attempts always show feedback, including missing consent and Safari network failure", async ({
+  page,
+}) => {
+  await seed(page, "Lokalni podatki");
+  const panel = page.getByRole("region", { name: "Sinhronizacija naprav" });
+  await panel
+    .getByRole("button", { name: "Ustvari šifrirano shrambo" })
+    .click();
+  await expect(panel.getByRole("alert")).toContainText("Najprej označi");
+  await panel.getByRole("checkbox", { name: /Dovolim šifrirano/ }).check();
+  await panel
+    .getByRole("button", { name: "Ustvari šifrirano shrambo" })
+    .click();
+  await expect(panel.getByRole("alert")).toContainText("namestitveno kodo");
+  await page.route("https://tezisce-sync.tim-bajc.workers.dev/**", (route) =>
+    route.abort(),
+  );
+  await panel
+    .getByRole("button", { name: "Preveri povezavo s strežnikom" })
+    .click();
+  await expect(panel.getByRole("alert")).toContainText("Safari ni uspel");
+  expect((await get(page)).profile.name).toBe("Lokalni podatki");
+});
 test("two devices share encrypted data and preserve the previous local collection", async ({
   browser,
 }) => {

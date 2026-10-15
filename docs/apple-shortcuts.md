@@ -4,6 +4,22 @@ Ta sprejemnik omogoča prenos izbranih dnevnih povzetkov iz Apple Health v TEŽI
 
 ## Enkratna nastavitev
 
+### Pripravljena Bližnjica z enim korakom na Macu
+
+V aplikaciji je na voljo generični paket `shortcuts/TEZISCE-Apple-Health.zip`, zgrajen iz preglednega `scripts/build-health-shortcut.py`. Vsebuje že sestavljenih 42 dejanj za korake, aktivno energijo in minute vadbe. V paketu ni osebnih kod ali podatkov. ZIP vključuje izvorno nepodpisano datoteko, kratek ukaz za vgrajeno Applovo orodje ter navodila.
+
+Apple je pri dejanskem poskusu na GitHubovem Macu podpis zavrnil z »In order to do this, you must be signed into iCloud.« Zato se paket ne predstavlja kot že podpisana namestitev. Na Macu, prijavljenem v iCloud, razširi ZIP v Prenosih in zaženi:
+
+```sh
+/bin/bash ~/Downloads/TEZISCE-Apple-Health/pripravi-bliznjico.command
+```
+
+To uporabi `shortcuts sign --mode anyone`, odpre Finder in označi pripravljeno datoteko. Pošlji jo na iPhone prek AirDrop. Ob dodajanju odgovori na uvozno vprašanje s sprejemno kodo iz Apple Health nastavitev TEŽIŠČA; to ni koda za namestitev Cloudflare ali povezavo naprav. V prvem iskanju zdravstvenih vzorcev izberi svojo uro pri Izvor, namesto Vprašaj vsakič. Preostali poizvedbi uporabita izvor prvega dejanskega vzorca korakov. Če korakov ni, bližnjica opozori in prenos ustavi. Neobstoječe energetske/vadbene vrednosti izpusti.
+
+Prvi zagon na odklenjenem iPhonu, dovoljenja Health, dejanski filter vira in primerjava številk ostanejo potrebni. Ta tok še ni bil preverjen na uporabnikovem iPhonu in zato ni opisan kot uspešna povezava. Po prvem preverjenem prenosu nastavi osebno avtomatizacijo. Developer račun in nova aplikacija nista potrebna.
+
+### Ročno sestavljanje, če nimaš Maca z iCloudom
+
 1. Posodobi TEŽIŠČE. V Safariju odpri obstoječi naslov in preveri svojo zgodovino. Nameščena PWA in Safari lahko hranita ločeni zbirki; če se razlikujeta, najprej izvozi celotno kopijo iz obstoječe PWA ter jo obnovi v Safariju. Uporabi en zavihek.
 2. V **Nastavitve → Apple Health** preberi način prenosa in potrdi dovoljenje. Izberi **Omogoči sprejem iz Bližnjic**. S tem se v tem brskalniku ustvari koda za sprejem; to samo po sebi še ne prebere podatkov Health.
 3. Odpri **Enkratna nastavitev Bližnjice na iPhonu**. Vključena so navodila po dejanjih in predloga slovarja s tvojo kodo. Predlogo kopiraj samo v svojo bližnjico. Besedilna mesta SPREMENLJIVKA moraš zamenjati z dejanskimi spremenljivkami datumov, časa in meritev; predloga ni testna meritev.
@@ -11,7 +27,7 @@ Ta sprejemnik omogoča prenos izbranih dnevnih povzetkov iz Apple Health v TEŽI
 5. Besedilo JSON slovarja enkrat URL-kodiraj, pripni za `https://timbajc1992.github.io/turbo-octo-pancake/#health=` in uporabi **Open URLs / Odpri URL-je**.
 6. Prvič zaženi ročno in dovoli izbrane podatke Apple Health. Preveri datum in številke v TEŽIŠČU glede na isti vir v Apple Health. Šele nato dodaj osebno avtomatizacijo ob želenem času ali koncu vadbe Apple Watch; kadar je podprto, uporabi **Run Immediately / Zaženi takoj**.
 
-Bližnjico je treba enkrat sestaviti na iPhonu. V repozitoriju ni podpisane datoteke `.shortcut` ali nameščene iCloud bližnjice. Sprejemnik in brskalniški tok sta avtomatsko preverjena, dejanska dovoljenja Health, natančna imena in razpoložljivost filtrov dejanj ter izvedba avtomatizacije pa zahtevajo prvi preizkus na resničnem iPhonu.
+Ročno sestavljanje je rezervna možnost. V repozitoriju ni že podpisane datoteke `.shortcut` ali javne iCloud bližnjice; pripravljeni paket zahteva enkratno potrditev na lastnikovem Macu. Sprejemnik in brskalniški tok sta avtomatsko preverjena, dejanska dovoljenja Health, filtri dejanj ter izvedba avtomatizacije pa zahtevajo prvi preizkus na resničnem iPhonu.
 
 ## Podprti podatki
 

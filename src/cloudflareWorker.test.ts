@@ -1,5 +1,7 @@
 import worker from "../cloudflare/worker";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+// @ts-expect-error The Node deployment helper intentionally remains plain ESM.
+import { checkCloudSync } from "../scripts/check-cloudflare-sync.mjs";
 import { readFile } from "node:fs/promises";
 import { transform } from "esbuild";
 import { Miniflare, convertV4MiniflareOptions } from "miniflare";
@@ -165,6 +167,52 @@ describe("Cloudflare D1 encrypted vault API", () => {
       },
     );
     expect(oversized.status).toBe(413);
+    expect(((await (await call("GET")).json()) as any).revision).toBe(2);
+  });
+  it("checks real encrypted enrollment and two-device reads and cleans only its own synthetic vault", async () => {
+    const db = await mf.getD1Database("DB");
+    const before = await db
+      .prepare("SELECT COUNT(*) AS count FROM tezisce_vaults")
+      .first<any>();
+    let cleaned = false;
+    vi.stubGlobal("fetch", async (url: string, options: RequestInit) =>
+      worker.fetch(new Request(url, options), {
+        DB: db as any,
+        SETUP_SECRET: setup,
+        ALLOWED_ORIGIN: origin,
+      }),
+    );
+    try {
+      await checkCloudSync(
+        "https://sync.test",
+        setup,
+        origin,
+        async (vaultId: string, tokenHash: string) => {
+          const row = await db
+            .prepare("SELECT token_hash FROM tezisce_vaults WHERE id=?")
+            .bind(vaultId)
+            .first<any>();
+          expect(row.token_hash).toBe(tokenHash);
+          await db.batch([
+            db
+              .prepare(
+                "DELETE FROM tezisce_history WHERE vault_id IN (SELECT id FROM tezisce_vaults WHERE id=? AND token_hash=?)",
+              )
+              .bind(vaultId, tokenHash),
+            db
+              .prepare("DELETE FROM tezisce_vaults WHERE id=? AND token_hash=?")
+              .bind(vaultId, tokenHash),
+          ]);
+          cleaned = true;
+        },
+      );
+    } finally {
+      vi.unstubAllGlobals();
+    }
+    expect(cleaned).toBe(true);
+    expect(
+      await db.prepare("SELECT COUNT(*) AS count FROM tezisce_vaults").first(),
+    ).toEqual(before);
     expect(((await (await call("GET")).json()) as any).revision).toBe(2);
   });
 });

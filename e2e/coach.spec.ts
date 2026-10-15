@@ -60,6 +60,41 @@ async function saved(page: Page) {
     page.getByText("Shranjeno v tej napravi", { exact: true }),
   ).toBeAttached();
 }
+test("trainer fills starter templates through one equipment review without replacing custom exercises", async ({
+  page,
+}) => {
+  const s = legacy();
+  s.templates.find((t) => t.name === "Upper")!.exercises = [
+    newExercise("Moja ročna vaja"),
+  ];
+  await put(page, s);
+  await page.getByRole("button", { name: "Trening", exact: true }).click();
+  await expect(page.getByLabel("Programi trenerja")).toContainText("Leg Press");
+  await page
+    .getByRole("button", { name: "Pripravi moje treninge", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog");
+  for (const name of ["Kolena", "Hrbet", "Ramena"])
+    await dialog
+      .getByRole("combobox", { name, exact: true })
+      .selectOption("none");
+  await dialog
+    .getByRole("button", { name: "Potrdi naprave in omejitve" })
+    .click();
+  await saved(page);
+  const actual = await read(page);
+  expect(
+    actual.templates
+      .filter((t) => t.name !== "Upper")
+      .every((t) => t.exercises.length > 0),
+  ).toBe(true);
+  expect(actual.templates.find((t) => t.name === "Upper")!.exercises).toEqual(
+    s.templates.find((t) => t.name === "Upper")!.exercises,
+  );
+  expect(actual.measurements).toEqual(s.measurements);
+  await page.reload();
+  expect((await read(page)).templates).toEqual(actual.templates);
+});
 test("old IndexedDB record survives without coach fields or measurements being rewritten", async ({
   page,
 }) => {
@@ -319,7 +354,7 @@ test("Shortcuts intake requires local consent, clears health URLs and updates on
     .toBe(true);
   const token = (await read(page)).healthBridge!.token;
   await page
-    .getByText("Enkratna nastavitev Bližnjice na iPhonu", { exact: true })
+    .getByText("Ročna nastavitev na iPhonu, če nimaš Maca z iCloudom", { exact: true })
     .click();
   expect(
     await page.evaluate(

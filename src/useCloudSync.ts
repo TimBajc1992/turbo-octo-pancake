@@ -8,6 +8,7 @@ import {
   readRemote,
   validateSyncConnection,
   writeRemote,
+  syncError,
   type SyncDevice,
 } from "./syncApi";
 import {
@@ -66,15 +67,14 @@ export function useCloudSync(
   };
   async function run() {
     const d = deviceRef.current;
-    if (
-      !d ||
-      !latest.current ||
-      busyRef.current ||
-      storage !== "Shranjeno v tej napravi"
-    )
+    if (!d || !latest.current || busyRef.current) return;
+    if (storage !== "Shranjeno v tej napravi") {
+      setStatus("Čakam na lokalno shranjevanje · " + storage);
       return;
+    }
     busyRef.current = true;
     setBusy(true);
+    setStatus("Preverjam in prenašam podatke …");
     const gen = generation.current;
     try {
       const remote = await readRemote(d),
@@ -119,11 +119,7 @@ export function useCloudSync(
       setStatus("Sinhronizirano · " + new Date(at).toLocaleString("sl-SI"));
       setConflictRemote(undefined);
     } catch (e) {
-      setStatus(
-        e instanceof Error
-          ? e.message
-          : "Sinhronizacija ni uspela. Lokalni podatki ostanejo na voljo.",
-      );
+      setStatus(syncError(e));
       if (e instanceof SyncConflict) setPaused(true);
     } finally {
       busyRef.current = false;
@@ -137,6 +133,10 @@ export function useCloudSync(
         { ifAvailable: true },
         async (lock) => {
           if (lock) await run();
+          else
+            setStatus(
+              "Sinhronizacija poteka v drugem zavihku. Počakaj ali zapri drugi zavihek.",
+            );
         },
       );
     else await run();
@@ -157,10 +157,12 @@ export function useCloudSync(
     };
     document.addEventListener("visibilitychange", focus);
     window.addEventListener("online", focus);
+    window.addEventListener("focus", focus);
     return () => {
       clearInterval(t);
       document.removeEventListener("visibilitychange", focus);
       window.removeEventListener("online", focus);
+      window.removeEventListener("focus", focus);
     };
   }, [device?.id, paused, storage]);
   async function connect(
@@ -176,6 +178,11 @@ export function useCloudSync(
       throw Error("Najprej počakaj, da so lokalne spremembe shranjene.");
     busyRef.current = true;
     setBusy(true);
+    setStatus(
+      mode === "create"
+        ? "Ustvarjam šifrirano shrambo …"
+        : "Povezujem napravo in preverjam skupne podatke …",
+    );
     const gen = ++generation.current;
     try {
       const c =
@@ -217,6 +224,10 @@ export function useCloudSync(
       setPaused(false);
       setConflictRemote(undefined);
       setStatus("Sinhronizirano · " + new Date(at).toLocaleString("sl-SI"));
+    } catch (error) {
+      const message = syncError(error);
+      setStatus(message);
+      throw Error(message);
     } finally {
       busyRef.current = false;
       setBusy(false);

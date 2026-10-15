@@ -1,7 +1,12 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { backup, readDeviceValue } from "./db";
 import { type State } from "./model";
-import { pairingCode } from "./syncApi";
+import {
+  pairingCode,
+  defaultSyncURL,
+  checkSyncService,
+  syncError,
+} from "./syncApi";
 import { type CloudSyncControl } from "./useCloudSync";
 function download(state: State, label: string) {
   const url = URL.createObjectURL(
@@ -21,17 +26,27 @@ export function CloudSyncPanel({
   state: State;
 }) {
   const [mode, setMode] = useState<"create" | "join">("create"),
-    [url, setURL] = useState(""),
+    [url, setURL] = useState(defaultSyncURL),
     [setup, setSetup] = useState(""),
     [code, setCode] = useState("");
   const [replaceConsent, setReplaceConsent] = useState(false);
   const [consent, setConsent] = useState(false),
     [message, setMessage] = useState(""),
     [showCode, setShowCode] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const messageRef = useRef<HTMLParagraphElement>(null);
+  useEffect(() => {
+    if (message) messageRef.current?.scrollIntoView({ block: "nearest" });
+  }, [message]);
   return (
     <section className="panel" aria-label="Sinhronizacija naprav">
       <h2>Telefon in računalnik</h2>
       <p role="status">{sync.status}</p>
+      {message && (
+        <p ref={messageRef} className="notice" role="alert">
+          {message}
+        </p>
+      )}
       <p>
         Podatki se pred pošiljanjem šifrirajo v brskalniku (AES-GCM). Cloudflare
         hrani šifrirano kopijo; povezovalni ključ je samo na tvojih napravah.
@@ -39,6 +54,11 @@ export function CloudSyncPanel({
       </p>
       {!sync.device ? (
         <>
+          <p>
+            Na telefonu z obstoječimi podatki izberi prvo napravo. Na
+            računalniku izberi dodatno napravo in uporabi kodo s telefona. Dve
+            ločeno ustvarjeni shrambi se ne povežeta med seboj.
+          </p>
           <details>
             <summary>Najprej enkrat omogoči strežnik Cloudflare</summary>
             <p>
@@ -55,7 +75,10 @@ export function CloudSyncPanel({
             Ta naprava
             <select
               value={mode}
-              onChange={(e) => setMode(e.target.value as "create" | "join")}
+              onChange={(e) => {
+                setMode(e.target.value as "create" | "join");
+                setMessage("");
+              }}
             >
               <option value="create">
                 Prva naprava – objavi moje obstoječe podatke
@@ -77,6 +100,26 @@ export function CloudSyncPanel({
                   placeholder="https://tezisce-sync.….workers.dev"
                 />
               </label>
+              <button
+                className="button secondary"
+                disabled={checking}
+                onClick={async () => {
+                  setChecking(true);
+                  setMessage("Preverjam strežnik …");
+                  try {
+                    await checkSyncService(url);
+                    setMessage(
+                      "Strežnik je dosegljiv iz tega Safarija. Zdaj vnesi namestitveno kodo in ustvari shrambo.",
+                    );
+                  } catch (error) {
+                    setMessage(syncError(error));
+                  } finally {
+                    setChecking(false);
+                  }
+                }}
+              >
+                {checking ? "Preverjam …" : "Preveri povezavo s strežnikom"}
+              </button>
               <label>
                 Namestitvena koda shrambe
                 <input
@@ -115,16 +158,22 @@ export function CloudSyncPanel({
           </button>
           <button
             className="button"
-            disabled={!consent || sync.busy}
+            disabled={sync.busy}
             onClick={async () => {
               setMessage("");
+              if (!consent) {
+                setMessage(
+                  "Najprej označi Dovolim šifrirano spletno shranjevanje, nato ponovno pritisni gumb za povezavo.",
+                );
+                return;
+              }
               try {
                 await sync.connect(mode, mode === "create" ? url : code, setup);
                 setSetup("");
                 setCode("");
                 setConsent(false);
               } catch (e) {
-                setMessage((e as Error).message);
+                setMessage(syncError(e));
               }
             }}
           >
@@ -137,6 +186,12 @@ export function CloudSyncPanel({
         </>
       ) : (
         <>
+          <p>
+            <strong>Skupna shramba: {sync.device.id.slice(0, 8)}</strong>. Ta
+            oznaka mora biti enaka na obeh napravah. Če se razlikuje, na
+            računalniku izvozi lokalno kopijo, odklopi povezavo in uporabi kodo
+            s telefona.
+          </p>
           <p>
             Ob odprti aplikaciji se spremembe prenesejo po shranjevanju, druge
             naprave pa preverijo posodobitve približno vsakih 30 sekund in ob
@@ -280,7 +335,6 @@ export function CloudSyncPanel({
       >
         Izvozi obe kopiji pred zadnjo razrešitvijo
       </button>
-      <p role="status">{message}</p>
       <button
         className="text-button"
         onClick={async () => {

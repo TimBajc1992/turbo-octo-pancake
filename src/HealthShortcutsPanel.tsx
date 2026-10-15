@@ -91,8 +91,73 @@ export function HealthShortcutsPanel({
             izbrisa iz vseh sistemskih dnevnikov ali zgodovine. Kode in povezav
             ne deli z drugimi.
           </p>
+          <h3>Dodaj pripravljeno Bližnjico</h3>
+          <p>
+            Dejanja v Bližnjici so že sestavljena: koraki, aktivna energija in
+            minute vadbe iz iste ure. Enkrat jih mora potrditi tvoj Mac,
+            prijavljen v iCloud; Apple Developer račun ni potreben. Nato
+            Bližnjico dodaš na iPhone, dovoliš Health in izbereš svojo uro.
+          </p>
+          <div className="actions">
+            <a
+              className="button secondary"
+              download
+              href={`${import.meta.env.BASE_URL}shortcuts/TEZISCE-Apple-Health.zip`}
+            >
+              Prenesi pripravljeno Bližnjico za Mac
+            </a>
+            <button
+              className="button secondary"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(config.token);
+                  setCopyStatus(
+                    "Sprejemna koda kopirana. Prilepi jo v vprašanje ob dodajanju Bližnjice na iPhone.",
+                  );
+                } catch {
+                  setCopyStatus(
+                    "Kodo označi in kopiraj ročno iz spodnjega polja.",
+                  );
+                }
+              }}
+            >
+              Kopiraj kodo za Bližnjico
+            </button>
+          </div>
+          <label>
+            Sprejemna koda za Bližnjico
+            <input readOnly value={config.token} autoComplete="off" />
+          </label>
+          <ol>
+            <li>
+              Na Macu razširi preneseni ZIP. V Terminal prilepi spodnji ukaz. Ta
+              uporabi vgrajeno Applovo orodje; svojih gesel ne vnašaj v TEŽIŠČE.
+            </li>
+            <li>
+              Označeno datoteko pošlji na iPhone prek AirDrop in jo odpri. Ob
+              dodajanju prilepi zgornjo sprejemno kodo.
+            </li>
+            <li>
+              V prvem iskanju zdravstvenih vzorcev pri Izvor izberi svojo uro
+              namesto Vprašaj vsakič. Prvič zaženi ročno, dovoli Health ter
+              preveri številke. Nato dodaj avtomatizacijo ob želenem času ali
+              koncu vadbe.
+            </li>
+          </ol>
+          <pre style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>
+            /bin/bash
+            ~/Downloads/TEZISCE-Apple-Health/pripravi-bliznjico.command
+          </pre>
+          <p>
+            Dokler ne prispe prvi dejanski povzetek, povezava ostane označena
+            kot čakanje. Paket je pripravljen za prvi preizkus na iPhonu;
+            dovoljenj in filtrov na tvoji uri ne more preveriti spletna stran.
+          </p>
+          <p role="status">{copyStatus}</p>
           <details>
-            <summary>Enkratna nastavitev Bližnjice na iPhonu</summary>
+            <summary>
+              Ročna nastavitev na iPhonu, če nimaš Maca z iCloudom
+            </summary>
             <p>
               Bližnjico sestavi v Applovi aplikaciji Bližnjice. Samodejna
               namestitev ni pripravljena; prvi zagon in dovoljenja preveri na
@@ -167,7 +232,6 @@ export function HealthShortcutsPanel({
             >
               Kopiraj predlogo slovarja
             </button>
-            <p role="status">{copyStatus}</p>
             <p>
               Neobvezna polja za isti dan in en izvor: <code>moveKcal</code>{" "}
               (aktivna energija v kcal), <code>exerciseMin</code> (minute vadbe)
