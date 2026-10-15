@@ -1,3 +1,4 @@
+import { cloudflareToken } from "./cloudflare-token.mjs";
 import { spawn } from "node:child_process";
 import { readFile, writeFile, appendFile } from "node:fs/promises";
 import path from "node:path";
@@ -12,7 +13,8 @@ for (const name of [
       `Missing configured secret: ${name}. No deployment was attempted.`,
     );
 }
-if (!/^[a-f0-9]{32}$/i.test(process.env.CLOUDFLARE_ACCOUNT_ID))
+const deployEnv = { ...process.env, CLOUDFLARE_API_TOKEN: cloudflareToken(process.env.CLOUDFLARE_API_TOKEN), CLOUDFLARE_ACCOUNT_ID: process.env.CLOUDFLARE_ACCOUNT_ID.trim() };
+if (!/^[a-f0-9]{32}$/i.test(deployEnv.CLOUDFLARE_ACCOUNT_ID))
   throw Error("Invalid configured Cloudflare account ID.");
 if (process.env.TEZISCE_SYNC_SETUP_KEY.length < 32)
   throw Error("The setup key must have at least 32 characters.");
@@ -22,7 +24,7 @@ async function wrangler(args, { capture = false, input } = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(process.execPath, [cli, ...args], {
       cwd: root,
-      env: process.env,
+      env: deployEnv,
       stdio: ["pipe", capture ? "pipe" : "inherit", "inherit"],
     });
     let output = "";

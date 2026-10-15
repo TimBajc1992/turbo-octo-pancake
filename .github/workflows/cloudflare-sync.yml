@@ -6,6 +6,7 @@ on:
     paths:
       - "cloudflare/**"
       - "scripts/deploy-cloudflare.mjs"
+      - "scripts/cloudflare-token.mjs"
       - ".github/workflows/cloudflare-sync.yml"
       - "package.json"
       - "package-lock.json"
