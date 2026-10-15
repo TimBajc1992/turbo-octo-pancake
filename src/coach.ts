@@ -84,7 +84,7 @@ export interface CoachConfig {
   observations?: {
     metric: "hrvSDNN" | "restingHeartRate" | "sleepHours";
     value: number;
-    source: "manual" | "healthkit";
+    source: "manual" | "healthkit" | "apple-shortcuts";
     measuredAt: string;
     context: "rest" | "breathing" | "unknown";
     quality: "unknown" | "valid";
@@ -1560,7 +1560,8 @@ export function validateCoachData(value: unknown): void {
         fail();
       finite(a.value);
       for (const k of ["source", "measuredAt", "context", "quality"]) str(a[k]);
-      if (!["manual", "healthkit"].includes(a.source)) fail();
+      if (!["manual", "healthkit", "apple-shortcuts"].includes(a.source))
+        fail();
     });
 }
 

@@ -83,3 +83,7 @@ Podatkovni tipi/preračuni so v `src/model.ts`, vhodni uvoz v `src/importer.ts`,
 ## Moj trener
 
 Novi modul na zaslonu **Danes** izbira uredljiv trening iz potrjenih naprav, zgodovine, časa in današnjega vprašalnika. Podpira razložljive predloge obremenitev, poskusno določanje teže na novi napravi, zasedene naprave, stalni osnovni program in samostojen kardio. Osebni podatki in stare kopije ostanejo ohranjeni. Za uporabo glej [Moj trener](docs/moj-trener.md), kjer so ločena praktična pravila, manjkajoče informacije in stanje preverjanja raziskovalnih virov.
+
+Za izbrane povzetke Apple Health brez nove iOS aplikacije glej [prenos prek Bližnjic](docs/apple-shortcuts.md). Prvi zagon in dovoljenja je treba potrditi na telefonu.
+
+Za šifrirano povezavo telefona in računalnika ter enkratni dostop Cloudflare glej [sinhronizacijo naprav](docs/cloud-sync.md). Brez dejansko objavljenega Workerja povezava ni aktivna.

@@ -1,3 +1,7 @@
+import { CloudSyncPanel } from "./CloudSyncPanel";
+import { useCloudSync } from "./useCloudSync";
+import { HealthShortcutsPanel } from "./HealthShortcutsPanel";
+import { applyHealthTransfer, takeHealthFragment } from "./healthShortcuts";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   Activity,
@@ -299,7 +303,11 @@ function WorkoutArt() {
     </svg>
   );
 }
+const initialHealthTransfer = takeHealthFragment();
 export default function App() {
+  const [healthTransfer, setHealthTransfer] = useState(initialHealthTransfer);
+  const [healthResult, setHealthResult] = useState("");
+  const handledHealth = useRef<string | undefined>(undefined);
   const [state, setState] = useState<State>();
   const [tab, setTab] = useState<Tab>("today");
   const [settings, setSettings] = useState(false);
@@ -355,24 +363,58 @@ export default function App() {
   latest.current = state;
   function update(fn: (s: State) => State) {
     const previous = latest.current;
-    if (!previous) return;
+    if (!previous) return Promise.resolve();
     const next = fn(previous);
     latest.current = next;
     setState(next);
     setStorage("Shranjujem …");
-    queue.current = queue.current
+    const saved = queue.current
       .catch(() => {})
-      .then(() => saveState(next))
+      .then(() => saveState(next, previous))
       .then(() => {
         if (latest.current === next) setStorage("Shranjeno v tej napravi");
-      })
-      .catch(() => {
-        setStorage("Napaka shranjevanja");
-        setToast(
-          "Podatkov ni bilo mogoče shraniti. Izvozi varnostno kopijo in sprosti prostor.",
-        );
       });
+    queue.current = saved.catch((error) => {
+      setStorage("Napaka shranjevanja");
+      setToast(
+        error instanceof Error && error.message.includes("drugem zavihku")
+          ? error.message
+          : "Podatkov ni bilo mogoče shraniti. Izvozi varnostno kopijo in sprosti prostor.",
+      );
+    });
+    return saved;
   }
+  const cloudSync = useCloudSync(state, update, storage, latest);
+  useEffect(() => {
+    const receive = () => {
+      const value = takeHealthFragment();
+      if (value !== undefined) {
+        handledHealth.current = undefined;
+        setHealthTransfer(value);
+      }
+    };
+    window.addEventListener("hashchange", receive);
+    return () => window.removeEventListener("hashchange", receive);
+  }, []);
+  useEffect(() => {
+    if (
+      !state ||
+      healthTransfer === undefined ||
+      handledHealth.current === healthTransfer
+    )
+      return;
+    handledHealth.current = healthTransfer;
+    try {
+      const next = applyHealthTransfer(state, healthTransfer);
+      update(() => next);
+      setHealthResult(
+        "Prenos Apple Health iz Bližnjic je sprejet. Preveri podatke v Nastavitve → Apple Health.",
+      );
+    } catch (error) {
+      setHealthResult((error as Error).message);
+    }
+    setHealthTransfer(undefined);
+  }, [state, healthTransfer]);
   useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {
       if (storage !== "Shranjeno v tej napravi") {
@@ -606,6 +648,33 @@ export default function App() {
             </button>
           </div>
         </header>
+        {cloudSync.device && (
+          <p className="notice" role="status">
+            Naprave: {cloudSync.status}
+          </p>
+        )}
+        {healthResult && (
+          <div className="notice" role="status">
+            <p>
+              {healthResult}{" "}
+              {storage === "Shranjeno v tej napravi"
+                ? "Podatki so shranjeni v tej napravi."
+                : storage}
+            </p>
+            <button
+              className="text-button"
+              onClick={() => {
+                setSettings(true);
+                setHealthResult("");
+              }}
+            >
+              Odpri nastavitve prenosa
+            </button>
+            <button className="text-button" onClick={() => setHealthResult("")}>
+              Zapri obvestilo
+            </button>
+          </div>
+        )}
         <main>
           {settings ? (
             <>
@@ -674,8 +743,9 @@ export default function App() {
                   </div>
                   <p>
                     Vsi podatki so shranjeni v brskalniku te naprave
-                    (IndexedDB). Med napravami se ne sinhronizirajo samodejno.
-                    Brisanje podatkov brskalnika jih lahko odstrani.
+                    (IndexedDB). Šifrirano sinhronizacijo med napravami lahko
+                    omogočiš spodaj. Brisanje podatkov brskalnika jih lahko
+                    odstrani.
                   </p>
                   <div className="stack">
                     <Button secondary onClick={() => fileRef.current?.click()}>
@@ -713,16 +783,12 @@ export default function App() {
                     <h2>Apple Health</h2>
                     <Watch size={20} />
                   </div>
-                  <span className="badge neutral">Ni povezano</span>
-                  <p>
-                    Spletna aplikacija nima neposrednega dostopa do HealthKit.
-                    Pripravljena je zasnova za prihodnjo iOS komponento. Tvoji
-                    podatki se ne pošiljajo v oblak ali zunanjemu AI.
-                  </p>
+                  <HealthShortcutsPanel state={state} update={update} />
                   <Button secondary onClick={() => setModal("daily")}>
                     <Plus size={16} /> Ročni dnevni vnos
                   </Button>
                 </section>
+                <CloudSyncPanel sync={cloudSync} state={state} />
                 <section className="panel">
                   <div className="section-title">
                     <h2>Namesti na iPhone</h2>
@@ -1814,7 +1880,7 @@ export default function App() {
               )}
               {state.daily.length > 0 && (
                 <section className="panel">
-                  <h2>Dnevni zapisi · ročni vir</h2>
+                  <h2>Dnevni zapisi · izvor je naveden pri zapisu</h2>
                   <p>
                     Stari hr ima neznan pomen. Ničle aktivnosti niso dokaz
                     neaktivnosti.
@@ -1823,7 +1889,12 @@ export default function App() {
                     .sort((a, b) => b.date.localeCompare(a.date))
                     .map((d) => (
                       <div key={d.id} className="data-row">
-                        <span>{dateLabel(d.date, true)}</span>
+                        <span>
+                          {dateLabel(d.date, true)}
+                          {d.source === "apple-shortcuts"
+                            ? ` · Apple Health prek Bližnjic (${d.sourceId})`
+                            : " · ročni/stari vir"}
+                        </span>
                         <strong>
                           {d.steps === undefined ? "—" : num(d.steps, 0)}{" "}
                           korakov

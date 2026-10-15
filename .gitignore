@@ -10,3 +10,7 @@ test-results/
 !.env.example
 pulse-zgodovina.json
 tezisce-varnostna-kopija-*.json
+.wrangler/
+cloudflare/wrangler.generated.json
+.dev.vars
+work/

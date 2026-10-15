@@ -1,6 +1,6 @@
 # Prihodnja iOS integracija (še ni izvedena)
 
-PWA ne dostopa do HealthKit. UI vedno kaže »Ni povezano«. Stari vir z dovoljenjem `manual` se ne obravnava kot Apple Health. Integracija zahteva ločeno iOS aplikacijo ali iOS ovoj z dejansko native komponento.
+PWA nima neposrednega dostopa do HealthKit. Za izbrane dnevne povzetke je dodan [sprejem prek iPhonovih Bližnjic](apple-shortcuts.md), ki odprejo Safari; UI razlikuje čakajoč sprejem od dejansko prejetih podatkov. To ni stalna povezava z uro. Stari vir `manual` se ne obravnava kot Apple Health. Neposredna HealthKit integracija še vedno zahteva ločeno iOS aplikacijo ali iOS ovoj z dejansko native komponento.
 
 Pred implementacijo preveri aktualno uradno dokumentacijo Apple za HealthKit, HealthKit Authorization, HKAnchoredObjectQuery, HKObserverQuery, HKWorkout in WatchConnectivity ter veljavne zahteve App Store. Ta dokument ni trditev, da je bila povezava že preizkušena.
 

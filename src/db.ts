@@ -1,3 +1,4 @@
+import { validateHealthBridge } from "./healthShortcuts";
 import { validateCoachData } from "./coach";
 import { initialState, type State } from "./model";
 const open = () =>
@@ -19,15 +20,30 @@ export async function loadState(): Promise<State> {
     db.close();
   }
 }
-export async function saveState(state: State) {
+export async function saveState(state: State, expected?: State) {
   const db = await open();
   try {
     await new Promise<void>((resolve, reject) => {
       const tx = db.transaction("state", "readwrite");
-      tx.objectStore("state").put(state, "current");
+      const store = tx.objectStore("state");
+      let conflict: Error | undefined;
+      if (expected) {
+        const read = store.get("current");
+        read.onsuccess = () => {
+          if (
+            read.result !== undefined &&
+            JSON.stringify(read.result) !== JSON.stringify(expected)
+          ) {
+            conflict = Error(
+              "Podatki so se spremenili v drugem zavihku. Izvozi kopijo trenutnih sprememb in ponovno odpri aplikacijo, preden nadaljuješ.",
+            );
+            tx.abort();
+          } else store.put(state, "current");
+        };
+      } else store.put(state, "current");
       tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-      tx.onabort = () => reject(tx.error);
+      tx.onerror = () => reject(conflict ?? tx.error);
+      tx.onabort = () => reject(conflict ?? tx.error);
     });
   } finally {
     db.close();
@@ -146,6 +162,7 @@ function validateState(value: unknown): asserts value is State {
   finite(s.nextTemplate);
   if (!Number.isInteger(s.nextTemplate)) fail();
   if (s.coach !== undefined) validateCoachData(s.coach);
+  if (s.healthBridge !== undefined) validateHealthBridge(s.healthBridge);
   const p = obj(s.profile);
   for (const k of ["name", "goal", "equipment", "experience", "limitations"])
     str(p[k]);
@@ -224,4 +241,52 @@ export function restoreBackup(text: string): State {
     throw Error("Nepodprta oblika varnostne kopije.");
   validateState(v.state);
   return v.state;
+}
+
+/** Device-only credentials and merge baseline are never included in State or exported backups. */
+export async function readDeviceValue<T>(key: string): Promise<T | undefined> {
+  const db = await open();
+  try {
+    return await new Promise((resolve, reject) => {
+      const query = db
+        .transaction("state")
+        .objectStore("state")
+        .get("device:" + key);
+      query.onsuccess = () => resolve(query.result);
+      query.onerror = () => reject(query.error);
+    });
+  } finally {
+    db.close();
+  }
+}
+export async function writeDeviceValue(
+  key: string,
+  value: unknown,
+): Promise<void> {
+  const db = await open();
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction("state", "readwrite"),
+        store = tx.objectStore("state");
+      if (value === undefined) store.delete("device:" + key);
+      else store.put(value, "device:" + key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error);
+    });
+  } finally {
+    db.close();
+  }
+}
+export async function keepSyncSafetyCopy(state: State): Promise<void> {
+  const saved =
+    (await readDeviceValue<{ at: string; state: State }[]>("sync-safety")) ??
+    [];
+  await writeDeviceValue(
+    "sync-safety",
+    [
+      { at: new Date().toISOString(), state: structuredClone(state) },
+      ...saved,
+    ].slice(0, 5),
+  );
 }
