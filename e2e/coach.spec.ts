@@ -300,3 +300,68 @@ test("trainer time accepts individual keystrokes, deletion and persists minutes"
   await page.reload();
   expect((await read(page)).coach?.checkIn?.minutes).toBe(60);
 });
+
+test("Shortcuts intake requires local consent, clears health URLs and updates one row without touching workouts", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const original = legacy();
+  await put(page, original);
+  await page.getByRole("button", { name: "Nastavitve in profil" }).click();
+  const enable = page.getByRole("button", {
+    name: "Omogoči sprejem iz Bližnjic",
+  });
+  await expect(enable).toBeDisabled();
+  await page.getByRole("checkbox", { name: /Dovolim prenos izbranih/ }).check();
+  await enable.click();
+  await expect
+    .poll(async () => (await read(page)).healthBridge?.enabled)
+    .toBe(true);
+  const token = (await read(page)).healthBridge!.token;
+  await page
+    .getByText("Enkratna nastavitev Bližnjice na iPhonu", { exact: true })
+    .click();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  const packet = {
+    format: "tezisce-health-shortcuts",
+    version: 1,
+    token,
+    source: "Apple Watch",
+    date: localDate(),
+    updatedAt: new Date().toISOString(),
+    steps: 4321,
+    hrvSDNN: 42,
+    hrvMeasuredAt: new Date().toISOString(),
+  };
+  const transfer = async (payload: typeof packet) => {
+    await page.goto("./#health=" + encodeURIComponent(JSON.stringify(payload)));
+    await expect(page).not.toHaveURL(/#health=/);
+  };
+  await transfer(packet);
+  await expect.poll(async () => (await read(page)).daily.length).toBe(1);
+  await transfer({
+    ...packet,
+    steps: 5000,
+    updatedAt: new Date().toISOString(),
+  });
+  await expect.poll(async () => (await read(page)).daily[0].steps).toBe(5000);
+  const current = await read(page);
+  expect(current.daily).toHaveLength(1);
+  expect(current.coach?.observations).toHaveLength(1);
+  expect(current.workouts).toEqual(original.workouts);
+  expect(current.measurements).toEqual(original.measurements);
+  expect(current.nextTemplate).toBe(original.nextTemplate);
+  await page
+    .getByRole("button", { name: "Izklopi sprejem iz Bližnjic" })
+    .click();
+  await expect
+    .poll(async () => (await read(page)).healthBridge?.enabled)
+    .toBe(false);
+  await transfer({ ...packet, steps: 9999 });
+  await expect(page.getByText(/Najprej v Nastavitvah omogoči/)).toBeVisible();
+  expect((await read(page)).daily[0].steps).toBe(5000);
+});

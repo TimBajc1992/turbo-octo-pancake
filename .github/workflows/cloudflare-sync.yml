@@ -1,0 +1,53 @@
+name: Objavi šifrirano sinhronizacijo Cloudflare
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "cloudflare/**"
+      - "scripts/deploy-cloudflare.mjs"
+      - ".github/workflows/cloudflare-sync.yml"
+      - "package.json"
+      - "package-lock.json"
+permissions:
+  contents: read
+  statuses: write
+concurrency:
+  group: tezisce-cloudflare-sync
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Preveri podatke, šifriranje in strežnik D1
+        run: npm test
+      - name: Zgradi aplikacijo
+        run: npm run build
+        env:
+          VITE_BASE_PATH: /turbo-octo-pancake/
+      - name: Objavi Worker in pripravi D1
+        id: cloudflare
+        run: node scripts/deploy-cloudflare.mjs
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          TEZISCE_SYNC_SETUP_KEY: ${{ secrets.TEZISCE_SYNC_SETUP_KEY }}
+          WRANGLER_SEND_METRICS: "false"
+      - name: Shrani javni naslov v status commita
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SYNC_URL: ${{ steps.cloudflare.outputs.url }}
+        run: >-
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/statuses/${GITHUB_SHA}"
+          -f state=success -f context=tezisce-cloudflare
+          -f target_url="${SYNC_URL}/health"
+          -f description='Cloudflare sync endpoint verified'

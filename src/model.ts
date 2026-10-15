@@ -1,3 +1,4 @@
+import type { HealthBridge } from "./healthShortcuts";
 import type { CoachConfig, CheckIn } from "./coach";
 export type LoadMode =
   "unknown" | "barbell" | "dumbbell" | "machine" | "bodyweight" | "assisted";
@@ -48,7 +49,7 @@ export interface Exercise {
   };
 }
 export interface Provenance {
-  source?: "manual" | "pulse-v3" | "healthkit";
+  source?: "manual" | "pulse-v3" | "healthkit" | "apple-shortcuts";
   externalId?: string;
   measuredAt?: string;
   syncedAt?: string;
@@ -155,6 +156,7 @@ export interface State {
   imports: ImportBatch[];
   nextTemplate: number;
   coach?: CoachConfig;
+  healthBridge?: HealthBridge;
 }
 export const uid = () => crypto.randomUUID();
 export function localDate(d = new Date()) {

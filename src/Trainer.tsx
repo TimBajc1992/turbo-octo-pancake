@@ -273,7 +273,11 @@ export function CoachPanel({
       </div>
       <div className="coach-foot">
         <span>
-          <Watch size={14} /> Apple Health: Ni povezano · počutje{" "}
+          <Watch size={14} /> Apple Health:{" "}
+          {state.healthBridge?.lastImportAt
+            ? "podatki prek Bližnjic"
+            : "Ni povezano"}{" "}
+          · počutje{" "}
           {c.checkIn?.date === localDate() && c.checkIn.confirmed
             ? "potrjeno danes"
             : "še ni potrjeno danes"}
@@ -1669,8 +1673,8 @@ function Evidence() {
           </a>
           <p>
             HealthKit beleži SDNN iz intervalov med normalnimi utripi, običajno
-            v milisekundah. Ta PWA ni povezana z Apple Health in ne izračunava
-            regeneracije.
+            v milisekundah. PWA nima neposredne povezave HealthKit; sprejema
+            lahko izbrane podatke prek Bližnjic in ne izračunava regeneracije.
           </p>
         </li>
       </ul>
