@@ -79,3 +79,7 @@ Brskalniški testi uporabljajo sistemski Chromium, če je na voljo, sicer Playwr
 Ni prijave, strežniške sinhronizacije, samodejnega sestavljanja optimalnega programa, neposredne povezave Apple Health/Watch ali zagotovljenih opozoril v ozadju. Za osebni trening je na voljo ročno sestavljanje in previdna pravila napredovanja. Meritve dnevne aktivnosti se ohranijo; podrobne analize spanja/utripa so prihodnja faza. Na pravem iPhonu je treba še preveriti namestitev, tipkovnico in vedenje Safarija v ozadju; avtomatski mobilni testi uporabljajo Chromium.
 
 Podatkovni tipi/preračuni so v `src/model.ts`, vhodni uvoz v `src/importer.ts`, trajna zbirka in kopije v `src/db.ts`, uporabniški sloj v `src/App.tsx`. API za shranjevanje je ločen, da lahko pozneje dodamo strežniški repozitorij. Glej [načrt iOS integracije](docs/ios-health.md).
+
+## Moj trener
+
+Novi modul na zaslonu **Danes** izbira uredljiv trening iz potrjenih naprav, zgodovine, časa in današnjega vprašalnika. Podpira razložljive predloge obremenitev, poskusno določanje teže na novi napravi, zasedene naprave, stalni osnovni program in samostojen kardio. Osebni podatki in stare kopije ostanejo ohranjeni. Za uporabo glej [Moj trener](docs/moj-trener.md), kjer so ločena praktična pravila, manjkajoče informacije in stanje preverjanja raziskovalnih virov.

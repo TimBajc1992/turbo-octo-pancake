@@ -36,6 +36,7 @@ import {
   completeSets,
   dateLabel,
   emptySet,
+  exerciseComparisonKey,
   initialState,
   lastExercise,
   localDate,
@@ -43,6 +44,7 @@ import {
   newExercise,
   nextSessionDate,
   num,
+  plannedExercise,
   records,
   rolling,
   streak,
@@ -57,6 +59,14 @@ import {
   type Template,
   type Workout,
 } from "./model";
+import { PwaUpdate } from "./PwaUpdate";
+import { CoachPanel, BusyDevice, CoachExerciseInfo } from "./Trainer";
+import {
+  getCoach,
+  replaceDevice,
+  replacementWorkout,
+  reconcileExercise,
+} from "./coach";
 type Tab = "today" | "training" | "progress" | "history";
 const tabs = [
   { id: "today" as Tab, label: "Danes", icon: House },
@@ -405,7 +415,9 @@ export default function App() {
     lastWeight && firstWeight
       ? lastWeight.value - firstWeight.value
       : undefined;
-  const doneWorkouts = state.workouts.filter((w) => completeSets(w).length);
+  const doneWorkouts = state.workouts.filter((w) =>
+    w.exercises.some((e) => e.sets.some((a) => a.done)),
+  );
   const thisWeek = doneWorkouts.filter(
     (w) => w.date >= weekStart() && w.date <= localDate(),
   );
@@ -448,17 +460,7 @@ export default function App() {
       source: "manual",
       measuredAt: new Date().toISOString(),
       startedAt: Date.now(),
-      exercises: structuredClone(t.exercises).map((e) => ({
-        ...e,
-        note: "",
-        pain: false,
-        sets: e.sets.map((s) => ({
-          ...s,
-          id: uid(),
-          done: false,
-          rir: undefined,
-        })),
-      })),
+      exercises: t.exercises.map(plannedExercise),
     };
     update((s) => ({ ...s, active }));
     setTab("training");
@@ -590,6 +592,7 @@ export default function App() {
             </span>
           </a>
           <div className="header-right">
+            <PwaUpdate saved={storage === "Shranjeno v tej napravi"} />
             <span className="local-status">
               <span className="status-dot" />
               {storage}
@@ -812,6 +815,15 @@ export default function App() {
                   </button>
                 </div>
               )}
+              <CoachPanel
+                state={state}
+                update={update}
+                editProfile={() => setModal("profile")}
+                start={(w) => {
+                  update((s) => ({ ...s, active: w }));
+                  setTab("training");
+                }}
+              />
               <div className="dashboard-top">
                 <section className="hero-card">
                   <div className="hero-content">
@@ -1202,10 +1214,33 @@ export default function App() {
                       </small>
                     </div>
                   )}
+                  {state.active.cardioPlan && (
+                    <section className="panel">
+                      <h2>Kardio · današnji načrt</h2>
+                      <p>
+                        {state.active.cardioPlan.warmup} min ogrevanja +{" "}
+                        {state.active.cardioPlan.minutes -
+                          state.active.cardioPlan.warmup -
+                          state.active.cardioPlan.cooldown}{" "}
+                        min osrednjega dela + {state.active.cardioPlan.cooldown}{" "}
+                        min umirjanja. {state.active.cardioPlan.intensity}{" "}
+                        {state.active.cardioPlan.type === "treadmill"
+                          ? `Naklon: ${state.active.cardioPlan.incline} %.`
+                          : ""}
+                      </p>
+                      <p>
+                        Spodaj vnesi dejanske opravljene minute in potrdi
+                        aktivnost. Kardio ne premakne zaporedja moči.
+                      </p>
+                    </section>
+                  )}
                   <WorkoutEditor
                     workout={state.active}
                     state={state}
                     onChange={saveActive}
+                    onReplaceDevice={(index, id, permanent) =>
+                      update((s) => replaceDevice(s, index, id, permanent))
+                    }
                     onDone={(rest) =>
                       update((s) => ({
                         ...s,
@@ -1252,7 +1287,17 @@ export default function App() {
                             ],
                             active: undefined,
                             restUntil: undefined,
-                            nextTemplate: s.nextTemplate + 1,
+                            nextTemplate:
+                              s.nextTemplate +
+                              (active.exercises.some(
+                                (e) =>
+                                  !e.cardio &&
+                                  e.sets.some(
+                                    (a) => a.done && a.kind !== "warmup",
+                                  ),
+                              )
+                                ? 1
+                                : 0),
                           }));
                           setToast("Trening je shranjen. Dober korak naprej.");
                           setTab("history");
@@ -1677,7 +1722,10 @@ export default function App() {
                                       a.id === w.id
                                         ? {
                                             ...a,
-                                            durationMin: Math.max(0, +e.target.value),
+                                            durationMin: Math.max(
+                                              0,
+                                              +e.target.value,
+                                            ),
                                             modifiedAt:
                                               new Date().toISOString(),
                                           }
@@ -2608,19 +2656,7 @@ function AddExercise({
           onClick={() => {
             const e = pool.find((e) => e.id === selected);
             add(
-              e && !name.trim()
-                ? {
-                    ...structuredClone(e),
-                    note: "",
-                    pain: false,
-                    sets: e.sets.map((s) => ({
-                      ...s,
-                      id: uid(),
-                      done: false,
-                      rir: undefined,
-                    })),
-                  }
-                : newExercise(name.trim()),
+              e && !name.trim() ? plannedExercise(e) : newExercise(name.trim()),
             );
             setName("");
             setSelected("");
@@ -2735,7 +2771,9 @@ function WorkoutEditor({
   onChange,
   onDone,
   historical = false,
+  onReplaceDevice,
 }: {
+  onReplaceDevice?: (index: number, id: string, permanent: boolean) => void;
   workout: Workout;
   state: State;
   onChange: (w: Workout) => void;
@@ -2744,7 +2782,7 @@ function WorkoutEditor({
 }) {
   const [replace, setReplace] = useState<number>();
   function change(i: number, e: Exercise) {
-    onChange({ ...w, exercises: w.exercises.map((x, j) => (i === j ? e : x)) });
+    onChange(reconcileExercise(w, i, e));
   }
   return (
     <div className="workout-editor">
@@ -2779,6 +2817,18 @@ function WorkoutEditor({
                 Zamenjaj
               </button>
             </div>
+            {!historical && onReplaceDevice && (
+              <BusyDevice
+                state={state}
+                index={i}
+                move={() => {
+                  const rows = [...w.exercises];
+                  const item = rows.splice(i, 1)[0];
+                  onChange({ ...w, exercises: [...rows, item] });
+                }}
+                replace={(id, permanent) => onReplaceDevice(i, id, permanent)}
+              />
+            )}
             {replace === i && (
               <div className="notice replace-box">
                 <p>
@@ -2788,7 +2838,16 @@ function WorkoutEditor({
                 <AddExercise
                   state={state}
                   add={(v) => {
-                    change(i, { ...v, sets: v.sets.map(() => emptySet()) });
+                    onChange(
+                      replacementWorkout(w, i, {
+                        ...v,
+                        sets: v.sets.map(() => ({
+                          ...emptySet(),
+                          weight: 0,
+                          loadPending: true,
+                        })),
+                      }),
+                    );
                     setReplace(undefined);
                   }}
                 />
@@ -2832,7 +2891,12 @@ function WorkoutEditor({
                           sets: e.sets.map((s, j) => {
                             const p = previous[j];
                             return p
-                              ? { ...s, weight: p.weight, reps: p.reps }
+                              ? {
+                                  ...s,
+                                  weight: p.weight,
+                                  reps: p.reps,
+                                  loadPending: false,
+                                }
                               : s;
                           }),
                         });
@@ -2842,7 +2906,7 @@ function WorkoutEditor({
                     </button>
                   )}
                 </div>
-                {!historical && (
+                {!historical && !e.coach && (
                   <details className="suggestion">
                     <summary>
                       <Zap size={16} /> Predlog naslednje serije{" "}
@@ -2877,6 +2941,13 @@ function WorkoutEditor({
                   </details>
                 )}
               </>
+            )}
+            {e.coach && (
+              <CoachExerciseInfo
+                e={e}
+                state={state}
+                change={(v) => change(i, v)}
+              />
             )}
             <div className="sets-table">
               <div className="sets-header">
@@ -2922,13 +2993,18 @@ function WorkoutEditor({
                     inputMode="decimal"
                     min="0"
                     step="0.1"
-                    value={s.weight}
+                    value={s.loadPending ? "" : s.weight}
+                    placeholder={s.loadPending ? "Vnesi kg" : ""}
                     onChange={(v) =>
                       change(i, {
                         ...e,
                         sets: e.sets.map((a, k) =>
                           j === k
-                            ? { ...a, weight: Math.max(0, +v.target.value) }
+                            ? {
+                                ...a,
+                                weight: Math.max(0, +v.target.value),
+                                loadPending: v.target.value === "",
+                              }
                             : a,
                         ),
                       })
@@ -2991,9 +3067,15 @@ function WorkoutEditor({
                   <button
                     aria-label={`${s.done ? "Razveljavi" : "Potrdi"} serijo ${j + 1} ${e.name}`}
                     aria-pressed={s.done}
+                    title={
+                      s.loadPending
+                        ? "Najprej vnesi dejansko obremenitev"
+                        : "Potrdi ali razveljavi serijo"
+                    }
+                    disabled={!s.done && !!s.loadPending}
                     className="set-check"
                     onClick={() => {
-                      if (!s.done && s.reps <= 0) return;
+                      if (!s.done && (s.reps <= 0 || s.loadPending)) return;
                       change(i, {
                         ...e,
                         sets: e.sets.map((a, k) =>
@@ -3012,7 +3094,13 @@ function WorkoutEditor({
               <button
                 className="text-button"
                 onClick={() =>
-                  change(i, { ...e, sets: [...e.sets, emptySet()] })
+                  change(i, {
+                    ...e,
+                    sets: [
+                      ...e.sets,
+                      { ...emptySet(), loadPending: !!e.coach, weight: 0 },
+                    ],
+                  })
                 }
               >
                 <Plus size={15} /> Dodaj serijo
@@ -3089,20 +3177,13 @@ function Strength({ state }: { state: State }) {
   const all = records(state);
   const options = [
     ...new Map(
-      all.map((r) => [
-        JSON.stringify([r.exercise.id, r.exercise.mode, r.exercise.equipment]),
-        r.exercise,
-      ]),
+      all.map((r) => [exerciseComparisonKey(r.exercise), r.exercise]),
     ).entries(),
   ];
   const [selected, setSelected] = useState("");
   const key = selected || options[0]?.[0];
   const exercise = options.find(([id]) => id === key)?.[1];
-  const matches = all.filter(
-    (r) =>
-      JSON.stringify([r.exercise.id, r.exercise.mode, r.exercise.equipment]) ===
-      key,
-  );
+  const matches = all.filter((r) => exerciseComparisonKey(r.exercise) === key);
   const [repCount, setRepCount] = useState(10);
   const [load, setLoad] = useState(0);
   const events = exercise
@@ -3111,9 +3192,7 @@ function Strength({ state }: { state: State }) {
           w.exercises
             .filter(
               (e) =>
-                e.id === exercise.id &&
-                e.mode === exercise.mode &&
-                e.equipment === exercise.equipment,
+                exerciseComparisonKey(e) === exerciseComparisonKey(exercise),
             )
             .flatMap((e) =>
               e.sets.filter((s) => s.done).map((s) => ({ ...s, date: w.date })),
@@ -3122,7 +3201,10 @@ function Strength({ state }: { state: State }) {
         .sort((a, b) => a.date.localeCompare(b.date))
     : [];
   const known =
-    !!exercise && exercise.mode !== "unknown" && !!exercise.equipment.trim();
+    !!exercise &&
+    exercise.mode !== "unknown" &&
+    !!exercise.equipment.trim() &&
+    (!exercise.coach || (!!exercise.coach.rom && !!exercise.coach.convention));
   return (
     <>
       {options.length ? (
@@ -3134,7 +3216,10 @@ function Strength({ state }: { state: State }) {
                 {options.map(([id, e]) => (
                   <option key={id} value={id}>
                     {e.name} · {modes[e.mode]}{" "}
-                    {e.equipment && `· ${e.equipment}`}
+                    {e.equipment && `· ${e.equipment}`}{" "}
+                    {e.coach?.rom && `· ${e.coach.rom}`}{" "}
+                    {e.coach?.convention &&
+                      `· zapis ${e.coach.convention === "stack" ? "na skladu" : e.coach.convention === "one-side" ? "ene strani" : "dodanih plošč"}`}
                   </option>
                 ))}
               </select>
@@ -3143,9 +3228,9 @@ function Strength({ state }: { state: State }) {
               <div className="notice">
                 <Info size={17} />
                 <span>
-                  Zgodovinski način obremenitve ni znan. Rezultati so prikazani
-                  kot shranjeni, primerljivost opreme ni potrjena. Ocene 1RM ne
-                  izračunavamo.
+                  Način obremenitve, naprava ali izvedba še niso potrjeni.
+                  Rezultati so prikazani kot shranjeni, primerljivost opreme ni
+                  potrjena. Ocene 1RM ne izračunavamo.
                 </span>
               </div>
             )}

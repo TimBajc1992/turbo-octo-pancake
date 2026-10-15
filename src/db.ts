@@ -1,3 +1,4 @@
+import { validateCoachData } from "./coach";
 import { initialState, type State } from "./model";
 const open = () =>
   new Promise<IDBDatabase>((resolve, reject) => {
@@ -91,6 +92,24 @@ function validateState(value: unknown): asserts value is State {
       fail();
     bool(e.pain);
     bool(e.confirmed);
+    if (e.coach !== undefined) {
+      const c = obj(e.coach);
+      for (const k of ["catalogId", "slotId", "rom", "seat", "reason"])
+        str(c[k]);
+      if (!["lower", "upper", "full"].includes(c.group)) fail();
+      bool(c.calibration);
+      for (const k of ["retired", "formGood", "trialLogged", "stepConfirmed"])
+        if (c[k] !== undefined) bool(c[k]);
+      if (c.convention !== undefined) str(c.convention);
+      if (c.trialDraft !== undefined) {
+        const d = obj(c.trialDraft);
+        for (const k of ["weight", "reps", "rir"])
+          if (d[k] !== undefined) finite(d[k]);
+        for (const k of ["formGood", "pain"])
+          if (d[k] !== undefined) bool(d[k]);
+      }
+    }
+
     for (const k of ["minReps", "maxReps", "rest"]) finite(e[k]);
     finite(e.increment, 0.1);
     if (e.minReps > e.maxReps) fail();
@@ -101,6 +120,10 @@ function validateState(value: unknown): asserts value is State {
       finite(a.reps);
       if (!Number.isInteger(a.reps)) fail();
       bool(a.done);
+      if (a.loadPending !== undefined) {
+        bool(a.loadPending);
+        if (a.done && a.loadPending) fail();
+      }
       if (!["unknown", "work", "warmup"].includes(a.kind)) fail();
       if (a.rir !== undefined) {
         finite(a.rir);
@@ -122,6 +145,7 @@ function validateState(value: unknown): asserts value is State {
   if (s.schema !== 1) fail();
   finite(s.nextTemplate);
   if (!Number.isInteger(s.nextTemplate)) fail();
+  if (s.coach !== undefined) validateCoachData(s.coach);
   const p = obj(s.profile);
   for (const k of ["name", "goal", "equipment", "experience", "limitations"])
     str(p[k]);
