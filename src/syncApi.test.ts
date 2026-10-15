@@ -6,6 +6,22 @@ import {
   syncError,
 } from "./syncApi";
 afterEach(() => vi.unstubAllGlobals());
+it("supports setup codes with Slovenian letters, percent signs and spaces in HTTP headers", async () => {
+  const setup = "Moja TEŽIŠČE koda z znaki % / žšč 123456789";
+  vi.stubGlobal("fetch", async (_url: string, options: RequestInit) => {
+    const header = new Headers(options.headers).get("X-Setup-Key")!;
+    expect(decodeURIComponent(header)).toBe(setup);
+    expect(header).not.toContain("Ž");
+    return Response.json({ revision: 1 }, { status: 201 });
+  });
+  await expect(
+    createRemote(
+      createSyncConnection("https://tezisce-sync.test.workers.dev"),
+      setup,
+      { version: 1, iv: "AAAAAAAAAAAAAAAA", data: "AAAAAAAAAAAAAAAAAAAAAA" },
+    ),
+  ).resolves.toBeUndefined();
+});
 it("connects without AbortSignal.timeout, including on older Safari, and trims pasted setup codes", async () => {
   const timeout = vi.spyOn(AbortSignal, "timeout").mockImplementation(() => {
     throw Error("Unavailable in this Safari");

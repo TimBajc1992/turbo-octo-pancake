@@ -114,7 +114,7 @@ async function request(
       Authorization: "Bearer " + c.auth,
       ...(payload ? { "Content-Type": "application/json" } : {}),
       ...(expected ? { "If-Match": `"${expected}"` } : {}),
-      ...(setup ? { "X-Setup-Key": setup } : {}),
+      ...(setup ? { "X-Setup-Key": encodeURIComponent(setup) } : {}),
     },
     body: payload ? JSON.stringify(payload) : undefined,
   });

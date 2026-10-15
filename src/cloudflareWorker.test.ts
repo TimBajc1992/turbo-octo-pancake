@@ -215,4 +215,28 @@ describe("Cloudflare D1 encrypted vault API", () => {
     ).toEqual(before);
     expect(((await (await call("GET")).json()) as any).revision).toBe(2);
   });
+  it("accepts encoded Unicode setup keys while preserving literal keys used by older clients", async () => {
+    const vaultId = createSyncSecret();
+    const unicodeSetup = "Moja TEŽIŠČE koda z znaki % / žšč 123456789";
+    const db = await mf.getD1Database("DB");
+    const response = await worker.fetch(
+      new Request("https://sync.test/v1/vaults/" + vaultId, {
+        method: "POST",
+        headers: {
+          Origin: origin,
+          Authorization: "Bearer " + auth,
+          "Content-Type": "application/json",
+          "X-Setup-Key": encodeURIComponent(unicodeSetup),
+        },
+        body: JSON.stringify(payload),
+      }),
+      { DB: db as any, SETUP_SECRET: unicodeSetup, ALLOWED_ORIGIN: origin },
+    );
+    expect(response.status).toBe(201);
+    expect((await call("GET", undefined, {}, vaultId)).status).toBe(200);
+    await db
+      .prepare("DELETE FROM tezisce_vaults WHERE id=?")
+      .bind(vaultId)
+      .run();
+  });
 });

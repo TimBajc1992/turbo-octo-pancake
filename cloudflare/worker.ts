@@ -71,11 +71,18 @@ export default {
         .bind(id)
         .first<{ token_hash: string; revision: number; payload: string }>();
       if (request.method === "POST") {
-        const setup = request.headers.get("X-Setup-Key") ?? "";
+        const suppliedSetup = request.headers.get("X-Setup-Key") ?? "";
+        let setup = suppliedSetup;
+        try {
+          setup = decodeURIComponent(suppliedSetup);
+        } catch {
+          /* Older clients send the literal ASCII key. */
+        }
         if (
           !env.SETUP_SECRET ||
           env.SETUP_SECRET.length < 32 ||
-          !(await matches(setup, env.SETUP_SECRET))
+          (!(await matches(suppliedSetup, env.SETUP_SECRET)) &&
+            !(await matches(setup, env.SETUP_SECRET)))
         )
           return reply(401, { error: "Enrollment not allowed" });
         if (existing) return reply(409, { error: "Vault already exists" });

@@ -59,7 +59,7 @@ export async function checkCloudSync(url, setup, origin, cleanup) {
   try {
     const initial = { synthetic: "TEZISCE connection check", revision: 1 };
     let response = await request("POST", await encrypt(initial), {
-      "X-Setup-Key": setup,
+      "X-Setup-Key": encodeURIComponent(setup),
     });
     assert.equal(
       response.status,

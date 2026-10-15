@@ -1,7 +1,7 @@
 name: Preveri trening in Safari
 on:
   push:
-    branches: [main, fix/trainer-health-sync]
+    branches: [main]
     paths:
       [
         "src/**",

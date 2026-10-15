@@ -27,6 +27,8 @@ Nastavitve GitHub Pages ostanejo na `gh-pages`. Prejšnji workflow Pages na `mai
 
 Naslov strežnika je že izpolnjen: `https://tezisce-sync.tim-bajc.workers.dev`. Gumb **Preveri povezavo s strežnikom** preveri storitev iz tega brskalnika. Poskus brez privolitve ali kode pokaže vidno sporočilo in ga pomakne v pogled. Napake omrežja Safari so prevedene v navodilo za ponovitev. HTTP zahteve uporabljajo `AbortController`, zato ne zahtevajo novejšega `AbortSignal.timeout`.
 
+Namestitvena koda se za prenos v glavi HTTP URL-kodira. Tako delujejo tudi šumniki in presledki; neposredno pošiljanje znakov izven Latin-1 bi brskalnik zavrnil pred omrežno zahtevo. Strežnik sprejme novo kodirano vrednost in še naprej tudi dobesedne ključe starejših odjemalcev. Kode zaradi tega ni treba spreminjati.
+
 Na povezanih napravah je vidna neskrivna oznaka **Skupna shramba**. Oznaki morata biti enaki: ustvarjanje prve shrambe na obeh napravah naredi dve ločeni zbirki. Za drugo napravo je treba uporabiti povezovalno kodo iz prve. Ohranita se varnostna kopija pred prevzemom in izrecna privolitev.
 
 1. Na telefonu, kjer so pravilni obstoječi podatki, izvozi varnostno kopijo. Odpri **Nastavitve → Telefon in računalnik**.
