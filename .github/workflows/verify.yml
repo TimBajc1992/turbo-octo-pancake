@@ -43,3 +43,10 @@ jobs:
         run: npm run test:e2e
         env:
           TEST_BROWSER: webkit
+      - name: Shrani diagnostiko neuspešnih preizkusov
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-test-failures
+          path: test-results/
+          retention-days: 3

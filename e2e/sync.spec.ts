@@ -150,7 +150,14 @@ test("two devices share encrypted data and preserve the previous local collectio
   await panel
     .getByRole("button", { name: "Ustvari šifrirano shrambo" })
     .click();
-  await expect.poll(() => revision).toBe(1);
+  await expect
+    .poll(
+      async () =>
+        revision ||
+        (await panel.getByRole("alert").allTextContents()).join(" ") ||
+        0,
+    )
+    .toBe(1);
   await expect(
     panel.getByRole("button", { name: "Pokaži kodo za drugo napravo" }),
   ).toBeVisible();
