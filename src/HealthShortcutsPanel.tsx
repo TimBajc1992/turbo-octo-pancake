@@ -102,9 +102,9 @@ export function HealthShortcutsPanel({
             <a
               className="button secondary"
               download
-              href={`${import.meta.env.BASE_URL}shortcuts/TEZISCE-Apple-Health.zip`}
+              href={`${import.meta.env.BASE_URL}shortcuts/TEZISCE-Apple-Health.zip?v=2`}
             >
-              Prenesi pripravljeno Bližnjico za Mac
+              Prenesi paket Bližnjice · različica 2
             </a>
             <button
               className="button secondary"
@@ -134,16 +134,23 @@ export function HealthShortcutsPanel({
               uporabi vgrajeno Applovo orodje; svojih gesel ne vnašaj v TEŽIŠČE.
             </li>
             <li>
-              Označeno datoteko pošlji na iPhone prek AirDrop in jo odpri. Ob
-              dodajanju prilepi zgornjo sprejemno kodo.
+              Podpisano datoteko TEZISCE Apple Health.shortcut pošlji na iPhone
+              prek AirDrop in jo tam odpri. Ob dodajanju prilepi zgornjo
+              sprejemno kodo. Mac samo pripravi datoteko; Bližnjico zaženi na
+              iPhonu.
             </li>
             <li>
-              V prvem iskanju zdravstvenih vzorcev pri Izvor izberi svojo uro
+              V prvem iskanju zdravstvenih vzorcev pri Vir izberi svojo uro
               namesto Vprašaj vsakič. Prvič zaženi ročno, dovoli Health ter
               preveri številke. Nato dodaj avtomatizacijo ob želenem času ali
               koncu vadbe.
             </li>
           </ol>
+          <p>
+            Različica 2 popravi tri prazne pogoje Če iz prvega paketa. Če imaš
+            staro Bližnjico, zamenjaj mapo iz ZIP-a na Macu in ob dodajanju na
+            iPhonu izberi zamenjavo obstoječe Bližnjice.
+          </p>
           <pre style={{ whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>
             /bin/bash
             ~/Downloads/TEZISCE-Apple-Health/pripravi-bliznjico.command
