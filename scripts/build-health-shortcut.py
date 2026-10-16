@@ -1,9 +1,11 @@
-"""Build a read-only Apple Health shortcut. Apple signs this generic file in CI.
+"""Build a read-only Apple Health shortcut for signing on the owner's Mac.
 
 No personal token, health data, or account credential is present in this source.
 The import question supplies the browser-local receiving token on the iPhone.
 Health filter shapes follow an exported iOS shortcut and the current locked Type
 predicate documented by viticci/shortcuts-playground-plugin (HEALTHKIT.md).
+Conditional inputs use the native export's Type=Variable envelope; a bare
+WFTextTokenAttachment imports as an empty condition on the iPhone.
 """
 import pathlib
 import plistlib
@@ -79,11 +81,12 @@ def if_positive(identifier):
     count = add("count", Input=token(output(identifier, "Health Samples")), WFCountType="Items")
     group = str(uuid.uuid5(NAMESPACE, "if-" + identifier)).upper()
     add("conditional", GroupingIdentifier=group, WFControlFlowMode=0, WFCondition=2,
-        WFInput=token(output(count, "Count")), WFNumberValue=0)
+        WFInput={"Type": "Variable", "Variable": token(output(count, "Count"))},
+        WFConditionalLegacyComparisonBehavior=True, WFNumberValue=0)
     return group
 
 
-add("comment", WFCommentActionText="TEŽIŠČE · samo branje Apple Health. Po dodajanju v prvem dejanju Poišči zdravstvene vzorce pri Izvor izberi svojo Apple Watch namesto Vprašaj vsakič. Ostali poizvedbi uporabita isti izvor. Če ni korakov, se prenos ustavi. Podatki odprejo TEŽIŠČE v Safariju; samodejni zagon nastavi po prvem preizkusu.")
+add("comment", WFCommentActionText="TEŽIŠČE · paket 2, popravljeni pogoji. Samo branje Apple Health NA IPHONU; Mac samo podpiše datoteko. Po dodajanju v prvem dejanju Poišči zdravstvene vzorce pri Vir izberi svojo Apple Watch namesto Vprašaj vsakič. Ostali poizvedbi uporabita isti vir. Če ni korakov, se prenos ustavi. Podatki odprejo TEŽIŠČE v Safariju; samodejni zagon nastavi po prvem preizkusu.")
 receiving_token_index = len(actions)
 receiving_token = add("gettext", WFTextActionText="VNESI_KODO_IZ_TEZISCA")
 now = add("date", WFDateActionMode="Current Date")
@@ -148,17 +151,19 @@ cd -- "$(dirname -- "$0")"
 printf '\\nBliznjica je pripravljena. Poslji oznaceno datoteko na iPhone prek AirDrop in jo odpri v Bliznjicah.\\n'
 open -R "TEZISCE Apple Health.shortcut"
 '''
-    instructions = '''TEŽIŠČE – Apple Health
+    instructions = '''TEŽIŠČE – Apple Health · paket 2 (popravljeni trije pogoji Če)
 
 To je že sestavljena Bližnjica za korake, aktivno energijo in minute vadbe iz enega vira Apple Health. Ne namešča nove aplikacije in ne potrebuje Apple Developer računa.
+
+Bližnjica se izvaja SAMO NA IPHONU. Mac samo podpiše datoteko; na Macu dejanje Najdi zdravstvene vzorce ne deluje. Če zamenjuješ prvi paket, v Prenosih najprej zamenjaj staro mapo TEZISCE-Apple-Health z mapo iz tega ZIP-a. Na iPhonu ob dodajanju zamenjaj staro istoimensko Bližnjico. Podatki TEŽIŠČA ostanejo shranjeni.
 
 Apple zahteva potrditev datoteke na Macu, prijavljenem v iCloud. GitHubov Mac brez iClouda jo zavrne, zato ta paket vsebuje nepodpisano izvorno datoteko in kratek, pregleden ukaz za Applovo vgrajeno orodje. Paket še ni preverjen na tvojem iPhonu.
 
 1. Razširi ZIP v Prenosih. V Terminal prilepi:
    /bin/bash ~/Downloads/TEZISCE-Apple-Health/pripravi-bliznjico.command
-2. V Finderju se označi datoteka »TEZISCE Apple Health.shortcut«. Pošlji jo na iPhone prek AirDrop in odpri v Bližnjicah.
+2. V Finderju se označi podpisana datoteka »TEZISCE Apple Health.shortcut« (brez .unsigned). Pošlji jo na iPhone prek AirDrop in odpri v Bližnjicah na iPhonu. Ne zaženi je na Macu.
 3. Ko uvoz vpraša za kodo, prilepi kodo iz TEŽIŠČE → Nastavitve → Apple Health → Kopiraj kodo za Bližnjico. To ni koda Cloudflare.
-4. V prvem dejanju Poišči zdravstvene vzorce pri filtru Izvor izberi svojo Apple Watch namesto »Vprašaj vsakič«. Ostali poizvedbi uporabita isti izvor. Ne izberi vseh naprav skupaj.
+4. V prvem dejanju Najdi zdravstvene vzorce pri filtru Vir izberi svojo Apple Watch namesto »Vprašaj vsakič«. Ostali poizvedbi uporabita isti vir. Ne izberi vseh naprav skupaj. Vsi trije pogoji Če morajo že vsebovati Število je večje od 0, ne praznega polja Pogoj.
 5. Prvič zaženi ročno na odklenjenem iPhonu in dovoli branje Health. Preveri datum, korake, aktivno energijo in minute glede na isti izvor v Zdravju. Če dovoljenje ali filtri ne delujejo, ničesar ne označuj kot uspešno povezano.
 6. V Bližnjice → Avtomatizacija nastavi čas dneva ali konec vadbe Apple Watch, zaženi to Bližnjico in izberi Zaženi takoj, kadar je na voljo. Prenos odpre Safari; zaklenjen telefon lahko zahteva odklep.
 

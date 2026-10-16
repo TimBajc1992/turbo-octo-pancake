@@ -4,9 +4,13 @@ Ta sprejemnik omogoča prenos izbranih dnevnih povzetkov iz Apple Health v TEŽI
 
 ## Enkratna nastavitev
 
-### Pripravljena Bližnjica z enim korakom na Macu
+### Pripravljena Bližnjica: priprava na Macu, izvajanje na iPhonu
 
 V aplikaciji je na voljo generični paket `shortcuts/TEZISCE-Apple-Health.zip`, zgrajen iz preglednega `scripts/build-health-shortcut.py`. Vsebuje že sestavljenih 42 dejanj za korake, aktivno energijo in minute vadbe. V paketu ni osebnih kod ali podatkov. ZIP vključuje izvorno nepodpisano datoteko, kratek ukaz za vgrajeno Applovo orodje ter navodila.
+
+**Paket 2 (16. 10. 2026)** popravi tri pogoje `Če`, ki jih je iPhone prej prikazal kot prazno polje `Pogoj`. Vhod pogoja zahteva ovojnico `Type: Variable` z gnezdenim `Variable: WFTextTokenAttachment`, kot v izvirnem Applovem izvozu; navadna priponka ni veljaven vhod za to dejanje. Vsi trije pogoji preverjajo število vzorcev > 0. Regresijski preizkus bere dejansko datoteko iz objavljenega ZIP-a. Popravek strukture ne nadomesti prvega preizkusa na iPhonu.
+
+Pri zamenjavi prvega paketa v Prenosih zamenjaj staro mapo `TEZISCE-Apple-Health` z mapo iz novega ZIP-a. Po pripravi datoteke na Macu jo ponovno pošlji na iPhone in zamenjaj staro istoimensko Bližnjico. Sprejemno kodo ponovno vzemi iz obstoječih nastavitev TEŽIŠČA; sprejema ni treba izklopiti ali ustvariti nove kode. Podatki aplikacije ostanejo shranjeni.
 
 Apple je pri dejanskem poskusu na GitHubovem Macu podpis zavrnil z »In order to do this, you must be signed into iCloud.« Zato se paket ne predstavlja kot že podpisana namestitev. Na Macu, prijavljenem v iCloud, razširi ZIP v Prenosih in zaženi:
 
@@ -14,7 +18,7 @@ Apple je pri dejanskem poskusu na GitHubovem Macu podpis zavrnil z »In order to
 /bin/bash ~/Downloads/TEZISCE-Apple-Health/pripravi-bliznjico.command
 ```
 
-To uporabi `shortcuts sign --mode anyone`, odpre Finder in označi pripravljeno datoteko. Pošlji jo na iPhone prek AirDrop. Ob dodajanju odgovori na uvozno vprašanje s sprejemno kodo iz Apple Health nastavitev TEŽIŠČA; to ni koda za namestitev Cloudflare ali povezavo naprav. V prvem iskanju zdravstvenih vzorcev izberi svojo uro pri Izvor, namesto Vprašaj vsakič. Preostali poizvedbi uporabita izvor prvega dejanskega vzorca korakov. Če korakov ni, bližnjica opozori in prenos ustavi. Neobstoječe energetske/vadbene vrednosti izpusti.
+To uporabi `shortcuts sign --mode anyone`, odpre Finder in označi podpisano datoteko `TEZISCE Apple Health.shortcut` (brez `.unsigned`). Pošlji jo na iPhone prek AirDrop. **Bližnjico zaženi samo na iPhonu.** Mac ne podpira dejanja Find Health Samples / Najdi zdravstvene vzorce. Ob dodajanju odgovori na uvozno vprašanje s sprejemno kodo iz Apple Health nastavitev TEŽIŠČA; to ni koda za namestitev Cloudflare ali povezavo naprav. V prvem iskanju zdravstvenih vzorcev izberi svojo uro pri Vir, namesto Vprašaj vsakič. Preostali poizvedbi uporabita vir prvega dejanskega vzorca korakov. Če korakov ni, bližnjica opozori in prenos ustavi. Neobstoječe energetske/vadbene vrednosti izpusti.
 
 Prvi zagon na odklenjenem iPhonu, dovoljenja Health, dejanski filter vira in primerjava številk ostanejo potrebni. Ta tok še ni bil preverjen na uporabnikovem iPhonu in zato ni opisan kot uspešna povezava. Po prvem preverjenem prenosu nastavi osebno avtomatizacijo. Developer račun in nova aplikacija nista potrebna.
 

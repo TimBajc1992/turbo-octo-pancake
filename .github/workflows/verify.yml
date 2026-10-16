@@ -8,6 +8,9 @@ on:
         "e2e/**",
         "package*.json",
         "playwright.config.ts",
+        "scripts/build-health-shortcut.py",
+        "scripts/test-health-shortcut.py",
+        "public/shortcuts/**",
         ".github/workflows/verify.yml",
       ]
   pull_request:
@@ -37,6 +40,7 @@ jobs:
         run: |
           python3 scripts/build-health-shortcut.py work/TEZISCE-Apple-Health.unsigned.shortcut --bundle
           cmp work/TEZISCE-Apple-Health.zip public/shortcuts/TEZISCE-Apple-Health.zip
+          python3 scripts/test-health-shortcut.py
       - run: npm test
       - run: npm run build
       - run: npx playwright install --with-deps chromium webkit
