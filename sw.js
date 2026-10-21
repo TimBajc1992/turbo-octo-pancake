@@ -1,9 +1,9 @@
 /* The build injects hashed assets here so installation is atomic and offline-ready. */
 const BASE = new URL("./", self.location.href).pathname;
 const CACHE_PREFIX = "tezisce:" + self.registration.scope + ":";
-const BUILD="turbooctopancakeassetsindexCCaatXAajsturbooctopancakeassetsindexd6rVG8vXcss";
+const BUILD="turbooctopancakeassetsindexA42Kpo2jsturbooctopancakeassetsindexCFCp7tycss";
 const CACHE = CACHE_PREFIX + BUILD;
-const ASSETS=["/turbo-octo-pancake/","/turbo-octo-pancake/index.html","/turbo-octo-pancake/icon.svg","/turbo-octo-pancake/icon-192.png","/turbo-octo-pancake/icon-512.png","/turbo-octo-pancake/apple-touch-icon.png","/turbo-octo-pancake/manifest.webmanifest","/turbo-octo-pancake/assets/index-CCaatXAa.js","/turbo-octo-pancake/assets/index-d6rVG8vX.css"];
+const ASSETS=["/turbo-octo-pancake/","/turbo-octo-pancake/index.html","/turbo-octo-pancake/icon.svg","/turbo-octo-pancake/icon-192.png","/turbo-octo-pancake/icon-512.png","/turbo-octo-pancake/apple-touch-icon.png","/turbo-octo-pancake/manifest.webmanifest","/turbo-octo-pancake/assets/index-A42Kp_o2.js","/turbo-octo-pancake/assets/index-CFCp7-ty.css"];
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(ASSETS)));
 });
