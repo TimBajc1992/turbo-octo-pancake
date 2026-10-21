@@ -1,5 +1,9 @@
 # Trening 0.3
 
+## Popravek 0.3.1 za iPhone
+
+Glava upošteva `safe-area-inset-top`, zato logotip in nastavitve pri odpiranju z ikone na začetnem zaslonu ostanejo pod iPhonovo uro in baterijo. Odmik se prilagodi tudi ob obračanju zaslona; pri ničelnem odmiku ostane običajna postavitev. Spremenjena sta le postavitev glave in prikazana različica, shranjevanje podatkov pa ostane enako. Brskalniški preizkus simulira statusno vrstico, ki prestreza dotike, preveri dejanski dotik nastavitev in primerja celotne shranjene podatke pred in po preizkusu. Fizične iPhonove statusne vrstice avtomatizirani preizkus ne vključuje.
+
 ## Uporaba
 
 Aktivni trening se privzeto odpre v **Hitrem pogledu**. Prikazana je ena vaja in naslednja neopravljena serija. Težo in ponovitve spremeniš z gumboma +/− ali z neposrednim vnosom; decimalna vejica je podprta. **Serija opravljena** potrdi samo to serijo. Kratka zaščita pred dvojnim dotikom prepreči, da bi isti hiter pritisk potrdil še naslednjo serijo.
