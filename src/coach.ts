@@ -92,372 +92,8 @@ export interface CoachConfig {
     externalId?: string;
   }[];
 }
-export interface Candidate {
-  id: string;
-  name: string;
-  group: Group;
-  muscles: string[];
-  pattern: string;
-  equipment: string;
-  instructions: string;
-  reason: string;
-  alternatives: string[];
-  difference: string;
-  joints: ("knees" | "back" | "shoulders")[];
-}
-const candidate = (
-  id: string,
-  name: string,
-  group: Group,
-  muscles: string[],
-  pattern: string,
-  equipment: string,
-  instructions: string,
-  reason: string,
-  alternatives: string[],
-  joints: Candidate["joints"],
-  difference: string,
-): Candidate => ({
-  id,
-  name,
-  group,
-  muscles,
-  pattern,
-  equipment,
-  instructions,
-  reason,
-  alternatives,
-  joints,
-  difference,
-});
-export const catalog: Candidate[] = [
-  candidate(
-    "leg_press",
-    "Leg Press",
-    "lower",
-    ["Sprednje stegenske", "Zadnjica"],
-    "leg-push",
-    "Potisk z nogami",
-    "Nastavi sedež za udoben obseg. Stopala stabilno na plošči; ne sili v boleč položaj.",
-    "Osnovni večsklepni potisk z nogami.",
-    ["hack_squat"],
-    ["knees", "back"],
-    "Kot sedeža in vodila spremenijo obseg ter razmerje obremenitev. Kilogrami niso neposredno primerljivi.",
-  ),
-  candidate(
-    "hack_squat",
-    "Hack Squat",
-    "lower",
-    ["Sprednje stegenske", "Zadnjica"],
-    "leg-push",
-    "Hack squat naprava",
-    "Hrbet in ramena udobno ob opori. Izberi nadzorovan obseg brez bolečine.",
-    "Alternativa potisku z nogami; ne dodajamo je samodejno kot druge težke glavne vaje.",
-    ["leg_press"],
-    ["knees", "back"],
-    "Bolj pokončen položaj in drugačna vodila; ni enaka izvedba kot Leg Press.",
-  ),
-  candidate(
-    "seated_leg_curl",
-    "Seated Leg Curl",
-    "lower",
-    ["Zadnje stegenske"],
-    "knee-flexion",
-    "Sedeči upogib kolen",
-    "Poravnaj os kolena z osjo naprave in prilagodi oporo za stegno.",
-    "Praktična prva možnost za upogib kolena, če je udobna.",
-    ["leg_curl"],
-    ["knees"],
-    "Upogib kolka spremeni položaj zadnjih stegenskih mišic glede na ležečo različico.",
-  ),
-  candidate(
-    "leg_curl",
-    "Lying Leg Curl",
-    "lower",
-    ["Zadnje stegenske"],
-    "knee-flexion",
-    "Ležeči upogib kolen",
-    "Poravnaj koleno z osjo; medenica naj ostane udobno ob opori.",
-    "Uporabna stalna možnost, posebno ob obstoječi zgodovini.",
-    ["seated_leg_curl"],
-    ["knees", "back"],
-    "Ležeči položaj se razlikuje od sedečega. Za novo napravo določi obremenitev na novo.",
-  ),
-  candidate(
-    "leg_extension",
-    "Leg Extension",
-    "lower",
-    ["Sprednje stegenske"],
-    "knee-extension",
-    "Izteg kolen",
-    "Nastavi naslon in valjček; koleno poravnaj z osjo in uporabi udoben obseg.",
-    "Dodatna enosklepna vaja za sprednje stegenske. Prenehaj ob bolečini.",
-    [],
-    ["knees"],
-    "Ne nadomesti celotnega večsklepnega učinka Leg Pressa.",
-  ),
-  candidate(
-    "glute_drive",
-    "Glute Drive / Hip Thrust",
-    "lower",
-    ["Zadnjica"],
-    "hip-extension",
-    "Naprava za izteg kolka",
-    "Prilagodi oporo medenici; gib nadzoruj brez pretiranega usločanja križa.",
-    "Možnost neposrednega iztega kolka.",
-    [],
-    ["back"],
-    "Različne naprave imajo različna vodila in začetni upor.",
-  ),
-  candidate(
-    "seated_calf",
-    "Seated Calf Raise",
-    "lower",
-    ["Meča"],
-    "calf",
-    "Sedeči dvig na prste",
-    "Opora nad stegni naj bo udobna. Izvedi nadzorovan dvig in spust.",
-    "Stalna možnost za meča.",
-    ["standing_calf"],
-    ["knees"],
-    "Pokrčena kolena spremenijo poudarek v mečnih mišicah.",
-  ),
-  candidate(
-    "standing_calf",
-    "Standing Calf Raise",
-    "lower",
-    ["Meča"],
-    "calf",
-    "Stoječi dvig na prste",
-    "Nastavi ramensko oporo in ohrani stabilen, udoben položaj.",
-    "Alternativa za meča.",
-    ["seated_calf"],
-    ["back"],
-    "Iztegnjena kolena spremenijo poudarek v primerjavi s sedečo izvedbo.",
-  ),
-  candidate(
-    "machine_chest_press",
-    "Machine Chest Press",
-    "upper",
-    ["Prsi", "Triceps"],
-    "horizontal-push",
-    "Prsna potisna naprava",
-    "Nastavi sedež tako, da so ročaji v udobni višini ob prsih.",
-    "Glavni prsni potisk na napravi.",
-    ["chest_press_alt"],
-    ["shoulders"],
-    "Različna vodila in ročaji niso povsem enakovredni; Bench Press ni ista naprava.",
-  ),
-  candidate(
-    "chest_press_alt",
-    "Chest Press · druga naprava",
-    "upper",
-    ["Prsi", "Triceps"],
-    "horizontal-push",
-    "Druga prsna potisna naprava",
-    "Preveri višino sedeža, ročaje in udoben začetek giba.",
-    "Alternativna prsna potisna naprava.",
-    ["machine_chest_press"],
-    ["shoulders"],
-    "Drugačna pot ročajev in vzvod zahtevata novo določitev obremenitve.",
-  ),
-  candidate(
-    "chest_supported_row",
-    "Chest-Supported Row",
-    "upper",
-    ["Hrbet", "Biceps"],
-    "horizontal-pull",
-    "Veslanje s prsno oporo",
-    "Nastavi prsno oporo in ročaje; vleci nadzorovano brez sunkov.",
-    "Horizontalni vlek s prsno oporo.",
-    ["seated_row"],
-    ["back", "shoulders"],
-    "Prsna opora spremeni zahteve za stabilizacijo trupa glede na sedeči kabel.",
-  ),
-  candidate(
-    "seated_row",
-    "Seated Cable Row",
-    "upper",
-    ["Hrbet", "Biceps"],
-    "horizontal-pull",
-    "Sedeče veslanje na kablu",
-    "Izberi udoben ročaj in stabilen trup; ne pomagaj si s sunki.",
-    "Horizontalni vlek z možnostjo nadaljevanja zgodovine.",
-    ["chest_supported_row"],
-    ["back", "shoulders"],
-    "Brez prsne opore je drugačna zahteva za trup in lahko drugačen obseg giba.",
-  ),
-  candidate(
-    "lat_pulldown",
-    "Lat Pulldown",
-    "upper",
-    ["Hrbet", "Biceps"],
-    "vertical-pull",
-    "Poteg na prsi",
-    "Nastavi oporo za stegna in izberi udoben prijem; vleci pred telo.",
-    "Vertikalni vlek.",
-    ["lat_pulldown_alt"],
-    ["shoulders"],
-    "Prijem, opore in vodila se med napravami razlikujejo.",
-  ),
-  candidate(
-    "lat_pulldown_alt",
-    "Lat Pulldown · druga naprava",
-    "upper",
-    ["Hrbet", "Biceps"],
-    "vertical-pull",
-    "Druga naprava za poteg na prsi",
-    "Preveri opore in udoben obseg nove naprave.",
-    "Alternativni vertikalni vlek.",
-    ["lat_pulldown"],
-    ["shoulders"],
-    "Drug vzvod ali kabelsko razmerje pomeni novo obremenitev.",
-  ),
-  candidate(
-    "machine_shoulder_press",
-    "Machine Shoulder Press",
-    "upper",
-    ["Ramena", "Triceps"],
-    "vertical-push",
-    "Ramenska potisna naprava",
-    "Sedež prilagodi udobnemu položaju ročajev; ne sili v boleč položaj nad glavo.",
-    "Dodatni potisk nad glavo le, če je udoben in smiseln v obsegu programa.",
-    [],
-    ["shoulders", "back"],
-    "Ni ista vaja ali obremenitev kot zgodovinski Overhead Press s prostimi utežmi.",
-  ),
-  candidate(
-    "reverse_fly",
-    "Reverse Pec Deck",
-    "upper",
-    ["Zadnji del ramen"],
-    "rear-delt",
-    "Obratni metulj",
-    "Prilagodi sedež in prsno oporo, gib izvedi brez sunkov.",
-    "Dodatna vaja za zadnji del ramen.",
-    ["cable_reverse_fly"],
-    ["shoulders"],
-    "Naprava vodi pot; kabel omogoča drugačno pot in stabilizacijo.",
-  ),
-  candidate(
-    "cable_reverse_fly",
-    "Cable Reverse Fly",
-    "upper",
-    ["Zadnji del ramen"],
-    "rear-delt",
-    "Kabelski obratni razmik",
-    "Izberi udobno višino kablov in stabilen položaj telesa.",
-    "Alternativa za zadnji del ramen.",
-    ["reverse_fly"],
-    ["shoulders", "back"],
-    "Kabel zahteva več samostojnega nadzora poti kot Reverse Pec Deck.",
-  ),
-  candidate(
-    "cable_lateral_raise",
-    "Machine / Cable Lateral Raise",
-    "upper",
-    ["Ramena"],
-    "lateral-raise",
-    "Stranski dvig na napravi ali kablu",
-    "Zabeleži točno napravo in ali beležiš eno stran. Gib naj bo udoben.",
-    "Dodatna vaja za ramena ob razpoložljivem času.",
-    [],
-    ["shoulders"],
-    "Kabel, ročke in naprava niso neposredno primerljivi.",
-  ),
-  candidate(
-    "pec_deck",
-    "Pec Deck",
-    "upper",
-    ["Prsi"],
-    "chest-fly",
-    "Metulj za prsi",
-    "Sedež in začetni položaj prilagodi udobnemu obsegu ramen.",
-    "Dodatna vaja za prsi, ne samodejno nadomestilo glavnega potiska.",
-    [],
-    ["shoulders"],
-    "Enosklepni razmik ne nadomesti celotnega potiska za prsi.",
-  ),
-  candidate(
-    "tricep_pushdown",
-    "Cable Triceps Pushdown",
-    "upper",
-    ["Triceps"],
-    "elbow-extension",
-    "Kabelski potisk navzdol",
-    "Izberi udoben nastavek in stabilen položaj nadlakti.",
-    "Dodatna vaja za triceps.",
-    ["oh_extension"],
-    ["shoulders"],
-    "Položaj rame se razlikuje od iztega nad glavo.",
-  ),
-  candidate(
-    "oh_extension",
-    "Overhead Extension",
-    "upper",
-    ["Triceps"],
-    "elbow-extension",
-    "Kabelski izteg nad glavo",
-    "Uporabi udoben položaj rame in nadzorovan obseg.",
-    "Alternativa za triceps, če je položaj nad glavo udoben.",
-    ["tricep_pushdown"],
-    ["shoulders", "back"],
-    "Položaj nad glavo spremeni dolžino mišice in zahteve za ramo.",
-  ),
-  candidate(
-    "biceps_machine",
-    "Biceps Curl · naprava",
-    "upper",
-    ["Biceps"],
-    "elbow-flexion",
-    "Naprava za upogib komolca",
-    "Poravnaj komolec z osjo in nastavi udobno oporo.",
-    "Dodatna vaja za biceps.",
-    ["cable_biceps"],
-    ["shoulders"],
-    "Opora in vzvod se razlikujeta od kabla ali palice.",
-  ),
-  candidate(
-    "cable_biceps",
-    "Biceps Curl · kabel",
-    "upper",
-    ["Biceps"],
-    "elbow-flexion",
-    "Kabelski upogib komolca",
-    "Izberi nastavek in nadzorovan gib brez zamaha.",
-    "Alternativa za biceps.",
-    ["biceps_machine"],
-    ["shoulders"],
-    "Kabelsko razmerje ni enako napravi ali zgodovinski palici.",
-  ),
-  candidate(
-    "pallof_press",
-    "Cable Pallof Press",
-    "full",
-    ["Trup"],
-    "trunk",
-    "Kabel za Pallof Press",
-    "Stoj stabilno; izberi udoben upor brez rotacije ali bolečine.",
-    "Možnost nadzorovanega dela trupa.",
-    [],
-    ["back", "shoulders"],
-    "Ni popolna zamenjava za vse vaje za trup.",
-  ),
-  candidate(
-    "trunk_machine",
-    "Naprava za trup",
-    "full",
-    ["Trup"],
-    "trunk-machine",
-    "Naprava za trup",
-    "Vrsto naprave, opore in udoben obseg opiši v nastavitvah.",
-    "Možnost za trup po preverjanju udobja in omejitev.",
-    [],
-    ["back"],
-    "Gib naprave moraš potrditi; ni samodejno enakovreden Pallof Pressu.",
-  ),
-];
-export const byId = (id: string) => catalog.find((c) => c.id === id);
+export { catalog, byId, type Candidate } from "./exerciseCatalog";
+import { catalog, byId } from "./exerciseCatalog";
 export const defaultPreference = (): DevicePreference => ({
   identity: "",
   rom: "",
@@ -512,7 +148,7 @@ export function comparableHistory(s: State, id: string) {
   return historicalEntries(s, id).filter(({ w, e, key }) => {
     const link = c.historyLinks[key];
     return (
-      (e.mode === "machine" &&
+      (e.mode === (byId(id)?.mode ?? "machine") &&
         e.equipment === p.identity &&
         e.coach?.rom === p.rom &&
         e.coach?.convention === p.convention) ||
@@ -856,7 +492,12 @@ export function loadProposal(
       Math.min(slot.maxReps, sets[Math.min(i, sets.length - 1)].reps),
     ),
   );
-  if (weights.some((w) => w <= 0))
+  const loadMode = byId(slot.catalogId)?.mode ?? "machine";
+  if (
+    weights.some((w) => w <= 0) &&
+    loadMode !== "bodyweight" &&
+    loadMode !== "assisted"
+  )
     return {
       ...out,
       status: "intro",
@@ -867,17 +508,19 @@ export function loadProposal(
     return {
       ...out,
       weights: weights.map((w) =>
-        Math.min(
-          w,
-          Math.max(
-            p.increment,
-            Math.floor((w * 0.9) / p.increment) * p.increment,
-          ),
-        ),
+        loadMode === "assisted"
+          ? w + p.increment
+          : Math.min(
+              w,
+              Math.max(
+                p.increment,
+                Math.floor((w * 0.9) / p.increment) * p.increment,
+              ),
+            ),
       ),
       reps: reps.map(() => slot.minReps),
       status: "reduce",
-      reason: `${light ? "Današnji lažji trening." : `Premor ${Math.floor(gap)} dni.`} Praktični predlog: manj serij in približno 10 % manjša obremenitev, zaokrožena na potrjen korak. Prilagodi po uvodnih serijah.`,
+      reason: `${light ? "Današnji lažji trening." : `Premor ${Math.floor(gap)} dni.`} ${loadMode === "assisted" ? "Predlagan je en korak več pomoči." : "Praktični predlog: manj serij in približno 10 % manjša obremenitev, zaokrožena na potrjen korak."} Prilagodi po uvodnih serijah.`,
     };
   if (
     !last.e.note &&
@@ -894,7 +537,11 @@ export function loadProposal(
   )
     return {
       ...out,
-      weights: weights.map((w) => w + p.increment),
+      weights: weights.map((w) =>
+        loadMode === "assisted"
+          ? Math.max(0, w - p.increment)
+          : w + p.increment,
+      ),
       reps: reps.map(() => slot.minReps),
       status: "increase",
       reason:
@@ -1146,7 +793,9 @@ export function exerciseForSlot(
     p = preference(c, cat.id),
     proposal = loadProposal(s, slot, light);
   if (dayCheckIn(s).extended && proposal.status === "increase") {
-    proposal.weights = proposal.weights?.map((w) => w - p.increment);
+    proposal.weights = proposal.weights?.map((w) =>
+      cat.mode === "assisted" ? w + p.increment : w - p.increment,
+    );
     proposal.status = "maintain";
     proposal.reason =
       "Daljša različica ohranja delovno težo; dodatni čas je za ogrevanje in počitke.";
@@ -1154,7 +803,7 @@ export function exerciseForSlot(
   return {
     ...newExercise(cat.name),
     id: cat.id,
-    mode: "machine",
+    mode: cat.mode ?? "machine",
     equipment: p.identity,
     confirmed: !!p.identity.trim() && !!p.rom.trim() && p.comfort === "yes",
     minReps: slot.minReps,
@@ -1174,13 +823,13 @@ export function exerciseForSlot(
         !!p.convention &&
         p.comfort === "yes",
       reason: cat.reason,
-      calibration: !proposal.weights,
+      calibration: !proposal.weights && cat.mode !== "bodyweight",
     },
     sets: Array.from({ length: slot.sets }, (_, i) => ({
       ...emptySet(),
       weight: proposal.weights?.[i] ?? 0,
       reps: proposal.reps[i] ?? slot.minReps,
-      loadPending: !proposal.weights,
+      loadPending: !proposal.weights && cat.mode !== "bodyweight",
     })),
   };
 }

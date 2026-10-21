@@ -27,6 +27,7 @@ jobs:
     env:
       VITE_BASE_PATH: /turbo-octo-pancake/
       TEST_BASE_PATH: /turbo-octo-pancake/
+      PREVIOUS_RELEASE_DIR: work/previous-release
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,6 +36,12 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+      - name: Pripravi prejšnjo objavljeno različico za preverjanje posodobitve
+        uses: actions/checkout@v4
+        with:
+          ref: 23b576f55effd789fd753bfe726f33124208536c
+          path: work/previous-release
+          persist-credentials: false
       - run: npm ci
       - name: Preveri izvor pripravljene Bližnjice
         run: |

@@ -2,6 +2,8 @@
 
 Modul deluje lokalno brez AI ključev. Najdeš ga na zaslonu **Danes**, nad ročnim programom. Obstoječi ročni program, zgodovina in meritve ostanejo na voljo.
 
+Posodobitev **0.3** doda hiter pogled ene vaje, beleženje z gumboma +/−, knjižnico 55 vaj s skicami, prikaz zadnjih rezultatov in izbirne uvodne ocene za nove sorodne različice s prostimi utežmi. Podrobni urejevalnik ostane dosegljiv prek **Vse serije**. Zbirka in obstoječi podatki ostanejo isti; [uporaba, pravila ocen in preverjanje ohranitve podatkov](workout-0.3.md).
+
 ## Prva uporaba
 
 1. Potrdi osebni profil in omejitve.

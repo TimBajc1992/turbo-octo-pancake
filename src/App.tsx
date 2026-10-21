@@ -65,6 +65,9 @@ import {
 } from "./model";
 import { PwaUpdate } from "./PwaUpdate";
 import { CoachPanel, BusyDevice, CoachExerciseInfo } from "./Trainer";
+import { FocusWorkout } from "./FocusWorkout";
+import { ExerciseLibraryButton } from "./ExerciseLibrary";
+import { prepareWorkoutLoads } from "./loadAdvice";
 import {
   getCoach,
   replaceDevice,
@@ -328,6 +331,7 @@ export default function App() {
   const [now, setNow] = useState(Date.now());
   const [historyOpen, setHistoryOpen] = useState<string>();
   const [templateOpen, setTemplateOpen] = useState<string>();
+  const [detailedWorkout, setDetailedWorkout] = useState(false);
   const [progressKind, setProgressKind] = useState<
     "weight" | "waist" | "strength"
   >("weight");
@@ -504,7 +508,7 @@ export default function App() {
       startedAt: Date.now(),
       exercises: t.exercises.map(plannedExercise),
     };
-    update((s) => ({ ...s, active }));
+    update((s) => ({ ...s, active: prepareWorkoutLoads(s, active) }));
     setTab("training");
   }
   function saveActive(w: Workout) {
@@ -741,9 +745,7 @@ export default function App() {
                     <h2>Podatki & zasebnost</h2>
                     <ShieldCheck size={18} />
                   </div>
-                  <p>
-                    Različica 0.2 · pripravljene predloge in povezava naprav
-                  </p>
+                  <p>Različica 0.3 · hiter trening in knjižnica vaj</p>
                   <PwaUpdate
                     saved={storage === "Shranjeno v tej napravi"}
                     manual
@@ -893,7 +895,7 @@ export default function App() {
                 update={update}
                 editProfile={() => setModal("profile")}
                 start={(w) => {
-                  update((s) => ({ ...s, active: w }));
+                  update((s) => ({ ...s, active: prepareWorkoutLoads(s, w) }));
                   setTab("training");
                 }}
               />
@@ -1211,7 +1213,9 @@ export default function App() {
             </>
           ) : tab === "training" ? (
             <>
-              <div className="page-heading">
+              <div
+                className={`page-heading ${state.active ? "active-workout-heading" : ""}`}
+              >
                 <div>
                   <div className="eyebrow">SERIJO ZA SERIJO</div>
                   <h1>{state.active ? "Tvoj trening." : "Tvoj program."}</h1>
@@ -1221,21 +1225,31 @@ export default function App() {
                       : "Trener pripravi vaje, serije in ponovitve glede na tvojo opremo in današnji čas."}
                   </p>
                 </div>
-                {!state.active && (
-                  <Button
-                    secondary
-                    onClick={() =>
-                      update((s) => ({
-                        ...s,
-                        templates: [
-                          ...s.templates,
-                          { id: uid(), name: "Nov trening", exercises: [] },
-                        ],
-                      }))
-                    }
+                {state.active ? (
+                  <button
+                    className="button secondary workout-view-toggle"
+                    onClick={() => setDetailedWorkout(!detailedWorkout)}
                   >
-                    <Plus size={17} /> Dodaj trening
-                  </Button>
+                    {detailedWorkout ? "Hiter pogled" : "Vse serije"}
+                  </button>
+                ) : (
+                  <div className="actions">
+                    <ExerciseLibraryButton state={state} />
+                    <Button
+                      secondary
+                      onClick={() =>
+                        update((s) => ({
+                          ...s,
+                          templates: [
+                            ...s.templates,
+                            { id: uid(), name: "Nov trening", exercises: [] },
+                          ],
+                        }))
+                      }
+                    >
+                      <Plus size={17} /> Dodaj trening
+                    </Button>
+                  </div>
                 )}
               </div>
               {state.active ? (
@@ -1262,33 +1276,29 @@ export default function App() {
                         .reduce((n, e) => n + e.sets.length, 0)}{" "}
                       serij
                     </span>
-                  </div>
-                  {state.restUntil && (
-                    <div className="rest-bar">
-                      <Clock size={18} />
-                      <span>
-                        {state.restUntil > now
-                          ? "Počitek"
-                          : "Počitek je končan"}
-                      </span>
+                    <div className="workout-rest" aria-label="Počitek">
+                      <Clock size={15} />
+                      <span className="rest-label">Počitek</span>
                       <strong>
-                        {Math.max(0, Math.ceil((state.restUntil - now) / 1000))}{" "}
-                        s
+                        {state.restUntil
+                          ? state.restUntil > now
+                            ? `${Math.ceil((state.restUntil - now) / 1000)} s`
+                            : "Končan"
+                          : "—"}
                       </strong>
-                      <button
-                        className="text-button"
-                        onClick={() =>
-                          update((s) => ({ ...s, restUntil: undefined }))
-                        }
-                      >
-                        Zaključi
-                      </button>
-                      <small>
-                        Časovnik deluje iz časovne oznake; opozorilo ob zaklepu
-                        ni zagotovljeno.
-                      </small>
+                      {state.restUntil && (
+                        <button
+                          className="icon-button"
+                          aria-label="Preskoči počitek"
+                          onClick={() =>
+                            update((s) => ({ ...s, restUntil: undefined }))
+                          }
+                        >
+                          <X size={14} />
+                        </button>
+                      )}
                     </div>
-                  )}
+                  </div>
                   {state.active.cardioPlan && (
                     <section className="panel">
                       <h2>Kardio · današnji načrt</h2>
@@ -1309,30 +1319,55 @@ export default function App() {
                       </p>
                     </section>
                   )}
-                  <WorkoutEditor
-                    workout={state.active}
-                    state={state}
-                    onChange={saveActive}
-                    onReplaceDevice={(index, id, permanent) =>
-                      update((s) => replaceDevice(s, index, id, permanent))
-                    }
-                    onDone={(rest) =>
-                      update((s) => ({
-                        ...s,
-                        restUntil: Date.now() + rest * 1000,
-                      }))
-                    }
-                  />
-                  <section className="panel">
-                    <label>
-                      Opomba treninga
-                      <textarea
-                        value={state.active.note}
-                        onChange={(e) =>
-                          saveActive({ ...state.active!, note: e.target.value })
-                        }
-                      />
-                    </label>
+                  {detailedWorkout ? (
+                    <WorkoutEditor
+                      workout={state.active}
+                      state={state}
+                      onChange={saveActive}
+                      onReplaceDevice={(index, id, permanent) =>
+                        update((s) => replaceDevice(s, index, id, permanent))
+                      }
+                      onDone={(rest) =>
+                        update((s) => ({
+                          ...s,
+                          restUntil: Date.now() + rest * 1000,
+                        }))
+                      }
+                    />
+                  ) : (
+                    <FocusWorkout
+                      workout={state.active}
+                      state={state}
+                      onChange={saveActive}
+                      onReplaceDevice={(index, id, permanent) =>
+                        update((s) => replaceDevice(s, index, id, permanent))
+                      }
+                      onDone={(rest) =>
+                        update((s) => ({
+                          ...s,
+                          restUntil:
+                            rest > 0 ? Date.now() + rest * 1000 : undefined,
+                        }))
+                      }
+                      showDetails={() => setDetailedWorkout(true)}
+                    />
+                  )}
+                  <section className="panel workout-finish">
+                    <details>
+                      <summary>Opomba treninga</summary>
+                      <label>
+                        Opomba treninga
+                        <textarea
+                          value={state.active.note}
+                          onChange={(e) =>
+                            saveActive({
+                              ...state.active!,
+                              note: e.target.value,
+                            })
+                          }
+                        />
+                      </label>
+                    </details>
                     <div className="actions">
                       <Button
                         onClick={() => {
@@ -1408,7 +1443,10 @@ export default function App() {
                     programs
                     editProfile={() => setModal("profile")}
                     start={(w) => {
-                      update((s) => ({ ...s, active: w }));
+                      update((s) => ({
+                        ...s,
+                        active: prepareWorkoutLoads(s, w),
+                      }));
                       setTab("training");
                     }}
                   />
@@ -2714,6 +2752,11 @@ function AddExercise({
   ];
   return (
     <div className="add-exercise">
+      <ExerciseLibraryButton
+        state={state}
+        onChoose={add}
+        label="Izberi iz knjižnice vaj"
+      />
       <div className="field-grid">
         <label>
           Obstoječa vaja
@@ -2980,7 +3023,7 @@ function WorkoutEditor({
                           ...e,
                           sets: e.sets.map((s, j) => {
                             const p = previous[j];
-                            return p
+                            return p && !s.done
                               ? {
                                   ...s,
                                   weight: p.weight,

@@ -1,4 +1,7 @@
 import { BoundedNumberInput } from "./BoundedNumberInput";
+import { ExerciseSketch } from "./ExerciseSketch";
+import { normalizeExerciseName } from "./exerciseCatalog";
+import { loadAdvice } from "./loadAdvice";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   ArrowRight,
@@ -783,6 +786,7 @@ function CoachSettings({
 }) {
   const c = getCoach(state);
   const [error, setError] = useState("");
+  const [exerciseSearch, setExerciseSearch] = useState("");
   const patch = (v: Partial<CoachConfig>) =>
     setCoach(update, (config) => ({ ...config, ...v, confirmed: false }));
   return (
@@ -899,123 +903,154 @@ function CoachSettings({
         </label>
       </div>
       <h3>Razpoložljive naprave za moč</h3>
+      <label>
+        Poišči vajo ali opremo
+        <input
+          type="search"
+          value={exerciseSearch}
+          onChange={(e) => setExerciseSearch(e.target.value)}
+          placeholder="Npr. noge, bench, ročke …"
+        />
+      </label>
       <div className="device-list">
-        {catalog.map((e) => {
-          const p = preference(c, e.id);
-          const change = (v: Partial<typeof p>) =>
-            patch({
-              preferences: { ...c.preferences, [e.id]: { ...p, ...v } },
-            });
-          return (
-            <div className="device-row" key={e.id}>
-              <label className="check-label">
-                <input
-                  type="checkbox"
-                  checked={c.available.includes(e.id)}
-                  onChange={(v) =>
-                    patch({
-                      available: v.target.checked
-                        ? [...c.available, e.id]
-                        : c.available.filter((id) => id !== e.id),
-                    })
-                  }
-                />
-                <strong>{e.name}</strong>
-                <span className="subtle">{e.muscles.join(", ")}</span>
-              </label>
-              {c.available.includes(e.id) && (
-                <details>
-                  <summary>Oprema, udobje in nastavitve</summary>
-                  <p>{e.instructions}</p>
-                  <div className="field-grid">
-                    <label>
-                      Identiteta točne naprave
+        {catalog
+          .filter((e) =>
+            normalizeExerciseName(
+              [e.name, e.equipment, ...e.muscles].join(" "),
+            ).includes(normalizeExerciseName(exerciseSearch)),
+          )
+          .map((e) => {
+            const p = preference(c, e.id);
+            const change = (v: Partial<typeof p>) =>
+              patch({
+                preferences: { ...c.preferences, [e.id]: { ...p, ...v } },
+              });
+            return (
+              <div className="device-row" key={e.id}>
+                <label className="check-label">
+                  <input
+                    type="checkbox"
+                    checked={c.available.includes(e.id)}
+                    onChange={(v) =>
+                      patch({
+                        available: v.target.checked
+                          ? [...c.available, e.id]
+                          : c.available.filter((id) => id !== e.id),
+                      })
+                    }
+                  />
+                  <strong>{e.name}</strong>
+                  <span className="subtle">{e.muscles.join(", ")}</span>
+                </label>
+                {c.available.includes(e.id) && (
+                  <details>
+                    <summary>Oprema, udobje in nastavitve</summary>
+                    <p>{e.instructions}</p>
+                    <div className="field-grid">
+                      <label>
+                        Identiteta točne naprave
+                        <input
+                          value={p.identity}
+                          placeholder="Npr. znamka in številka naprave"
+                          onChange={(v) => change({ identity: v.target.value })}
+                        />
+                      </label>
+                      <label>
+                        Način beleženja kg
+                        <select
+                          value={p.convention ?? ""}
+                          onChange={(v) =>
+                            change({ convention: v.target.value })
+                          }
+                        >
+                          <option value="">Še ni potrjen</option>
+                          <option value="stack">
+                            Oznaka v kg na skladu / zaslonu
+                          </option>
+                          <option value="added-total">
+                            Skupna dodana teža plošč
+                          </option>
+                          <option value="one-side">
+                            Teža ene strani / roke
+                          </option>
+                          <option value="total-with-bar">
+                            Skupaj s palico
+                          </option>
+                          <option value="one-dumbbell">
+                            Teža ene ročke / uteži
+                          </option>
+                          <option value="added-bodyweight">
+                            Dodatna teža ob lastni teži
+                          </option>
+                          <option value="assistance">Kilogrami pomoči</option>
+                        </select>
+                      </label>
+                      <label>
+                        Obseg gibanja in izvedba
+                        <input
+                          value={p.rom}
+                          placeholder="Npr. udoben obseg, isti ročaj"
+                          onChange={(v) => change({ rom: v.target.value })}
+                        />
+                      </label>
+                      <label>
+                        Sedež / opore (neobvezno)
+                        <input
+                          value={p.seat}
+                          onChange={(v) => change({ seat: v.target.value })}
+                        />
+                      </label>
+                      <label>
+                        Najmanjši razpoložljivi korak (kg)
+                        <input
+                          type="number"
+                          min="0.1"
+                          step="0.1"
+                          value={p.increment}
+                          onChange={(v) =>
+                            change({
+                              increment: Math.max(0.1, +v.target.value),
+                            })
+                          }
+                        />
+                      </label>
+                      <label>
+                        Udobje
+                        <select
+                          value={p.comfort}
+                          onChange={(v) =>
+                            change({
+                              comfort: v.target.value as typeof p.comfort,
+                            })
+                          }
+                        >
+                          <option value="unknown">Še ni preverjeno</option>
+                          <option value="yes">Udobna izvedba</option>
+                          <option value="no">Ni udobna / izpusti</option>
+                        </select>
+                      </label>
+                    </div>
+                    <label className="check-label">
                       <input
-                        value={p.identity}
-                        placeholder="Npr. znamka in številka naprave"
-                        onChange={(v) => change({ identity: v.target.value })}
+                        type="checkbox"
+                        checked={p.favorite}
+                        onChange={(v) => change({ favorite: v.target.checked })}
                       />
+                      Priljubljena vaja
                     </label>
-                    <label>
-                      Način beleženja kg
-                      <select
-                        value={p.convention ?? ""}
-                        onChange={(v) => change({ convention: v.target.value })}
-                      >
-                        <option value="">Še ni potrjen</option>
-                        <option value="stack">
-                          Oznaka v kg na skladu / zaslonu
-                        </option>
-                        <option value="added-total">
-                          Skupna dodana teža plošč
-                        </option>
-                        <option value="one-side">Teža ene strani / roke</option>
-                      </select>
-                    </label>
-                    <label>
-                      Obseg gibanja in izvedba
+                    <label className="check-label">
                       <input
-                        value={p.rom}
-                        placeholder="Npr. udoben obseg, isti ročaj"
-                        onChange={(v) => change({ rom: v.target.value })}
+                        type="checkbox"
+                        checked={p.excluded}
+                        onChange={(v) => change({ excluded: v.target.checked })}
                       />
+                      Izključi iz predlogov
                     </label>
-                    <label>
-                      Sedež / opore (neobvezno)
-                      <input
-                        value={p.seat}
-                        onChange={(v) => change({ seat: v.target.value })}
-                      />
-                    </label>
-                    <label>
-                      Najmanjši razpoložljivi korak (kg)
-                      <input
-                        type="number"
-                        min="0.1"
-                        step="0.1"
-                        value={p.increment}
-                        onChange={(v) =>
-                          change({ increment: Math.max(0.1, +v.target.value) })
-                        }
-                      />
-                    </label>
-                    <label>
-                      Udobje
-                      <select
-                        value={p.comfort}
-                        onChange={(v) =>
-                          change({
-                            comfort: v.target.value as typeof p.comfort,
-                          })
-                        }
-                      >
-                        <option value="unknown">Še ni preverjeno</option>
-                        <option value="yes">Udobna izvedba</option>
-                        <option value="no">Ni udobna / izpusti</option>
-                      </select>
-                    </label>
-                  </div>
-                  <label className="check-label">
-                    <input
-                      type="checkbox"
-                      checked={p.favorite}
-                      onChange={(v) => change({ favorite: v.target.checked })}
-                    />
-                    Priljubljena vaja
-                  </label>
-                  <label className="check-label">
-                    <input
-                      type="checkbox"
-                      checked={p.excluded}
-                      onChange={(v) => change({ excluded: v.target.checked })}
-                    />
-                    Izključi iz predlogov
-                  </label>
-                </details>
-              )}
-            </div>
-          );
-        })}
+                  </details>
+                )}
+              </div>
+            );
+          })}
       </div>
       <h3>Kardio naprave</h3>
       {cardioTypes.map((t) => (
@@ -1228,6 +1263,10 @@ function PlanExercise({
   const cat = byId(slot.catalogId)!;
   const p = preference(getCoach(state), cat.id),
     proposal = loadProposal(state, slot, light);
+  const intro =
+    proposal.status === "intro"
+      ? loadAdvice(state, exerciseForSlot(state, slot, cat.group, light))
+      : undefined;
   return (
     <article className="coach-plan-exercise">
       <div className="section-title">
@@ -1243,13 +1282,16 @@ function PlanExercise({
             ? proposal.weights
                 .map((w, i) => `${num(w)} kg × ${proposal.reps[i]}`)
                 .join(" / ")
-            : "Obremenitev določi na napravi"}
+            : intro?.kind === "estimate"
+              ? `${num(intro.weight!)} kg · uvodna ocena, preveri z lahko serijo`
+              : "Obremenitev določi z uvodno serijo"}
         </strong>
       </p>
-      <p>{proposal.reason}</p>
-      <small>Zgodovinsko izhodišče: {proposal.basis}</small>
       <details>
         <summary>Zakaj ta vaja, navodila in zgodovina</summary>
+        <ExerciseSketch exercise={cat} />
+        <p>{proposal.reason}</p>
+        <small>Zgodovinsko izhodišče: {proposal.basis}</small>
         <p>
           {cat.reason} Ciljne mišice: {cat.muscles.join(", ")}. Vzorec:{" "}
           {cat.pattern}.

@@ -155,6 +155,45 @@ function result(s: State, id: string, weights: number[], days = 1): Workout {
   };
 }
 describe("Moj trener: evidence and loads", () => {
+  it("keeps free-weight load modes and accepts comparable free-weight history", () => {
+    const s = ready();
+    s.coach!.available.push("bench_press");
+    s.coach!.preferences.bench_press = {
+      ...defaultPreference(),
+      identity: "Rack A",
+      rom: "udoben obseg",
+      convention: "total-with-bar",
+      comfort: "yes",
+    };
+    const w = result(s, "bench_press", [45, 45, 40]);
+    w.exercises[0].coach!.formGood = false;
+    s.workouts = [w];
+    expect(w.exercises[0].mode).toBe("barbell");
+    expect(loadProposal(s, slot("bench_press")).weights).toEqual([45, 45, 40]);
+  });
+  it("adds help for a lighter assisted workout and reduces help for progression", () => {
+    const s = ready();
+    s.coach!.available.push("assisted_pull_up");
+    s.coach!.preferences.assisted_pull_up = {
+      ...defaultPreference(),
+      identity: "Assisted A",
+      rom: "udoben obseg",
+      convention: "assistance",
+      comfort: "yes",
+    };
+    s.workouts = [result(s, "assisted_pull_up", [35, 35, 35])];
+    expect(loadProposal(s, slot("assisted_pull_up"), true).weights).toEqual([
+      37.5, 37.5, 37.5,
+    ]);
+    expect(loadProposal(s, slot("assisted_pull_up")).weights).toEqual([
+      32.5, 32.5, 32.5,
+    ]);
+    expect(
+      exerciseForSlot(s, slot("pull_up"), "upper").sets.every(
+        (a) => !a.loadPending && a.weight === 0 && !a.done,
+      ),
+    ).toBe(true);
+  });
   it("uses latest comparable sets and preserves different weights per set", () => {
     const s = ready();
     s.workouts = [result(s, "seated_row", [45, 45, 40], 2)];
