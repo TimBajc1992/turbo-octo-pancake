@@ -745,7 +745,7 @@ export default function App() {
                     <h2>Podatki & zasebnost</h2>
                     <ShieldCheck size={18} />
                   </div>
-                  <p>Različica 0.3 · hiter trening in knjižnica vaj</p>
+                  <p>Različica 0.3.1 · hiter trening in knjižnica vaj</p>
                   <PwaUpdate
                     saved={storage === "Shranjeno v tej napravi"}
                     manual
