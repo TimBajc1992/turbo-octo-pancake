@@ -193,6 +193,7 @@ test("real setup, daily check-in, trial calibration and busy device preserve per
   await dialog.getByLabel("Energija", { exact: false }).selectOption("4");
   await dialog.getByRole("button", { name: "Potrdi današnje počutje" }).click();
   await page.getByRole("button", { name: "Potrdi in začni" }).click();
+  await page.getByRole("button", { name: "Vse serije", exact: true }).click();
   await page
     .getByRole("button", { name: "Potrdi serijo 1 Leg Press", exact: true })
     .isDisabled()
