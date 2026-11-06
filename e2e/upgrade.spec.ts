@@ -13,6 +13,9 @@ import {
 test("upgrades the actual published app and service worker without rewriting any saved data or device entries", async ({
   page,
 }) => {
+  await page.addInitScript(() =>
+    localStorage.setItem("moc-forma:interface", "legacy"),
+  );
   const previous = process.env.PREVIOUS_RELEASE_DIR;
   test.skip(
     !previous,

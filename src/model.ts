@@ -1,3 +1,4 @@
+import type { TrainingDraft, TrainingType } from "./training";
 import type { HealthBridge } from "./healthShortcuts";
 import type { CoachConfig, CheckIn } from "./coach";
 export type LoadMode =
@@ -59,6 +60,8 @@ export interface Provenance {
   modifiedAt?: string;
 }
 export interface Workout extends Provenance {
+  trainingType?: TrainingType;
+  acknowledgedMissingGroups?: string[];
   coach?: {
     group: "lower" | "upper" | "full";
     mode: string;
@@ -143,7 +146,17 @@ export interface ImportBatch {
   profileAfter?: string;
   undone?: boolean;
 }
+export interface HabitDay {
+  id: string;
+  date: string;
+  protein: boolean;
+  plants: boolean;
+  water: boolean;
+  sleep?: number;
+}
 export interface State {
+  trainingDraft?: TrainingDraft;
+  habits?: HabitDay[];
   schema: 1;
   profile: Profile;
   workouts: Workout[];

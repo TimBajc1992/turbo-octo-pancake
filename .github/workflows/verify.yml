@@ -28,6 +28,7 @@ jobs:
       VITE_BASE_PATH: /turbo-octo-pancake/
       TEST_BASE_PATH: /turbo-octo-pancake/
       PREVIOUS_RELEASE_DIR: work/previous-release
+      MOC_PREVIOUS_RELEASE_DIR: work/published-before-moc-forma
     steps:
       - uses: actions/checkout@v4
         with:
@@ -41,6 +42,12 @@ jobs:
         with:
           ref: 23b576f55effd789fd753bfe726f33124208536c
           path: work/previous-release
+          persist-credentials: false
+      - name: Pripravi objavljeno Težišče za preverjanje prehoda na Moč & Formo
+        uses: actions/checkout@v4
+        with:
+          ref: 96b5aa922a81e3a2537ec23b7db2a2fd1ff22b68
+          path: work/published-before-moc-forma
           persist-credentials: false
       - run: npm ci
       - name: Preveri izvor pripravljene Bližnjice

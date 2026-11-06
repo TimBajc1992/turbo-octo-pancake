@@ -1,4 +1,36 @@
-# TEŽIŠČE
+# Moč & Forma — Stara šola
+
+Osebna aplikacija v potrjenem kovinskem videzu. Ta različica združuje videz Moč & Forma, celotno knjižnico 55 vaj Težišča in njegovo izvirno podatkovno zbirko. Spletni naslov ostaja `https://timbajc1992.github.io/turbo-octo-pancake/`; obstoječi šifrirani Cloudflare Worker in povezava med napravami ostaneta ista.
+
+## Novo sestavljanje treninga
+
+Sistem predlaga samo **Push Day, Pull Day, Legs ali Celotno telo**. Vaje izbereš sam iz knjižnice, ki pokaže samo vaje za izbrani sklop. Vsaka mišična skupina ima števec `0/2`; največ dve vaji sta dovoljeni na glavno mišično skupino. Pomožne mišice so prikazane ločeno. Pred začetkom dobiš seznam praznih skupin in jih lahko dopolniš ali izrecno označiš, da jih danes izpuščaš. Za vsako vrsto treninga se hrani ločena izbira.
+
+Knjižnica ohranja skice začetnega in končnega položaja, navodila, iskanje po vzdevkih, filtre po opremi, zadnje dejanske rezultate in izbirne uvodne ocene z enakimi pravili primerljivosti kot Težišče. Nove serije se ne označijo kot opravljene samodejno.
+
+## Ohranitev zgodovine
+
+Na obstoječem naslovu aplikacija uporablja isto IndexedDB zbirko `tezisce`, različico 1, shrambo `state` in ključ `current`. Podatkov ne preimenuje ali pretvarja. Ob prvem odpiranju pred začetkom urejanja shrani celotno lokalno kopijo v ključ `moc-forma:safety:v1`; ob ponovnem odpiranju je ne prepiše. V nastavitvah je gumb **Izvozi kopijo pred prenovo**. Trenutni celotni izvoz ostaja združljiv z obliko `tezisce-backup`.
+
+Zgodovina, aktivni trening, izvorni paketi, meritve, dnevne aktivnosti, ročne predloge, nastavitve trenerja, Apple Health in lokalni ključi povezave med napravami ostanejo ohranjeni. Prejšnji vmesnik Težišče ostaja dosegljiv v nastavitvah kot možnost za nadaljnjo uporabo starih orodij. Nova polja za pripravo treninga in navade so neobvezna razširitev.
+
+## Razvoj in prenos
+
+```sh
+npm ci
+npm test
+VITE_BASE_PATH=/turbo-octo-pancake/ npm run build
+TEST_BASE_PATH=/turbo-octo-pancake/ npm run test:e2e
+```
+
+Za lokalni koren uporabi `npm run build`. Brskalniški preizkusi privzeto uporabijo vrata 4174; `TEST_PORT` jih lahko spremeni. Preizkusi prehoda iz objave uporabijo `PREVIOUS_RELEASE_DIR` za predhodni vmesnik in `MOC_PREVIOUS_RELEASE_DIR` za zadnje objavljeno Težišče; CI pripravi oba posnetka. Podrobnosti so v [prehodu na Moč & Formo](docs/moc-forma-migration.md).
+
+Nadaljevanje v niti `01a14128-8b6e-70db-90ca-0174858a3067` mora uporabiti ta repozitorij in najnovejšo vejo `main`; ID klepeta ni naslov spletne aplikacije. Navodila za delo v drugi niti so v dokumentu [predaja](docs/PREDAJA-MOC-FORMA.md).
+
+---
+
+## Prejšnja dokumentacija Težišča
+
 
 **Manj kilogramov. Več moči.** Osebna aplikacija za beleženje treningov, meritev in napredka. React 19 + TypeScript + Vite, IndexedDB, brez strežniške zbirke in zunanjega AI.
 

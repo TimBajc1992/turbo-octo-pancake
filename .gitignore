@@ -14,3 +14,6 @@ tezisce-varnostna-kopija-*.json
 cloudflare/wrangler.generated.json
 .dev.vars
 work/
+
+moc-in-forma-varnostna-kopija-*.json
+tezisce-pred-moc-in-forma*.json

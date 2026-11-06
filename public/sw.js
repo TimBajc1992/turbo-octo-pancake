@@ -36,7 +36,12 @@ self.addEventListener("fetch", (event) => {
     return;
   event.respondWith(
     caches.open(CACHE).then(async (cache) => {
-      const cached = await cache.match(event.request);
+      // The precached files are static and have the same content for every origin.
+      // Module requests may carry an Origin header while installation fetches do
+      // not; a host's Vary: Origin must not break the first offline reload.
+      const cached = await cache.match(event.request, {
+        ignoreVary: ASSETS.includes(url.pathname),
+      });
       if (cached) return cached;
       try {
         const response = await fetch(event.request);

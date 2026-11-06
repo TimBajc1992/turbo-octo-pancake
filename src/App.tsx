@@ -1,3 +1,9 @@
+import { IronToday, IronMark } from "./iron/IronToday";
+import { IronHabits } from "./iron/IronHabits";
+import { TrainingBuilder } from "./TrainingBuilder";
+import { validateWorkoutSelection } from "./training";
+import { ensureMocFormaSafetyCopy, readMocFormaSafetyCopy } from "./db";
+import { Leaf } from "lucide-react";
 import { CloudSyncPanel } from "./CloudSyncPanel";
 import { useCloudSync } from "./useCloudSync";
 import { HealthShortcutsPanel } from "./HealthShortcutsPanel";
@@ -74,10 +80,11 @@ import {
   replacementWorkout,
   reconcileExercise,
 } from "./coach";
-type Tab = "today" | "training" | "progress" | "history";
+type Tab = "today" | "training" | "habits" | "progress" | "history";
 const tabs = [
   { id: "today" as Tab, label: "Danes", icon: House },
-  { id: "training" as Tab, label: "Trening", icon: Dumbbell },
+  { id: "training" as Tab, label: "Vadba", icon: Dumbbell },
+  { id: "habits" as Tab, label: "Navade", icon: Leaf },
   { id: "progress" as Tab, label: "Napredek", icon: BarChart3 },
   { id: "history" as Tab, label: "Zgodovina", icon: History },
 ];
@@ -204,8 +211,8 @@ function Chart({
           x2="0"
           y2="1"
         >
-          <stop offset="0%" stopColor="#c5ed88" stopOpacity=".17" />
-          <stop offset="100%" stopColor="#c5ed88" stopOpacity="0" />
+          <stop offset="0%" stopColor="#91482e" stopOpacity=".17" />
+          <stop offset="100%" stopColor="#91482e" stopOpacity="0" />
         </linearGradient>
       </defs>
       {[0, 0.5, 1].map((f) => (
@@ -234,7 +241,7 @@ function Chart({
           <polyline
             points={points}
             fill="none"
-            stroke="#c5ed88"
+            stroke="#91482e"
             strokeWidth="2.5"
             strokeLinejoin="round"
           />
@@ -246,7 +253,7 @@ function Chart({
           cx={x(r.date)}
           cy={y(r.value)}
           r={sorted.length > 30 ? 2 : 4}
-          fill="#c5ed88"
+          fill="#91482e"
         >
           <title>
             {dateLabel(r.date, true)}: {num(r.value)} {unit}
@@ -338,9 +345,11 @@ export default function App() {
   useEffect(() => {
     let mounted = true;
     loadState()
-      .then((s) => {
+      .then(async (s) => {
+        await ensureMocFormaSafetyCopy(s);
         if (mounted) {
           setState(s);
+          if (s.active) setTab("training");
           setStorage("Shranjeno v tej napravi");
         }
       })
@@ -355,9 +364,12 @@ export default function App() {
     };
   }, []);
   useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), 1000);
+    const t = setInterval(
+      () => setNow(Date.now()),
+      state?.active ? 1000 : 60000,
+    );
     return () => clearInterval(t);
-  }, []);
+  }, [state?.active?.id]);
   useEffect(() => {
     if (!toast) return;
     const t = setTimeout(() => setToast(""), 5500);
@@ -512,13 +524,30 @@ export default function App() {
     setTab("training");
   }
   function saveActive(w: Workout) {
-    update((s) => ({ ...s, active: w }));
+    try {
+      validateWorkoutSelection(w);
+      void update((s) => ({ ...s, active: w }));
+    } catch (e) {
+      setToast((e as Error).message);
+    }
   }
+  function replaceActiveDevice(index: number, id: string, permanent: boolean) {
+    try {
+      void update((s) => {
+        const next = replaceDevice(s, index, id, permanent);
+        if (next.active) validateWorkoutSelection(next.active);
+        return next;
+      });
+    } catch (e) {
+      setToast((e as Error).message);
+    }
+  }
+
   function download() {
     const blob = new Blob([backup(state!)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `tezisce-varnostna-kopija-${localDate()}.json`;
+    a.download = `moc-in-forma-varnostna-kopija-${localDate()}.json`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
@@ -546,109 +575,86 @@ export default function App() {
     : "Brez meritev";
   const activeDone = state.active ? completeSets(state.active).length : 0;
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
+    <div className="iron-shell">
+      <aside className="iron-rail">
         <a
-          className="brand"
+          className="iron-rail-brand"
           href="#"
+          aria-label="Moč in Forma · Danes"
           onClick={(e) => {
             e.preventDefault();
             setTab("today");
             setSettings(false);
           }}
         >
-          TEŽIŠČE
-          <span>
-            <ArrowUpRight size={27} />
-          </span>
+          <IronMark />
         </a>
-        <div className="brand-sub">MANJ KILOGRAMOV. VEČ MOČI.</div>
-        <div className="nav-caption">TVOJ PROSTOR</div>
-        <nav>
-          {tabs.map((t) => (
+        <span className="iron-rail-caption">TVOJ PROSTOR</span>
+        <nav aria-label="Glavna navigacija">
+          {tabs.map((t, i) => (
             <button
               key={t.id}
+              aria-current={tab === t.id && !settings ? "page" : undefined}
+              className={tab === t.id && !settings ? "active" : ""}
               onClick={() => {
                 setTab(t.id);
                 setSettings(false);
+                window.scrollTo(0, 0);
               }}
-              className={tab === t.id && !settings ? "selected" : ""}
             >
-              <t.icon size={20} />
-              {t.label}
-              {t.id === "training" && state.active && (
-                <span className="nav-dot" />
-              )}
-              {tab === t.id && !settings && (
-                <ChevronRight size={15} className="nav-arrow" />
-              )}
+              <small aria-hidden="true">{String(i + 1).padStart(2, "0")}</small>
+              <t.icon size={21} />
+              <span>{t.label}</span>
             </button>
           ))}
         </nav>
-        <div className="side-note">
-          <div className="mini-mark">
-            <Zap size={18} />
-          </div>
-          <h3>Vsak trening šteje.</h3>
-          <p>
-            Majhni koraki.
+        <div className="iron-rail-bottom">
+          <strong>
+            VEDNO
             <br />
-            Dolgoročna sprememba.
-          </p>
-          <span>
-            OSTANI V GIBANJU <ArrowUpRight size={14} />
-          </span>
+            <em>NAPREJ.</em>
+          </strong>
+          <button
+            aria-label="Nastavitve in profil"
+            onClick={() => setSettings(true)}
+          >
+            <Settings size={20} />
+          </button>
+          <span>MOČ & FORMA</span>
         </div>
-        <div className="side-bottom">
-          <ShieldCheck size={16} />
-          <span>Tvoji podatki. Samo tvoji.</span>
-        </div>
-        <button className="profile-button" onClick={() => setSettings(true)}>
-          <div className="avatar">
-            {state.profile.name
-              ? state.profile.name.slice(0, 1).toUpperCase()
-              : "T"}
-          </div>
-          <div>
-            <strong>{state.profile.name || "Moj profil"}</strong>
-            <small>Osebni prostor</small>
-          </div>
-          <Settings size={17} />
-        </button>
       </aside>
-      <div className="main-wrap">
-        <header className="topbar">
-          <span className="breadcrumb">
-            Moj prostor <ChevronRight size={13} />{" "}
-            <strong>
-              {settings ? "Nastavitve" : tabs.find((t) => t.id === tab)?.label}
-            </strong>
-          </span>
+      <div className="iron-main">
+        <header className="iron-header">
           <a
-            className="brand mobile-brand"
+            className="iron-wordmark"
             href="#"
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
               setTab("today");
               setSettings(false);
             }}
           >
-            TEŽIŠČE
-            <span>
-              <ArrowUpRight size={27} />
-            </span>
+            MOČ <i>&</i> FORMA <span>↗</span>
           </a>
-          <div className="header-right">
+          <span className="iron-breadcrumb">
+            MOJ PROSTOR
+            <ChevronRight size={13} />
+            <strong>
+              {settings ? "Profil" : tabs.find((t) => t.id === tab)?.label}
+            </strong>
+          </span>
+          <div className="iron-header-right">
             <PwaUpdate saved={storage === "Shranjeno v tej napravi"} />
-            <span className="local-status">
-              <span className="status-dot" />
-              {storage}
+            <span className="iron-storage" role="status">
+              <i />
+              {storage === "Shranjeno v tej napravi" ? "Na napravi" : storage}
             </span>
             <button
+              className="iron-avatar"
               aria-label="Nastavitve in profil"
-              className="icon-button"
               onClick={() => setSettings(!settings)}
             >
-              <Settings size={19} />
+              {state.profile.name?.slice(0, 1).toUpperCase() || "T"}
             </button>
           </div>
         </header>
@@ -679,7 +685,7 @@ export default function App() {
             </button>
           </div>
         )}
-        <main>
+        <main className="iron-page" id="main-content">
           {settings ? (
             <>
               <div className="page-heading">
@@ -745,7 +751,40 @@ export default function App() {
                     <h2>Podatki & zasebnost</h2>
                     <ShieldCheck size={18} />
                   </div>
-                  <p>Različica 0.3.1 · hiter trening in knjižnica vaj</p>
+                  <p>
+                    Moč & Forma · knjižnica Težišča in tvoja ohranjena zgodovina
+                  </p>
+                  <button
+                    className="button secondary"
+                    onClick={async () => {
+                      const copy = await readMocFormaSafetyCopy();
+                      if (!copy) {
+                        setToast("Začetne varnostne kopije ni na tej napravi.");
+                        return;
+                      }
+                      const a = document.createElement("a"),
+                        url = URL.createObjectURL(
+                          new Blob([backup(copy.state)], {
+                            type: "application/json",
+                          }),
+                        );
+                      a.href = url;
+                      a.download = "tezisce-pred-moc-in-forma.json";
+                      a.click();
+                      setTimeout(() => URL.revokeObjectURL(url), 1000);
+                    }}
+                  >
+                    Izvozi kopijo pred prenovo
+                  </button>
+                  <button
+                    className="button secondary"
+                    onClick={() => {
+                      localStorage.setItem("moc-forma:interface", "legacy");
+                      location.reload();
+                    }}
+                  >
+                    Odpri prejšnji vmesnik Težišče
+                  </button>
                   <PwaUpdate
                     saved={storage === "Shranjeno v tej napravi"}
                     manual
@@ -856,361 +895,16 @@ export default function App() {
               )}
             </>
           ) : tab === "today" ? (
-            <>
-              <div className="page-heading">
-                <div>
-                  <div className="eyebrow">{todayName}</div>
-                  <h1>
-                    Tvoj tempo.
-                    <br className="mobile-break" />
-                    <span> Tvoj napredek.</span>
-                  </h1>
-                  <p>Vsak korak šteje. Nadaljuj tam, kjer si ostal.</p>
-                </div>
-                <button
-                  className="text-button"
-                  onClick={() => fileRef.current?.click()}
-                >
-                  <Upload size={16} /> Uvozi zgodovino
-                </button>
-              </div>
-              {!state.profile.confirmed && (
-                <div className="onboarding-strip">
-                  <div>
-                    <span className="tiny-icon">
-                      <Target size={18} />
-                    </span>
-                    <span>
-                      <strong>Najprej spoznajmo tvoje cilje.</strong> Potrdi
-                      profil in sestavi program po svoji meri.
-                    </span>
-                  </div>
-                  <button onClick={() => setModal("profile")}>
-                    Uredi profil <ArrowRight size={16} />
-                  </button>
-                </div>
-              )}
-              <CoachPanel
-                state={state}
-                update={update}
-                editProfile={() => setModal("profile")}
-                start={(w) => {
-                  update((s) => ({ ...s, active: prepareWorkoutLoads(s, w) }));
-                  setTab("training");
-                }}
-              />
-              <div className="dashboard-top">
-                <section className="hero-card">
-                  <div className="hero-content">
-                    <span className="eyebrow">
-                      <span className="status-dot" />
-                      {state.active ? "TRENING V TEKU" : "TVOJ NASLEDNJI KORAK"}
-                    </span>
-                    <div className="hero-title">
-                      <h2>
-                        {state.active?.name || next?.name || "Tvoj trening"}
-                      </h2>
-                      <span className="outline-tag">
-                        {state.active
-                          ? "Aktivno"
-                          : nextSessionDate(state.profile)
-                            ? dateLabel(nextSessionDate(state.profile)!)
-                            : "Prilagodljivo"}
-                      </span>
-                    </div>
-                    <p>
-                      {state.active
-                        ? "Moč gradiš serijo za serijo. Nadaljuj."
-                        : next?.exercises.length
-                          ? "Danes naredi nekaj zase. Pripravljen na novo serijo?"
-                          : "Sestavi trening ali nadaljuj z vajami iz svoje zgodovine."}
-                    </p>
-                    <div className="hero-meta">
-                      <span>
-                        <Dumbbell size={16} />
-                        {state.active?.exercises.length ??
-                          next?.exercises.length ??
-                          0}{" "}
-                        vaj
-                      </span>
-                      <span>
-                        <Clock size={16} />
-                        {state.profile.time} min na voljo
-                      </span>
-                    </div>
-                    <Button
-                      onClick={() =>
-                        state.active
-                          ? setTab("training")
-                          : next
-                            ? start(next)
-                            : setTab("training")
-                      }
-                    >
-                      {state.active
-                        ? "Nadaljuj trening"
-                        : next?.exercises.length
-                          ? "Začni trening"
-                          : "Pripravi trening"}{" "}
-                      <ArrowRight size={19} />
-                    </Button>
-                  </div>
-                  <WorkoutArt />
-                  <div className="hero-bottom">
-                    <span>
-                      01 <span>/ TVOJ PROGRAM</span>
-                    </span>
-                    <button onClick={() => setTab("training")}>
-                      Poglej program <ArrowUpRight size={14} />
-                    </button>
-                  </div>
-                </section>
-                <section className="week-card">
-                  <div className="section-title">
-                    <h2>Ta teden</h2>
-                    <span className="subtle">
-                      {dateLabel(weekStart())} — danes
-                    </span>
-                  </div>
-                  <div className="week-number">
-                    {thisWeek.length}
-                    <span>
-                      {state.profile.weeklyGoal
-                        ? ` / ${state.profile.weeklyGoal}`
-                        : " treningov"}
-                    </span>
-                  </div>
-                  <p>
-                    {state.profile.weeklyGoal
-                      ? "Opravljenih treningov od ponedeljka"
-                      : "Tedenski cilj še ni nastavljen"}
-                  </p>
-                  <div className="week-days">
-                    {["P", "T", "S", "Č", "P", "S", "N"].map((d, i) => {
-                      const date = new Date(weekStart() + "T12:00:00");
-                      date.setDate(date.getDate() + i);
-                      const day = localDate(date);
-                      const done = thisWeek.some((w) => w.date === day);
-                      return (
-                        <div key={i}>
-                          <span>{d}</span>
-                          <div
-                            title={dateLabel(day, true)}
-                            className={`${done ? "day-done" : ""} ${day === localDate() ? "day-today" : ""}`}
-                          >
-                            {done ? <Check size={16} /> : date.getDate()}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                  <div className="week-footer">
-                    <Flame size={16} />
-                    <span>
-                      {streak(state.workouts)} zaporednih aktivnih tednov
-                    </span>
-                  </div>
-                </section>
-              </div>
-              <div className="metrics-grid">
-                <section className="metric-card">
-                  <div className="section-title">
-                    <span>Telesna teža</span>
-                    <button
-                      className="icon-button"
-                      aria-label="Dodaj težo"
-                      onClick={() => openMeasure("weight")}
-                    >
-                      <Plus size={18} />
-                    </button>
-                  </div>
-                  <div className="metric-value">
-                    {lastWeight ? num(lastWeight.value) : "—"}
-                    <span>kg</span>
-                  </div>
-                  <div className="metric-foot">
-                    <span>{lastDateInfo}</span>
-                    <span className="metric-symbol">
-                      <Activity size={21} />
-                    </span>
-                  </div>
-                </section>
-                <section className="metric-card">
-                  <div className="section-title">
-                    <span>Sprememba teže</span>
-                    <ArrowDownLeft size={19} />
-                  </div>
-                  <div
-                    className={`metric-value ${weightDelta !== undefined && weightDelta < 0 ? "lime" : ""}`}
-                  >
-                    {weightDelta === undefined
-                      ? "—"
-                      : `${weightDelta > 0 ? "+" : ""}${num(weightDelta)}`}
-                    <span>kg</span>
-                  </div>
-                  <div className="metric-foot">
-                    <span>
-                      {firstWeight
-                        ? `od ${dateLabel(firstWeight.date, true)}`
-                        : "od prve meritve"}
-                    </span>
-                    {weights.length > 1 && (
-                      <span className="small-badge">
-                        {num(
-                          (Math.abs(weightDelta!) / firstWeight.value) * 100,
-                        )}{" "}
-                        %
-                      </span>
-                    )}
-                  </div>
-                </section>
-                <section className="metric-card">
-                  <div className="section-title">
-                    <span>Obseg pasu</span>
-                    <button
-                      className="icon-button"
-                      aria-label="Dodaj obseg pasu"
-                      onClick={() => openMeasure("waist")}
-                    >
-                      <Plus size={18} />
-                    </button>
-                  </div>
-                  <div className="metric-value">
-                    {lastWaist ? num(lastWaist.value) : "—"}
-                    <span>cm</span>
-                  </div>
-                  <div className="metric-foot">
-                    <span>
-                      {lastWaist
-                        ? dateLabel(lastWaist.date, true)
-                        : "Brez meritev"}
-                    </span>
-                    <span className="metric-symbol">
-                      <Target size={21} />
-                    </span>
-                  </div>
-                </section>
-              </div>
-              <div className="dashboard-middle">
-                <section className="panel weight-panel">
-                  <div className="section-title">
-                    <div>
-                      <h2>Lažji korak. Močnejši ti.</h2>
-                      <p>Telesna teža skozi čas</p>
-                    </div>
-                    <button
-                      className="text-button"
-                      onClick={() => {
-                        setProgressKind("weight");
-                        setTab("progress");
-                      }}
-                    >
-                      Napredek <ArrowUpRight size={16} />
-                    </button>
-                  </div>
-                  <Chart rows={weights} unit="kg" />
-                  <div className="chart-caption">
-                    <span>
-                      <i /> Posamezne meritve
-                    </span>
-                    <span>
-                      {weights.length} meritev · brez dodanih vmesnih vrednosti
-                    </span>
-                  </div>
-                </section>
-                <section className="panel insight-card">
-                  <span className="eyebrow">
-                    <Zap size={15} /> POGLED NA NAPREDEK
-                  </span>
-                  <h2>
-                    {weights.length > 1
-                      ? "Doslednost premika meje."
-                      : "Tvoja zgodba se začne tukaj."}
-                  </h2>
-                  <p>
-                    {weights.length > 1
-                      ? `Od prve meritve se je teža spremenila za ${num(weightDelta!)} kg. V zgodovini imaš ${doneWorkouts.length} opravljenih treningov.`
-                      : "Dodaj prvo meritev ali uvozi zgodovino. Tako bo tvoj naslednji korak temeljil na dejanskih podatkih."}
-                  </p>
-                  <div className="insight-divider" />
-                  <span className="label">NASLEDNJI KORAK</span>
-                  <p>
-                    {!state.profile.confirmed
-                      ? "Potrdi cilje in omejitve. Program in obremenitve prilagodi svojemu počutju."
-                      : "Opravljene serije beleži sproti. Pri vajah potrdi opremo in ciljni razpon ponovitev."}
-                  </p>
-                  <button
-                    className="text-button"
-                    onClick={() =>
-                      state.profile.confirmed
-                        ? setTab("training")
-                        : setModal("profile")
-                    }
-                  >
-                    {state.profile.confirmed
-                      ? "Odpri program"
-                      : "Dopolni profil"}{" "}
-                    <ArrowRight size={16} />
-                  </button>
-                </section>
-              </div>
-              <div className="section-title recent-title">
-                <h2>
-                  Zadnji treningi{" "}
-                  <span className="count">{state.workouts.length}</span>
-                </h2>
-                <button
-                  className="text-button"
-                  onClick={() => setTab("history")}
-                >
-                  Vsa zgodovina <ArrowRight size={15} />
-                </button>
-              </div>
-              <section className="recent-list">
-                {recent.length ? (
-                  recent.map((w) => (
-                    <button
-                      key={w.id}
-                      className="recent-row"
-                      onClick={() => {
-                        setHistoryOpen(w.id);
-                        setTab("history");
-                      }}
-                    >
-                      <span className="workout-icon">
-                        <Dumbbell size={21} />
-                      </span>
-                      <div>
-                        <strong>{w.name}</strong>
-                        <small>{dateLabel(w.date, true)}</small>
-                      </div>
-                      <span className="recent-stat">
-                        {completeSets(w).length}
-                        <small>serij</small>
-                      </span>
-                      <span className="recent-duration">
-                        <Clock size={14} />
-                        {w.reviewDuration
-                          ? "Za preverjanje"
-                          : `${num(w.durationMin, 0)} min`}
-                      </span>
-                      <ChevronRight size={18} />
-                    </button>
-                  ))
-                ) : (
-                  <Empty
-                    title="Prostor za tvoje prve zmage"
-                    detail="Tukaj bodo tvoji opravljeni treningi. Uvozi zgodovino ali sestavi prvi trening."
-                  />
-                )}
-              </section>
-              <div className="bottom-note">
-                <ShieldCheck size={14} />{" "}
-                {cloudSync.device
-                  ? cloudSync.status
-                  : "Lokalno shranjeno · naprave poveži v nastavitvah."}
-              </div>
-            </>
+            <IronToday
+              state={state}
+              update={update}
+              train={() => setTab("training")}
+              habits={() => setTab("habits")}
+              history={() => setTab("history")}
+              daily={() => setModal("daily")}
+            />
+          ) : tab === "habits" ? (
+            <IronHabits state={state} update={update} />
           ) : tab === "training" ? (
             <>
               <div
@@ -1218,11 +912,11 @@ export default function App() {
               >
                 <div>
                   <div className="eyebrow">SERIJO ZA SERIJO</div>
-                  <h1>{state.active ? "Tvoj trening." : "Tvoj program."}</h1>
+                  <h1>{state.active ? state.active.name : "Tvoja vadba."}</h1>
                   <p>
                     {state.active
                       ? "Načrt ni rezultat. Potrdi vsako opravljeno serijo."
-                      : "Trener pripravi vaje, serije in ponovitve glede na tvojo opremo in današnji čas."}
+                      : "Vrsto treninga predlagamo. Vaje iz knjižnice izbereš ti."}
                   </p>
                 </div>
                 {state.active ? (
@@ -1233,23 +927,7 @@ export default function App() {
                     {detailedWorkout ? "Hiter pogled" : "Vse serije"}
                   </button>
                 ) : (
-                  <div className="actions">
-                    <ExerciseLibraryButton state={state} />
-                    <Button
-                      secondary
-                      onClick={() =>
-                        update((s) => ({
-                          ...s,
-                          templates: [
-                            ...s.templates,
-                            { id: uid(), name: "Nov trening", exercises: [] },
-                          ],
-                        }))
-                      }
-                    >
-                      <Plus size={17} /> Dodaj trening
-                    </Button>
-                  </div>
+                  <span className="iron-tag">SESTAVI PO SVOJE</span>
                 )}
               </div>
               {state.active ? (
@@ -1324,9 +1002,7 @@ export default function App() {
                       workout={state.active}
                       state={state}
                       onChange={saveActive}
-                      onReplaceDevice={(index, id, permanent) =>
-                        update((s) => replaceDevice(s, index, id, permanent))
-                      }
+                      onReplaceDevice={replaceActiveDevice}
                       onDone={(rest) =>
                         update((s) => ({
                           ...s,
@@ -1339,9 +1015,7 @@ export default function App() {
                       workout={state.active}
                       state={state}
                       onChange={saveActive}
-                      onReplaceDevice={(index, id, permanent) =>
-                        update((s) => replaceDevice(s, index, id, permanent))
-                      }
+                      onReplaceDevice={replaceActiveDevice}
                       onDone={(rest) =>
                         update((s) => ({
                           ...s,
@@ -1436,145 +1110,17 @@ export default function App() {
                   </section>
                 </>
               ) : (
-                <>
-                  <CoachPanel
-                    state={state}
-                    update={update}
-                    programs
-                    editProfile={() => setModal("profile")}
-                    start={(w) => {
-                      update((s) => ({
-                        ...s,
-                        active: prepareWorkoutLoads(s, w),
-                      }));
-                      setTab("training");
-                    }}
-                  />
-                  {!state.profile.confirmed && (
-                    <div className="notice">
-                      <Info size={18} />
-                      <span>
-                        Osebni program še ni potrjen. Zgodovina in ročno
-                        sestavljanje sta na voljo.
-                      </span>
-                      <button
-                        className="text-button"
-                        onClick={() => setModal("profile")}
-                      >
-                        Uredi profil
-                      </button>
-                    </div>
-                  )}
-                  <div className="program-grid">
-                    {state.templates.map((t, i) => (
-                      <section
-                        key={t.id}
-                        className={`panel program-card ${i === state.nextTemplate % state.templates.length ? "next-program" : ""}`}
-                      >
-                        <div className="section-title">
-                          <span className="program-index">
-                            {String(i + 1).padStart(2, "0")}
-                          </span>
-                          {i ===
-                            state.nextTemplate % state.templates.length && (
-                            <span className="badge">Naslednji</span>
-                          )}
-                        </div>
-                        <h2>{t.name}</h2>
-                        <p>
-                          {t.exercises.length} vaj ·{" "}
-                          {t.exercises.reduce((n, e) => n + e.sets.length, 0)}{" "}
-                          načrtovanih serij
-                        </p>
-                        <div className="program-exercises">
-                          {t.exercises.length ? (
-                            t.exercises.map((e, j) => (
-                              <span key={j}>{e.name}</span>
-                            ))
-                          ) : (
-                            <span>Predloga še nima vaj</span>
-                          )}
-                        </div>
-                        <button
-                          className="text-button"
-                          disabled={
-                            i === state.nextTemplate % state.templates.length
-                          }
-                          onClick={() =>
-                            update((s) => ({ ...s, nextTemplate: i }))
-                          }
-                        >
-                          {i === state.nextTemplate % state.templates.length
-                            ? "Naslednji v zaporedju"
-                            : "Nastavi kot naslednji"}
-                        </button>
-                        <div className="actions">
-                          <Button onClick={() => start(t)}>
-                            {t.exercises.length
-                              ? "Začni trening"
-                              : "Dodaj vaje"}{" "}
-                            <ArrowRight size={17} />
-                          </Button>
-                          <button
-                            className="icon-button"
-                            aria-label={`Uredi ${t.name}`}
-                            onClick={() => setTemplateOpen(t.id)}
-                          >
-                            <Settings size={19} />
-                          </button>
-                        </div>
-                      </section>
-                    ))}
-                  </div>
-                  <section className="panel">
-                    <h2>Uporabi vaje iz zgodovine</h2>
-                    <p>
-                      Izberi zadnji trening skupine kot izhodišče. Obremenitve
-                      ostanejo zgodovinske, serije pa nepotrjene. To ni
-                      samodejno potrjen program.
-                    </p>
-                    <div className="actions">
-                      {["legs", "push", "pull", "upper"].map((split) => {
-                        const w = [...state.workouts]
-                          .filter((w) => w.splitId.toLowerCase() === split)
-                          .sort((a, b) => b.date.localeCompare(a.date))[0];
-                        return (
-                          <Button
-                            key={split}
-                            secondary
-                            disabled={!w}
-                            onClick={() => {
-                              if (!w) return;
-                              const template: Template = {
-                                id: uid(),
-                                name: w.name,
-                                exercises: structuredClone(w.exercises).map(
-                                  (e) => ({
-                                    ...e,
-                                    confirmed: false,
-                                    sets: e.sets.map((a) => ({
-                                      ...a,
-                                      id: uid(),
-                                      done: false,
-                                    })),
-                                  }),
-                                ),
-                              };
-                              update((s) => ({
-                                ...s,
-                                templates: [...s.templates, template],
-                              }));
-                              setTemplateOpen(template.id);
-                            }}
-                          >
-                            {split.charAt(0).toUpperCase() + split.slice(1)}{" "}
-                            {w && <small>{dateLabel(w.date)}</small>}
-                          </Button>
-                        );
-                      })}
-                    </div>
-                  </section>
-                </>
+                <TrainingBuilder
+                  state={state}
+                  update={update}
+                  start={(workout) => {
+                    void update((s) => {
+                      if (s.active) throw Error("Vadba je že odprta.");
+                      return { ...s, active: workout, restUntil: undefined };
+                    });
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                />
               )}
             </>
           ) : tab === "progress" ? (
@@ -1972,20 +1518,22 @@ export default function App() {
         </main>
         <footer>
           <span>
-            TEŽIŠČE <ArrowUpRight size={13} className="footer-cross" />
+            MOČ & FORMA <ArrowUpRight size={13} className="footer-cross" />
           </span>
-          <span>Manj kilogramov. Več moči.</span>
+          <span>Majhni koraki. Na dolgi rok.</span>
           <span>Majhni koraki, vsak dan.</span>
         </footer>
       </div>
-      <nav className="bottom-nav" aria-label="Glavna navigacija">
+      <nav className="iron-dock" aria-label="Mobilna navigacija">
         {tabs.map((t) => (
           <button
             key={t.id}
-            className={t.id === tab && !settings ? "selected" : ""}
+            className={tab === t.id && !settings ? "active" : ""}
+            aria-current={tab === t.id && !settings ? "page" : undefined}
             onClick={() => {
               setTab(t.id);
               setSettings(false);
+              window.scrollTo(0, 0);
             }}
           >
             <t.icon size={21} />
@@ -2735,9 +2283,13 @@ function ExerciseConfig({
 }
 function AddExercise({
   state,
+  trainingType,
+  selectedExercises,
   add,
 }: {
   state: State;
+  trainingType?: import("./training").TrainingType;
+  selectedExercises?: Exercise[];
   add: (e: Exercise) => void;
 }) {
   const [name, setName] = useState("");
@@ -2754,64 +2306,72 @@ function AddExercise({
     <div className="add-exercise">
       <ExerciseLibraryButton
         state={state}
+        trainingType={trainingType}
+        selectedExercises={selectedExercises}
         onChoose={add}
         label="Izberi iz knjižnice vaj"
       />
-      <div className="field-grid">
-        <label>
-          Obstoječa vaja
-          <select
-            value={selected}
-            onChange={(e) => setSelected(e.target.value)}
-          >
-            <option value="">Izberi iz svoje zbirke</option>
-            {pool.map((e) => (
-              <option key={e.id} value={e.id}>
-                {e.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Ali nova vaja
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Ime nove vaje"
-            maxLength={100}
-          />
-        </label>
-      </div>
-      <div className="actions">
-        <Button
-          secondary
-          disabled={!name.trim() && !selected}
-          onClick={() => {
-            const e = pool.find((e) => e.id === selected);
-            add(
-              e && !name.trim() ? plannedExercise(e) : newExercise(name.trim()),
-            );
-            setName("");
-            setSelected("");
-          }}
-        >
-          <Plus size={16} /> Dodaj vajo
-        </Button>
-        <Button
-          secondary
-          onClick={() => {
-            const e = newExercise(name.trim() || "Kardio");
-            add({
-              ...e,
-              cardio: true,
-              sets: [{ ...emptySet(), weight: 0, reps: 20 }],
-            });
-            setName("");
-          }}
-        >
-          <Activity size={16} /> Dodaj kardio
-        </Button>
-      </div>
+      {!trainingType && (
+        <>
+          <div className="field-grid">
+            <label>
+              Obstoječa vaja
+              <select
+                value={selected}
+                onChange={(e) => setSelected(e.target.value)}
+              >
+                <option value="">Izberi iz svoje zbirke</option>
+                {pool.map((e) => (
+                  <option key={e.id} value={e.id}>
+                    {e.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Ali nova vaja
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Ime nove vaje"
+                maxLength={100}
+              />
+            </label>
+          </div>
+          <div className="actions">
+            <Button
+              secondary
+              disabled={!name.trim() && !selected}
+              onClick={() => {
+                const e = pool.find((e) => e.id === selected);
+                add(
+                  e && !name.trim()
+                    ? plannedExercise(e)
+                    : newExercise(name.trim()),
+                );
+                setName("");
+                setSelected("");
+              }}
+            >
+              <Plus size={16} /> Dodaj vajo
+            </Button>
+            <Button
+              secondary
+              onClick={() => {
+                const e = newExercise(name.trim() || "Kardio");
+                add({
+                  ...e,
+                  cardio: true,
+                  sets: [{ ...emptySet(), weight: 0, reps: 20 }],
+                });
+                setName("");
+              }}
+            >
+              <Activity size={16} /> Dodaj kardio
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -2969,6 +2529,8 @@ function WorkoutEditor({
                   ne prenesejo.
                 </p>
                 <AddExercise
+                  trainingType={w.trainingType}
+                  selectedExercises={w.exercises}
                   state={state}
                   add={(v) => {
                     onChange(
@@ -3299,6 +2861,8 @@ function WorkoutEditor({
       <section className="panel">
         <h3>Prilagodi trening</h3>
         <AddExercise
+          trainingType={w.trainingType}
+          selectedExercises={w.exercises}
           state={state}
           add={(e) => onChange({ ...w, exercises: [...w.exercises, e] })}
         />

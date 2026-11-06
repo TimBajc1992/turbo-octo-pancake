@@ -174,6 +174,8 @@ export function FocusWorkout({
       <section className="panel">
         <h2>Dodaj prvo vajo</h2>
         <ExerciseLibraryButton
+          trainingType={w.trainingType}
+          selectedExercises={w.exercises}
           state={state}
           onChoose={(next) => onChange({ ...w, exercises: [next] })}
         />
@@ -568,6 +570,8 @@ export function FocusWorkout({
           }}
         />
         <ExerciseLibraryButton
+          trainingType={w.trainingType}
+          selectedExercises={w.exercises}
           state={state}
           label="Dodaj vajo"
           onChoose={(next) =>

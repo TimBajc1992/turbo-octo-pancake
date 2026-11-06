@@ -1,3 +1,4 @@
+import { validateTrainingDraft, trainingTypes } from "./training";
 import { validateHealthBridge } from "./healthShortcuts";
 import { validateCoachData } from "./coach";
 import { initialState, type State } from "./model";
@@ -149,6 +150,10 @@ function validateState(value: unknown): asserts value is State {
   };
   const workout = (v: any) => {
     const w = obj(v);
+    if (w.trainingType !== undefined && !trainingTypes.includes(w.trainingType))
+      fail();
+    if (w.acknowledgedMissingGroups !== undefined)
+      arr(w.acknowledgedMissingGroups).forEach(str);
     for (const k of ["id", "name", "splitId", "note"]) str(w[k]);
     day(w.date);
     finite(w.durationMin);
@@ -158,6 +163,26 @@ function validateState(value: unknown): asserts value is State {
     if (w.finishedAt !== undefined) finite(w.finishedAt);
   };
   const s = obj(value);
+  if (s.trainingDraft !== undefined) validateTrainingDraft(s.trainingDraft);
+  if (s.habits !== undefined) {
+    const rows = arr(s.habits);
+    if (
+      new Set(rows.map((h) => h.id)).size !== rows.length ||
+      new Set(rows.map((h) => h.date)).size !== rows.length
+    )
+      fail();
+    rows.forEach((h) => {
+      obj(h);
+      str(h.id);
+      day(h.date);
+      for (const key of ["protein", "plants", "water"]) bool(h[key]);
+      if (
+        h.sleep !== undefined &&
+        (!Number.isInteger(h.sleep) || h.sleep < 1 || h.sleep > 5)
+      )
+        fail();
+    });
+  }
   if (s.schema !== 1) fail();
   finite(s.nextTemplate);
   if (!Number.isInteger(s.nextTemplate)) fail();
@@ -289,4 +314,45 @@ export async function keepSyncSafetyCopy(state: State): Promise<void> {
       ...saved,
     ].slice(0, 5),
   );
+}
+
+/** Preserve a complete local pre-upgrade record once, without touching history or device credentials. */
+export async function ensureMocFormaSafetyCopy(state: State): Promise<void> {
+  const db = await open();
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction("state", "readwrite"),
+        store = tx.objectStore("state");
+      const read = store.get("moc-forma:safety:v1");
+      read.onsuccess = () => {
+        if (read.result === undefined)
+          store.put(
+            { at: new Date().toISOString(), state: structuredClone(state) },
+            "moc-forma:safety:v1",
+          );
+      };
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error);
+    });
+  } finally {
+    db.close();
+  }
+}
+export async function readMocFormaSafetyCopy(): Promise<
+  { at: string; state: State } | undefined
+> {
+  const db = await open();
+  try {
+    return await new Promise((resolve, reject) => {
+      const read = db
+        .transaction("state")
+        .objectStore("state")
+        .get("moc-forma:safety:v1");
+      read.onsuccess = () => resolve(read.result);
+      read.onerror = () => reject(read.error);
+    });
+  } finally {
+    db.close();
+  }
 }

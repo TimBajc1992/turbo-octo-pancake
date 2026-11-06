@@ -4,12 +4,34 @@ import { catalog, loadLabel, normalizeExerciseName } from "./exerciseCatalog";
 import { ExerciseSketch } from "./ExerciseSketch";
 import { exerciseFromCatalog, historySummary, loadAdvice } from "./loadAdvice";
 import { num, type Exercise, type State } from "./model";
+import type { Candidate } from "./exerciseCatalog";
+import {
+  candidatesForExercises,
+  dayGroups,
+  fitsTraining,
+  groupLabel,
+  primaryMuscle,
+  trainingCoverage,
+  trainingLabels,
+  type MuscleGroup,
+  type TrainingType,
+} from "./training";
+
+type LibraryOptions = {
+  trainingType?: TrainingType;
+  selectedCandidates?: Candidate[];
+  selectedExercises?: Exercise[];
+  initialGroup?: MuscleGroup;
+  keepOpenOnChoose?: boolean;
+  onRemove?: (c: Candidate) => void;
+};
 
 export function ExerciseLibraryButton({
   state,
   onChoose,
   label = "Knjižnica vaj",
-}: {
+  ...options
+}: LibraryOptions & {
   state: State;
   onChoose?: (e: Exercise) => void;
   label?: string;
@@ -24,6 +46,7 @@ export function ExerciseLibraryButton({
       {open && (
         <ExerciseLibrary
           state={state}
+          {...options}
           onChoose={onChoose}
           close={() => setOpen(false)}
         />
@@ -31,28 +54,49 @@ export function ExerciseLibraryButton({
     </>
   );
 }
-function ExerciseLibrary({
+export function ExerciseLibrary({
   state,
   onChoose,
   close,
-}: {
+  trainingType,
+  selectedCandidates: chosenCandidates,
+  selectedExercises,
+  initialGroup,
+  keepOpenOnChoose,
+  onRemove,
+}: LibraryOptions & {
   state: State;
   onChoose?: (e: Exercise) => void;
   close: () => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const [search, setSearch] = useState("");
-  const [muscle, setMuscle] = useState("");
+  const [muscle, setMuscle] = useState<string>(initialGroup ?? "");
   const [mode, setMode] = useState("");
   useEffect(() => {
     const d = ref.current;
+    const focus = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
     d?.showModal();
-    return () => d?.close();
+    document.body.style.overflow = "hidden";
+    return () => {
+      d?.close();
+      document.body.style.overflow = previousOverflow;
+      focus?.focus();
+    };
   }, []);
   const query = normalizeExerciseName(search);
-  const rows = catalog.filter(
+  const chosen =
+    chosenCandidates ?? candidatesForExercises(selectedExercises ?? []);
+  const eligible = trainingType
+    ? catalog.filter((c) => fitsTraining(c, trainingType))
+    : catalog;
+  const rows = eligible.filter(
     (c) =>
-      (!muscle || c.muscles.includes(muscle)) &&
+      (!muscle ||
+        (trainingType
+          ? primaryMuscle(c) === muscle
+          : c.muscles.includes(muscle))) &&
       (!mode || (c.mode ?? "machine") === mode) &&
       normalizeExerciseName(
         [c.name, c.equipment, ...c.muscles, ...(c.aliases ?? [])].join(" "),
@@ -80,8 +124,28 @@ function ExerciseLibrary({
       </div>
       <p>
         Uveljavljene vaje za vse glavne mišične skupine. Izberi opremo in
-        izvedbo, ki ti ustrezata.
+        izvedbo, ki ti ustrezata.{" "}
+        {trainingType && (
+          <>
+            Prikazane so samo vaje za {trainingLabels[trainingType]}. Največ dve
+            vaji na glavno mišično skupino.
+          </>
+        )}
       </p>
+      {trainingType && (
+        <div
+          className="library-coverage"
+          aria-label="Pokritost izbire"
+          aria-live="polite"
+        >
+          {trainingCoverage(trainingType, chosen).map((g) => (
+            <span key={g.group}>
+              {g.label}
+              <b>{g.count}/2</b>
+            </span>
+          ))}
+        </div>
+      )}
       <div className="library-filters">
         <label className="library-search">
           <span>
@@ -100,8 +164,13 @@ function ExerciseLibrary({
           Mišična skupina
           <select value={muscle} onChange={(e) => setMuscle(e.target.value)}>
             <option value="">Vse mišice</option>
-            {[...new Set(catalog.flatMap((c) => c.muscles))].map((m) => (
-              <option key={m}>{m}</option>
+            {(trainingType
+              ? [...dayGroups[trainingType]]
+              : [...new Set(catalog.flatMap((c) => c.muscles))]
+            ).map((m) => (
+              <option key={m} value={m}>
+                {trainingType ? groupLabel(trainingType, m as MuscleGroup) : m}
+              </option>
             ))}
           </select>
         </label>
@@ -118,17 +187,34 @@ function ExerciseLibrary({
         </label>
       </div>
       <p className="subtle library-result-count" role="status">
-        {rows.length} / {catalog.length} vaj
+        {rows.length} / {eligible.length} vaj{" "}
+        {trainingType && `· ${trainingLabels[trainingType]}`}
       </p>
       <div className="library-grid">
         {rows.map((c) => {
           const e = exerciseFromCatalog(state, c),
             advice = loadAdvice(state, e);
+          const selected = chosen.some((row) => row.id === c.id);
+          const limit =
+            !!trainingType &&
+            chosen.filter((row) => primaryMuscle(row) === primaryMuscle(c))
+              .length >= 2;
           return (
             <article className="library-card" key={c.id}>
               <ExerciseSketch exercise={c} compact />
               <h3>{c.name}</h3>
-              <p className="library-muscles">{c.muscles.join(" · ")}</p>
+              <p className="library-muscles">
+                {trainingType ? (
+                  <>
+                    Glavna: {groupLabel(trainingType, primaryMuscle(c))}
+                    {c.muscles.length > 1 && (
+                      <span> · Pomožne: {c.muscles.slice(1).join(" · ")}</span>
+                    )}
+                  </>
+                ) : (
+                  c.muscles.join(" · ")
+                )}
+              </p>
               <small>
                 {c.equipment} · {loadLabel(c)}
               </small>
@@ -149,14 +235,22 @@ function ExerciseLibrary({
               {onChoose && (
                 <button
                   className="button secondary"
-                  aria-label={`Dodaj ${c.name}`}
+                  disabled={(selected && !onRemove) || (!selected && limit)}
+                  aria-label={`${selected && onRemove ? "Odstrani" : "Dodaj"} ${c.name}`}
                   onClick={() => {
-                    onChoose(e);
-                    close();
+                    if (selected && onRemove) onRemove(c);
+                    else onChoose(e);
+                    if (!keepOpenOnChoose) close();
                   }}
                 >
                   <Plus size={16} />
-                  Dodaj vajo
+                  {selected
+                    ? onRemove
+                      ? "Odstrani iz izbire"
+                      : "Že izbrano"
+                    : limit
+                      ? "Omejitev 2/2"
+                      : "Dodaj vajo"}
                 </button>
               )}
             </article>

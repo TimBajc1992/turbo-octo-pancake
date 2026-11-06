@@ -1,13 +1,13 @@
 {
   "id": "./",
-  "name": "TEŽIŠČE — Manj kilogramov. Več moči.",
-  "short_name": "TEŽIŠČE",
+  "name": "Moč & Forma",
+  "short_name": "Moč & Forma",
   "lang": "sl",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#171b18",
-  "theme_color": "#171b18",
+  "background_color": "#cbd0d2",
+  "theme_color": "#cbd0d2",
   "icons": [
     {
       "src": "icon-192.png",
