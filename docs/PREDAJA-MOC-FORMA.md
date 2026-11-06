@@ -3,6 +3,8 @@
 Ciljna nit: `01a14128-8b6e-70db-90ca-0174858a3067`.
 Repozitorij: `TimBajc1992/turbo-octo-pancake`.
 
+**Objavljeno 6. novembra 2026:** aplikacijska koda `93df5cb3154d1567ddc6a09a2cc721f10f5f82c5` je v `main`; statična objava je `eb50d62f6c9c7009372a81f84222f45025a2f0f0` na `gh-pages`. GitHub Pages je uspešno objavil na istem naslovu; preverjanje Chromium/WebKit in obstoječi potek Cloudflare sta uspešna. Ne objavljaj znova brez novih sprememb. Praktična navodila so v `docs/UPORABA-MOC-FORMA.md`.
+
 Uporabnik je 6. novembra 2026 izrecno odobril neposreden potisk pripravljenih sprememb v `main` in objavo na obstoječem naslovu Težišča z odgovorom »Odobrim!«, hkrati pa zahteval še naknadni ročni vnos opravljenega treninga. Prejšnji zastoj pri samodejnem pregledu je s tem razrešen; potrditve za isto objavo ne zahtevaj znova. Dejanski status objave, preverjanja in SHA so v `docs/moc-forma-release.json`. Upoštevaj morebitne lokalne spremembe v ciljnem okolju; ne prepisuj jih s ponastavitvijo delovnega drevesa.
 
 Nova Moč & Forma ima potrjeni videz Stara šola, dejansko knjižnico Težišča, isti podatkovni model/shrambo ter samostojen naknadni vnos. Nadaljevanje naj uporabi `main`, najprej prebere `docs/moc-forma-migration.md` in preveri stanje Git. Sprememb, ki so že objavljene, ne objavljaj znova brez novih sprememb.

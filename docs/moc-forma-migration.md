@@ -46,3 +46,11 @@ Pri objavi se ohranijo stare datoteke `assets/`, da se že odprta predhodna apli
 Brskalniški preizkusi med drugim primerjajo celotno izvirno stanje pred in po posodobitvi, ne le števila treningov. Izvirni ID-ji in neznani metapodatki ostanejo enaki. Novo sestavljen Push Day se lahko shrani, ponovno odpre brez povezave in zaključi, ne da bi se spremenile prejšnje vadbe.
 
 Naknadni vnos je dodatno preverjen s tipkanjem decimalne vejice, prazno težo in pravilno ničlo, preteklim/napačnim/prihodnjim datumom, kopiranjem serij, lastnimi vajami in kardiem. Preizkus shrani osnutek, znova odpre aplikacijo brez povezave in zaključi zapis; celotna stara zgodovina, aktivna vadba, metapodatki in ključi morajo ostati enaki. Modalni obrazec je preverjen tudi z axe.
+
+## Izvedena odobrena objava
+
+Uporabnik je izrecno dovolil neposreden potisk v `main` in produkcijsko objavo z odgovorom »Odobrim!«. Aplikacijska koda `93df5cb3154d1567ddc6a09a2cc721f10f5f82c5` je bila običajno, brez prisilnega potiska, prenesena v `main`. Javna gradnja je `eb50d62f6c9c7009372a81f84222f45025a2f0f0` na `gh-pages`; vseh 12 prejšnjih datotek v `assets/` je ohranjenih z enakimi bajti.
+
+[Dejanska objava Pages](https://github.com/TimBajc1992/turbo-octo-pancake/actions/runs/42189696741) je uspešna in na strani poteka navaja isti novi commit ter obstoječi javni URL. [Celotno preverjanje Chromium/WebKit](https://github.com/TimBajc1992/turbo-octo-pancake/actions/runs/42189623277) in [obstoječi potek Cloudflare](https://github.com/TimBajc1992/turbo-octo-pancake/actions/runs/42189623191) sta prav tako uspešna. Izvorna koda Workerja, D1 in konfiguracija povezave niso spremenjeni. Stari ločeni Pages workflow na `main` je še vedno zavrnjen zaradi predhodne omejitve okolja; dejanska obstoječa pot objave prek `gh-pages` deluje. Pravil zaščite nismo spreminjali.
+
+Neposredni HTTP dostop do `github.io` v tem izvajalnem okolju ni vključen v omrežno politiko. Zato je dokaz objave uspešen GitHub Pages potek za točen commit in URL ter lokalno preverjena ista gradnja na isti osnovni poti; neposrednega ogleda osebnih podatkov na uporabnikovem telefonu nismo izvajali. Obstoječo namestitev uporabnik posodobi po [navodilih](UPORABA-MOC-FORMA.md).

@@ -1,13 +1,13 @@
 {
-  "status": "approved_ready_for_publication",
+  "status": "published",
   "repository": "TimBajc1992/turbo-octo-pancake",
-  "source_branch": "moc-forma-migration",
-  "source_commit": null,
+  "source_branch": "main",
+  "source_commit": "93df5cb3154d1567ddc6a09a2cc721f10f5f82c5",
   "previous_main_commit": "342fdca72b288fa09724d7d8648b736c0e5ddcf8",
   "previous_pages_commit": "96b5aa922a81e3a2537ec23b7db2a2fd1ff22b68",
   "target_thread_id": "01a14128-8b6e-70db-90ca-0174858a3067",
   "production_url": "https://timbajc1992.github.io/turbo-octo-pancake/",
-  "production_updated": false,
+  "production_updated": true,
   "cloudflare_backend_changed": false,
   "data_model_database": "tezisce/state/current",
   "checks": {
@@ -16,7 +16,16 @@
     "extra_checks": "active workout, settings and WCAG contrast after visual refinement",
     "real_previous_release_upgrade": true,
     "manual_retrospective_entry": true,
-    "manual_offline_resume_and_history_preservation": true
+    "manual_offline_resume_and_history_preservation": true,
+    "ci_chromium_and_webkit": "success",
+    "ci_run": "https://github.com/TimBajc1992/turbo-octo-pancake/actions/runs/42189623277",
+    "production_deployment": "success",
+    "pages_run": "https://github.com/TimBajc1992/turbo-octo-pancake/actions/runs/42189696741",
+    "published_commit_verified_in_run_page": true,
+    "existing_cloudflare_workflow": "success",
+    "cloudflare_run": "https://github.com/TimBajc1992/turbo-octo-pancake/actions/runs/42189623191",
+    "live_production_http_checked": false,
+    "live_http_limit": "Direct github.io access is not enabled in this managed environment network policy; exact artifact was locally tested and GitHub Pages confirmed deployment for the matching commit and URL."
   },
   "preview_url": "https://6aed7deda9f5fd8816aaf7a2--flourishing-cuchufli-ba8975.netlify.app/",
   "netlify_production_unchanged": true,
@@ -26,5 +35,16 @@
     "scope": "direct fast-forward push to main and publication on the existing Težišče URL",
     "user_reply": "Odobrim! - ne pozabi prenesti tudi zgodovine in pa možnosti ročnega vnosa treninga (v primeru da telefon pustim doma, da potem lahko doma vnesem vse kar sem treniral)"
   },
-  "manual_entry_path": "Zgodovina ali Vadba → Naknadni vnos"
+  "manual_entry_path": "Zgodovina ali Vadba → Naknadni vnos",
+  "pages_branch": "gh-pages",
+  "pages_commit": "eb50d62f6c9c7009372a81f84222f45025a2f0f0",
+  "checked_at": "2026-11-06T08:49:06.126993+00:00",
+  "history_strategy": "Same production origin and tezisce/state/current, no conversion or replacement; one-time local safety copy before editing.",
+  "usage_instructions": "docs/UPORABA-MOC-FORMA.md",
+  "preview_note": "Earlier separate-origin design preview; predates retrospective entry and has no personal history.",
+  "legacy_main_pages_workflow": {
+    "status": "existing_environment_branch_restriction",
+    "run": "https://github.com/TimBajc1992/turbo-octo-pancake/actions/runs/42189623192",
+    "production_path": "Existing gh-pages branch deployment completed successfully; environment protections unchanged."
+  }
 }

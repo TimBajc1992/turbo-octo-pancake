@@ -2,6 +2,8 @@
 
 Osebna aplikacija v potrjenem kovinskem videzu. Ta različica združuje videz Moč & Forma, celotno knjižnico 55 vaj Težišča in njegovo izvirno podatkovno zbirko. Spletni naslov ostaja `https://timbajc1992.github.io/turbo-octo-pancake/`; obstoječi šifrirani Cloudflare Worker in povezava med napravami ostaneta ista.
 
+Kratka navodila za posodobitev, pripravo vadbe in naknadni vnos so v [navodilih za uporabo](docs/UPORABA-MOC-FORMA.md).
+
 ## Novo sestavljanje treninga
 
 Sistem predlaga samo **Push Day, Pull Day, Legs ali Celotno telo**. Vaje izbereš sam iz knjižnice, ki pokaže samo vaje za izbrani sklop. Vsaka mišična skupina ima števec `0/2`; največ dve vaji sta dovoljeni na glavno mišično skupino. Pomožne mišice so prikazane ločeno. Pred začetkom dobiš seznam praznih skupin in jih lahko dopolniš ali izrecno označiš, da jih danes izpuščaš. Za vsako vrsto treninga se hrani ločena izbira.
