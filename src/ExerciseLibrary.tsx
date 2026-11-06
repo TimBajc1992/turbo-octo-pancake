@@ -18,6 +18,7 @@ import {
 } from "./training";
 
 type LibraryOptions = {
+  selectionPurpose?: "plan" | "history";
   trainingType?: TrainingType;
   selectedCandidates?: Candidate[];
   selectedExercises?: Exercise[];
@@ -59,6 +60,7 @@ export function ExerciseLibrary({
   onChoose,
   close,
   trainingType,
+  selectionPurpose = "plan",
   selectedCandidates: chosenCandidates,
   selectedExercises,
   initialGroup,
@@ -127,8 +129,10 @@ export function ExerciseLibrary({
         izvedbo, ki ti ustrezata.{" "}
         {trainingType && (
           <>
-            Prikazane so samo vaje za {trainingLabels[trainingType]}. Največ dve
-            vaji na glavno mišično skupino.
+            Prikazane so samo vaje za {trainingLabels[trainingType]}.{" "}
+            {selectionPurpose === "history"
+              ? "Zabeleži dejansko opravljene vaje."
+              : "Največ dve vaji na glavno mišično skupino."}
           </>
         )}
       </p>
@@ -141,7 +145,11 @@ export function ExerciseLibrary({
           {trainingCoverage(trainingType, chosen).map((g) => (
             <span key={g.group}>
               {g.label}
-              <b>{g.count}/2</b>
+              <b>
+                {selectionPurpose === "history"
+                  ? `${g.count} vaj`
+                  : `${g.count}/2`}
+              </b>
             </span>
           ))}
         </div>
@@ -197,6 +205,7 @@ export function ExerciseLibrary({
           const selected = chosen.some((row) => row.id === c.id);
           const limit =
             !!trainingType &&
+            selectionPurpose !== "history" &&
             chosen.filter((row) => primaryMuscle(row) === primaryMuscle(c))
               .length >= 2;
           return (

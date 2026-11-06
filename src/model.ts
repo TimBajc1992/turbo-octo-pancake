@@ -60,6 +60,8 @@ export interface Provenance {
   modifiedAt?: string;
 }
 export interface Workout extends Provenance {
+  entryMode?: "retrospective";
+  recordedAt?: string;
   trainingType?: TrainingType;
   acknowledgedMissingGroups?: string[];
   coach?: {
@@ -155,6 +157,7 @@ export interface HabitDay {
   sleep?: number;
 }
 export interface State {
+  manualWorkoutDraft?: Workout;
   trainingDraft?: TrainingDraft;
   habits?: HabitDay[];
   schema: 1;

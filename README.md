@@ -8,6 +8,10 @@ Sistem predlaga samo **Push Day, Pull Day, Legs ali Celotno telo**. Vaje izbere�
 
 Knjižnica ohranja skice začetnega in končnega položaja, navodila, iskanje po vzdevkih, filtre po opremi, zadnje dejanske rezultate in izbirne uvodne ocene z enakimi pravili primerljivosti kot Težišče. Nove serije se ne označijo kot opravljene samodejno.
 
+## Trening brez telefona
+
+Odpri **Zgodovina → Naknadni vnos** (na voljo tudi v zavihku **Vadba**). Izberi datum, vaje iz knjižnice ali lastne vaje in vnesi opravljene serije, teže ter ponovitve. Trajanje, RIR in opombe so neobvezni; za kardio zabeleži minute. Gumb **Dodaj enako serijo** olajša več podobnih serij. Osnutek se sproti shrani in ga lahko nadaljuješ pozneje tudi brez povezave. **Shrani opravljeni trening** doda zapis v zgodovino; morebitna odprta vadba ostane ohranjena.
+
 ## Ohranitev zgodovine
 
 Na obstoječem naslovu aplikacija uporablja isto IndexedDB zbirko `tezisce`, različico 1, shrambo `state` in ključ `current`. Podatkov ne preimenuje ali pretvarja. Ob prvem odpiranju pred začetkom urejanja shrani celotno lokalno kopijo v ključ `moc-forma:safety:v1`; ob ponovnem odpiranju je ne prepiše. V nastavitvah je gumb **Izvozi kopijo pred prenovo**. Trenutni celotni izvoz ostaja združljiv z obliko `tezisce-backup`.
@@ -25,7 +29,7 @@ TEST_BASE_PATH=/turbo-octo-pancake/ npm run test:e2e
 
 Za lokalni koren uporabi `npm run build`. Brskalniški preizkusi privzeto uporabijo vrata 4174; `TEST_PORT` jih lahko spremeni. Preizkusi prehoda iz objave uporabijo `PREVIOUS_RELEASE_DIR` za predhodni vmesnik in `MOC_PREVIOUS_RELEASE_DIR` za zadnje objavljeno Težišče; CI pripravi oba posnetka. Podrobnosti so v [prehodu na Moč & Formo](docs/moc-forma-migration.md).
 
-Nadaljevanje v niti `01a14128-8b6e-70db-90ca-0174858a3067` mora uporabiti ta repozitorij in pripravljeno vejo `moc-forma-migration` (do odobritve produkcijske objave); ID klepeta ni naslov spletne aplikacije. Navodila za delo v drugi niti so v dokumentu [predaja](docs/PREDAJA-MOC-FORMA.md).
+Uporabnik je izrecno odobril neposreden potisk v `main` in objavo na obstoječem naslovu Težišča. Nadaljevanje v niti `01a14128-8b6e-70db-90ca-0174858a3067` naj uporabi `main` tega repozitorija in preveri stanje v `docs/moc-forma-release.json`; ID klepeta ni naslov spletne aplikacije. Navodila za delo v drugi niti so v dokumentu [predaja](docs/PREDAJA-MOC-FORMA.md).
 
 ---
 

@@ -1,8 +1,8 @@
 {
-  "status": "awaiting_explicit_main_and_production_approval",
+  "status": "approved_ready_for_publication",
   "repository": "TimBajc1992/turbo-octo-pancake",
   "source_branch": "moc-forma-migration",
-  "source_commit": "0949d60f92a620c1f18d6f3fd572e77844d71ed8",
+  "source_commit": null,
   "previous_main_commit": "342fdca72b288fa09724d7d8648b736c0e5ddcf8",
   "previous_pages_commit": "96b5aa922a81e3a2537ec23b7db2a2fd1ff22b68",
   "target_thread_id": "01a14128-8b6e-70db-90ca-0174858a3067",
@@ -11,17 +11,20 @@
   "cloudflare_backend_changed": false,
   "data_model_database": "tezisce/state/current",
   "checks": {
-    "unit_tests": 97,
-    "full_browser_suite": 26,
+    "unit_tests": 109,
+    "full_browser_suite": 32,
     "extra_checks": "active workout, settings and WCAG contrast after visual refinement",
-    "real_previous_release_upgrade": true
+    "real_previous_release_upgrade": true,
+    "manual_retrospective_entry": true,
+    "manual_offline_resume_and_history_preservation": true
   },
   "preview_url": "https://6aed7deda9f5fd8816aaf7a2--flourishing-cuchufli-ba8975.netlify.app/",
   "netlify_production_unchanged": true,
-  "approval_block": {
-    "action": "direct push to main and subsequent production publication",
-    "source": "automatic approval review",
-    "reason": "migration was authorized, but direct-main publication requires explicit approval",
-    "main_push_executed": false
-  }
+  "approval": {
+    "granted": true,
+    "date": "2026-11-06",
+    "scope": "direct fast-forward push to main and publication on the existing Težišče URL",
+    "user_reply": "Odobrim! - ne pozabi prenesti tudi zgodovine in pa možnosti ročnega vnosa treninga (v primeru da telefon pustim doma, da potem lahko doma vnesem vse kar sem treniral)"
+  },
+  "manual_entry_path": "Zgodovina ali Vadba → Naknadni vnos"
 }

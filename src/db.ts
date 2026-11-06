@@ -150,6 +150,13 @@ function validateState(value: unknown): asserts value is State {
   };
   const workout = (v: any) => {
     const w = obj(v);
+    if (w.entryMode !== undefined && w.entryMode !== "retrospective") fail();
+    if (
+      w.recordedAt !== undefined &&
+      (typeof w.recordedAt !== "string" ||
+        !Number.isFinite(Date.parse(w.recordedAt)))
+    )
+      fail();
     if (w.trainingType !== undefined && !trainingTypes.includes(w.trainingType))
       fail();
     if (w.acknowledgedMissingGroups !== undefined)
@@ -208,6 +215,10 @@ function validateState(value: unknown): asserts value is State {
     if (p[k] !== undefined) finite(p[k]);
   arr(s.workouts).forEach(workout);
   if (s.active !== undefined) workout(s.active);
+  if (s.manualWorkoutDraft !== undefined) {
+    workout(s.manualWorkoutDraft);
+    if (s.manualWorkoutDraft.entryMode !== "retrospective") fail();
+  }
   if (s.restUntil !== undefined) finite(s.restUntil);
   arr(s.templates).forEach((t) => {
     obj(t);

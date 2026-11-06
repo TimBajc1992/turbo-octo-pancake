@@ -111,7 +111,7 @@ export function mergeSnapshots(
     if (sameSnapshot(l, r)) return structuredClone(l);
     if (sameSnapshot(b, l)) return structuredClone(r);
     if (sameSnapshot(b, r)) return structuredClone(l);
-    if (path === "active") {
+    if (path === "active" || path === "manualWorkoutDraft") {
       conflicts.push(path);
       return structuredClone(l);
     }

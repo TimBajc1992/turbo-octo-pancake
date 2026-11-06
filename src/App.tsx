@@ -1,3 +1,5 @@
+import { ManualWorkoutDialog } from "./ManualWorkoutDialog";
+import { createManualWorkoutDraft } from "./manualWorkout";
 import { IronToday, IronMark } from "./iron/IronToday";
 import { IronHabits } from "./iron/IronHabits";
 import { TrainingBuilder } from "./TrainingBuilder";
@@ -336,6 +338,7 @@ export default function App() {
   const restoreRef = useRef<HTMLInputElement>(null);
   const [restore, setRestore] = useState<State>();
   const [now, setNow] = useState(Date.now());
+  const [manualOpen, setManualOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState<string>();
   const [templateOpen, setTemplateOpen] = useState<string>();
   const [detailedWorkout, setDetailedWorkout] = useState(false);
@@ -399,6 +402,14 @@ export default function App() {
       );
     });
     return saved;
+  }
+  function openManualWorkout() {
+    if (!latest.current?.manualWorkoutDraft)
+      void update((s) => ({
+        ...s,
+        manualWorkoutDraft: createManualWorkoutDraft(),
+      })).catch((e) => setToast(e.message));
+    setManualOpen(true);
   }
   const cloudSync = useCloudSync(state, update, storage, latest);
   useEffect(() => {
@@ -919,16 +930,27 @@ export default function App() {
                       : "Vrsto treninga predlagamo. Vaje iz knjižnice izbereš ti."}
                   </p>
                 </div>
-                {state.active ? (
+                <div className="actions manual-entry-actions">
                   <button
-                    className="button secondary workout-view-toggle"
-                    onClick={() => setDetailedWorkout(!detailedWorkout)}
+                    className="button secondary"
+                    onClick={openManualWorkout}
                   >
-                    {detailedWorkout ? "Hiter pogled" : "Vse serije"}
+                    <History size={17} />
+                    {state.manualWorkoutDraft
+                      ? "Nadaljuj naknadni vnos"
+                      : "Naknadni vnos"}
                   </button>
-                ) : (
-                  <span className="iron-tag">SESTAVI PO SVOJE</span>
-                )}
+                  {state.active ? (
+                    <button
+                      className="button secondary workout-view-toggle"
+                      onClick={() => setDetailedWorkout(!detailedWorkout)}
+                    >
+                      {detailedWorkout ? "Hiter pogled" : "Vse serije"}
+                    </button>
+                  ) : (
+                    <span className="iron-tag">SESTAVI PO SVOJE</span>
+                  )}
+                </div>
               </div>
               {state.active ? (
                 <>
@@ -1304,9 +1326,17 @@ export default function App() {
                     opravljenih serij
                   </p>
                 </div>
-                <Button secondary onClick={() => fileRef.current?.click()}>
-                  <Upload size={17} /> Uvozi zgodovino
-                </Button>
+                <div className="actions manual-entry-actions">
+                  <button className="button" onClick={openManualWorkout}>
+                    <Plus size={17} />
+                    {state.manualWorkoutDraft
+                      ? "Nadaljuj naknadni vnos"
+                      : "Naknadni vnos"}
+                  </button>
+                  <Button secondary onClick={() => fileRef.current?.click()}>
+                    <Upload size={17} /> Uvozi zgodovino
+                  </Button>
+                </div>
               </div>
               {state.workouts.length ? (
                 [...state.workouts]
@@ -1326,6 +1356,11 @@ export default function App() {
                         </span>
                         <div>
                           <h2>{w.name}</h2>
+                          {w.entryMode === "retrospective" && (
+                            <span className="manual-history-badge">
+                              Vneseno naknadno
+                            </span>
+                          )}
                           <p>
                             {dateLabel(w.date, true)} · {completeSets(w).length}{" "}
                             opravljenih serij
@@ -1573,6 +1608,20 @@ export default function App() {
             <X size={16} />
           </button>
         </div>
+      )}
+      {manualOpen && (
+        <ManualWorkoutDialog
+          state={state}
+          update={update}
+          close={() => setManualOpen(false)}
+          saved={() => {
+            setManualOpen(false);
+            setTab("history");
+            setSettings(false);
+            setHistoryOpen(undefined);
+            setToast("Trening je dodan v zgodovino na izbrani datum.");
+          }}
+        />
       )}
       {(modal === "weight" || modal === "waist") && (
         <Modal

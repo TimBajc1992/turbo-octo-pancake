@@ -25,6 +25,14 @@ Pred začetkom se izpiše pokritost skupin. Prazen trening se ne začne. Za izpu
 
 Nova aplikacija ohrani hitri in podrobni pogled treninga, dejanske pretekle serije, odštevalnik, popravke zgodovine, meritve, uvoze, kopije, Apple Health ter šifrirano sinhronizacijo. Dodane so navade v slogu Moč & Forma. V nastavitvah je dosegljiv prejšnji vmesnik.
 
+## Naknadni ročni vnos
+
+Dostop je **Vadba ali Zgodovina → Naknadni vnos**. Uporabnik izbere dejanski datum (danes ali prej), ime, neobvezen sklop in trajanje, doda vaje iz knjižnice ali lastne vaje ter vpiše dejanske teže, ponovitve, neobvezen RIR in opombe. Kardio ima minute aktivnosti. Serije lahko dodaja, kopira in odstranjuje; vrsta serije (delovna, ogrevanje, ne vem), oprema, način beleženja in bolečina so uredljivi.
+
+Osnutek `manualWorkoutDraft` se samostojno shranjuje in deluje brez povezave, ne da bi spreminjal `active` ali osnutke prihodnjih treningov. Nove vrstice imajo prazne dejanske vrednosti; knjižnica ne kopira starih rezultatov v opravljene serije. Šele izrecni gumb **Shrani opravljeni trening** doda zapis v zgodovino in potrdi vnesene serije. Uspeh se prikaže po končanem zapisu v IndexedDB. Če trajanje ni znano, ostane neznano; časov začetka in konca ne izmišljamo. Ponovna oddaja istega zapisa je zavrnjena.
+
+Omejitev dveh vaj na skupino velja za pripravo prihodnjih treningov. Naknadni zapis mora ohraniti resnično opravljeno vadbo, zato lahko zabeleži tudi več vaj za isto skupino. Izbrani sklop še vedno filtrira knjižnico; brez sklopa je dosegljiva celotna knjižnica. Obstoječi treningi, aktivna vadba, povezovalni ključi in surovi uvozi se ne prepisujejo. Novi osnutek je vključen v celotne varnostne kopije in obstoječo šifrirano sinhronizacijo, kjer se pri konfliktu obravnava kot celota.
+
 ## PWA in posodobitev
 
 Ime in ikone so Moč & Forma, pot in identiteta PWA ostaneta isti. Posodobitev ne briše IndexedDB ali `device:*`. Predpomnjene statične datoteke pri iskanju ne upoštevajo `Vary: Origin`, ker imajo enako javno vsebino za vsak izvor; s tem prvi ponovni zagon brez povezave deluje tudi pri gostiteljih, ki dodajo ta CORS header. Zunanje šifrirane zahteve se ne predpomnijo.
@@ -33,6 +41,8 @@ Pri objavi se ohranijo stare datoteke `assets/`, da se že odprta predhodna apli
 
 ## Preverjeno pred objavo
 
-6. november 2026: 97 uspešnih testov podatkovne logike, šifriranja, zaledja in varnostnih kopij. Celoten nabor 26 brskalniških preizkusov je uspešen na poti `/turbo-octo-pancake/`, vključno z dejanskima prejšnjima statičnima objavama in posodobitvijo service workerja. Po popravkih čitljivosti so dodatno preverjeni aktivna vadba, nastavitve, knjižnica in vseh pet zaslonov na računalniku ter telefonu; preverjanje axe ne pokaže kršitev za WCAG 2 A/AA in 2.1 AA.
+6. november 2026: 109 uspešnih testov podatkovne logike, šifriranja, zaledja in varnostnih kopij. Celoten nabor 32 brskalniških preizkusov je uspešen na poti `/turbo-octo-pancake/`, vključno z dejanskima prejšnjima statičnima objavama in posodobitvijo service workerja. Po popravkih čitljivosti so dodatno preverjeni aktivna vadba, nastavitve, knjižnica in vseh pet zaslonov na računalniku ter telefonu; preverjanje axe ne pokaže kršitev za WCAG 2 A/AA in 2.1 AA.
 
 Brskalniški preizkusi med drugim primerjajo celotno izvirno stanje pred in po posodobitvi, ne le števila treningov. Izvirni ID-ji in neznani metapodatki ostanejo enaki. Novo sestavljen Push Day se lahko shrani, ponovno odpre brez povezave in zaključi, ne da bi se spremenile prejšnje vadbe.
+
+Naknadni vnos je dodatno preverjen s tipkanjem decimalne vejice, prazno težo in pravilno ničlo, preteklim/napačnim/prihodnjim datumom, kopiranjem serij, lastnimi vajami in kardiem. Preizkus shrani osnutek, znova odpre aplikacijo brez povezave in zaključi zapis; celotna stara zgodovina, aktivna vadba, metapodatki in ključi morajo ostati enaki. Modalni obrazec je preverjen tudi z axe.
