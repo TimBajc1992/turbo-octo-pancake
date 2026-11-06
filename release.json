@@ -1,0 +1,12 @@
+{
+  "app": "Moč & Forma",
+  "source_commit": "93df5cb3154d1567ddc6a09a2cc721f10f5f82c5",
+  "published_from": "main",
+  "build_base": "/turbo-octo-pancake/",
+  "prepared_at": "2026-11-06T08:42:58.903276+00:00",
+  "storage": "tezisce/state/current",
+  "preserves_existing_history": true,
+  "retrospective_manual_entry": true,
+  "unit_tests": 109,
+  "browser_tests": 32
+}
