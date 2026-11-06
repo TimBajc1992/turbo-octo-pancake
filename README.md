@@ -25,7 +25,7 @@ TEST_BASE_PATH=/turbo-octo-pancake/ npm run test:e2e
 
 Za lokalni koren uporabi `npm run build`. Brskalniški preizkusi privzeto uporabijo vrata 4174; `TEST_PORT` jih lahko spremeni. Preizkusi prehoda iz objave uporabijo `PREVIOUS_RELEASE_DIR` za predhodni vmesnik in `MOC_PREVIOUS_RELEASE_DIR` za zadnje objavljeno Težišče; CI pripravi oba posnetka. Podrobnosti so v [prehodu na Moč & Formo](docs/moc-forma-migration.md).
 
-Nadaljevanje v niti `01a14128-8b6e-70db-90ca-0174858a3067` mora uporabiti ta repozitorij in najnovejšo vejo `main`; ID klepeta ni naslov spletne aplikacije. Navodila za delo v drugi niti so v dokumentu [predaja](docs/PREDAJA-MOC-FORMA.md).
+Nadaljevanje v niti `01a14128-8b6e-70db-90ca-0174858a3067` mora uporabiti ta repozitorij in pripravljeno vejo `moc-forma-migration` (do odobritve produkcijske objave); ID klepeta ni naslov spletne aplikacije. Navodila za delo v drugi niti so v dokumentu [predaja](docs/PREDAJA-MOC-FORMA.md).
 
 ---
 
