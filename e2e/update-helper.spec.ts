@@ -5,19 +5,32 @@ import {
   workoutFixture,
 } from "./workout-fixture";
 
-async function simulate(page: Page, stalled: "none" | "lookup" | "update") {
+async function simulate(
+  page: Page,
+  stalled: "none" | "lookup" | "update" | "update-promise",
+) {
   const source = workoutFixture();
   await seedWorkout(page, source);
   await page.addInitScript((stalled) => {
     if (!location.pathname.endsWith("/posodobi.html")) return;
     const never = () => new Promise(() => {});
-    const registration = {
+    const registration = Object.assign(new EventTarget(), {
       scope: new URL("./", location.href).href,
+      installing: null as (EventTarget & { state: string }) | null,
       update: () => {
         sessionStorage.setItem("synthetic-update-count", "1");
+        if (stalled === "update-promise") {
+          queueMicrotask(() => {
+            registration.installing = Object.assign(new EventTarget(), {
+              state: "installed",
+            });
+            registration.dispatchEvent(new Event("updatefound"));
+          });
+          return never();
+        }
         return stalled === "update" ? never() : Promise.resolve();
       },
-    };
+    });
     Object.defineProperty(navigator, "serviceWorker", {
       configurable: true,
       value: {
@@ -46,6 +59,20 @@ test("update helper reuses its existing registration without rewriting any worko
   expect(
     await page.evaluate(() => sessionStorage.getItem("synthetic-update-count")),
   ).toBe("1");
+  expect(await readWorkoutState(page)).toEqual(source);
+});
+
+test("a worker installation progresses even when Safari leaves its update promise pending", async ({
+  page,
+}) => {
+  const source = await simulate(page, "update-promise");
+  const app = page.url();
+  await page.goto("./posodobi.html");
+  await page
+    .getByRole("button", { name: "Posodobi in odpri TEŽIŠČE", exact: true })
+    .click();
+  await expect(page).toHaveURL(app);
+  await expect(page.getByRole("heading", { name: /Tvoj tempo/ })).toBeVisible();
   expect(await readWorkoutState(page)).toEqual(source);
 });
 

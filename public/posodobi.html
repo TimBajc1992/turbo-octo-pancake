@@ -44,27 +44,36 @@
     (() => {
       const button = document.querySelector("#update");
       const statusElement = document.querySelector("#status");
-      const withinDeadline = (operation) =>
+      const withinDeadline = (operation, registration) =>
         new Promise((resolve, reject) => {
+          let settled = false;
+          const finish = (callback, value) => {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timer);
+            registration?.removeEventListener("updatefound", progress);
+            callback(value);
+          };
+          const progress = () => {
+            if (registration?.installing || registration?.waiting)
+              finish(resolve, registration);
+          };
           const timer = setTimeout(
             () =>
-              reject(
+              finish(
+                reject,
                 Error(
                   "Preverjanje traja predolgo. Preveri povezavo in poskusi znova.",
                 ),
               ),
             30000,
           );
+          registration?.addEventListener("updatefound", progress);
           operation.then(
-            (value) => {
-              clearTimeout(timer);
-              resolve(value);
-            },
-            (error) => {
-              clearTimeout(timer);
-              reject(error);
-            },
+            (value) => finish(resolve, value),
+            (error) => finish(reject, error),
           );
+          progress();
         });
       button.onclick = async () => {
         button.disabled = true;
@@ -88,7 +97,7 @@
           } else if (!registration.installing && !registration.waiting) {
             // Re-registering and immediately updating an existing worker can
             // leave Safari waiting on its own update job. Reuse its registration.
-            await withinDeadline(registration.update());
+            await withinDeadline(registration.update(), registration);
           }
           if (registration.installing) {
             const installing = registration.installing;
