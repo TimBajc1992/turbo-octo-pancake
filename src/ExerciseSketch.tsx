@@ -15,14 +15,16 @@ import "./exercise-visual.css";
 function GuideDialog({
   exercise,
   close,
+  returnFocus,
 }: {
   exercise: Candidate;
   close: () => void;
+  returnFocus: HTMLButtonElement | null;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const dialog = ref.current;
-    const focus = document.activeElement as HTMLElement | null;
+    const focus = returnFocus;
     const previous = document.body.style.overflow;
     dialog?.showModal();
     document.body.style.overflow = "hidden";
@@ -66,6 +68,7 @@ export function ExerciseSketch({
   const [view, setView] = useState<"muscles" | "movement">("movement");
   const [selected, setSelected] = useState<MuscleRegion>();
   const [expanded, setExpanded] = useState(false);
+  const previewButton = useRef<HTMLButtonElement>(null);
   const heading = useId();
   const anatomy = anatomyForExercise(exercise),
     available = !!exerciseFamily(exercise);
@@ -81,6 +84,7 @@ export function ExerciseSketch({
         <button
           type="button"
           className="exercise-preview"
+          ref={previewButton}
           aria-label={`Prikaži mišice in izvedbo: ${exercise.name}`}
           aria-haspopup="dialog"
           aria-expanded={expanded}
@@ -106,7 +110,11 @@ export function ExerciseSketch({
           </span>
         </button>
         {expanded && (
-          <GuideDialog exercise={exercise} close={() => setExpanded(false)} />
+          <GuideDialog
+            exercise={exercise}
+            close={() => setExpanded(false)}
+            returnFocus={previewButton.current}
+          />
         )}
       </>
     );

@@ -159,11 +159,9 @@ test("a catalogue thumbnail opens the correct guide without selecting or adding 
     exact: true,
   });
   await dialog.getByLabel("Poišči vajo", { exact: true }).fill("Leg Extension");
-  const card = dialog
-    .locator(".library-card")
-    .filter({
-      has: page.getByRole("heading", { name: "Leg Extension", exact: true }),
-    });
+  const card = dialog.locator(".library-card").filter({
+    has: page.getByRole("heading", { name: "Leg Extension", exact: true }),
+  });
   await expect(card).toHaveCount(1);
   await card
     .getByRole("button", {
@@ -229,6 +227,7 @@ test("a browser without 3D keeps the exercise poster, muscle map and all existin
     .getByText("Mišice, izvedba in podlaga teže", { exact: true })
     .click();
   const guide = page.locator("section.exercise-visual");
+  await guide.locator(".exercise-3d-stage").scrollIntoViewIfNeeded();
   await expect(guide.locator(".exercise-3d-stage")).toHaveAttribute(
     "data-renderer",
     "poster",
