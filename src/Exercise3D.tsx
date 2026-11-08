@@ -19,6 +19,7 @@ export function Exercise3D({
     [failed, setFailed] = useState(false);
   const [playing, setPlaying] = useState(false),
     [progress, setProgress] = useState(0);
+  const [visible, setVisible] = useState(false);
   const phase = useRef(0),
     selectedRef = useRef(selected);
   selectedRef.current = selected;
@@ -29,6 +30,7 @@ export function Exercise3D({
     setPlaying(false);
     setProgress(0);
     phase.current = 0;
+    if (!visible) return;
     const start = async () => {
       try {
         const { ExerciseScene } = await import("./exercise3d/scene");
@@ -49,7 +51,7 @@ export function Exercise3D({
       scene.current?.dispose();
       scene.current = undefined;
     };
-  }, [exercise.id]);
+  }, [exercise.id, visible]);
   useEffect(() => {
     scene.current?.highlight(selected);
   }, [selected]);
@@ -58,9 +60,13 @@ export function Exercise3D({
       if (document.hidden) setPlaying(false);
     };
     document.addEventListener("visibilitychange", hidden);
-    const observer = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) setPlaying(false);
-    });
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setVisible(entry.isIntersecting);
+        if (!entry.isIntersecting) setPlaying(false);
+      },
+      { rootMargin: "100px" },
+    );
     if (stage.current) observer.observe(stage.current);
     return () => {
       observer.disconnect();

@@ -19,7 +19,9 @@ try {
   });
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
-  await page.goto(`${origin}/previews/exercise-3d/render.html`);
+  await page.goto(
+    process.env.POSTER_URL || `${origin}/previews/exercise-3d/render.html`,
+  );
   await page.waitForFunction(
     () => window.renderExercise,
     {},
@@ -42,10 +44,12 @@ try {
       ))
     )
       continue;
-    const data = await page.evaluate(
-      (id) => window.renderExercise(id),
-      exercise.id,
-    );
+    const { data, progress } = await page.evaluate(async (id) => {
+      const data = await window.renderExercise(id);
+      return { data, progress: window.lastPosterDebug.progress };
+    }, exercise.id);
+    if (Math.abs(progress - 0.45) > 1e-8)
+      throw Error(`Wrong poster phase: ${exercise.id} (${progress})`);
     await writeFile(
       `src/assets/exercise-previews/${exercise.id}.webp`,
       Buffer.from(data, "base64"),

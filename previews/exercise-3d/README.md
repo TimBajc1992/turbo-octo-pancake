@@ -6,4 +6,6 @@ The isolated review contains Machine Chest Press, Pec Deck, Cable Triceps Pushdo
 
 Build: `npx vite build --config previews/exercise-3d/vite.config.ts`. Include the MakeHuman CC0, Three.js MIT and Meshoptimizer MIT license files when distributing the output. The existing main app and its service worker were byte-identical before and after publishing this preview.
 
+For reproducible posters, build `render.config.ts`, serve `work/poster-build` locally and run `POSTER_URL=http://127.0.0.1:4188/render.html node scripts/render-exercise-posters.mjs`. This freezes the renderer during capture and verifies the recorded phase rather than relying on development-server caches.
+
 The MakeHuman source revision, file hashes and generated model hash are in `src/assets/athlete-source.json`; the core-asset license is beside the generated model. The Instagram screenshots identify MyFitCoach as the visual reference; none of its images, models or animations are included in the preview.

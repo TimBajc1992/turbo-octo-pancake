@@ -10,6 +10,7 @@ await scene.ready;
 window.exercises = catalog.filter(c=>exerciseFamily(c)).map(c=>({id:c.id,name:c.name,family:exerciseFamily(c)}));
 window.renderExercise = async (id,progress=.45) => {
   await scene.changeExercise(byId(id),progress);
+  window.lastPosterDebug = scene.debug();
   return scene.renderer.domElement.toDataURL('image/webp',.88).split(',')[1];
 };
 </script></html>
