@@ -19,6 +19,7 @@ export const muscleGroups = [
   "Sprednje stegenske",
   "Zadnje stegenske",
   "Zadnjica",
+  "Notranje stegenske",
   "Meča",
   "Trup",
 ] as const;
@@ -36,13 +37,19 @@ export const trainingLabels: Record<TrainingType, string> = {
 export const trainingDescriptions: Record<TrainingType, string> = {
   push: "Prsi · ramena · triceps",
   pull: "Hrbet · zadnji del ramen · biceps",
-  legs: "Sprednje in zadnje stegenske · zadnjica · meča",
+  legs: "Sprednje, zadnje in notranje stegenske · zadnjica · meča",
   full: "Pregled vseh glavnih mišičnih skupin",
 };
 export const dayGroups: Record<TrainingType, readonly MuscleGroup[]> = {
   push: ["Prsi", "Ramena", "Triceps"],
   pull: ["Hrbet", "Ramena", "Biceps"],
-  legs: ["Sprednje stegenske", "Zadnje stegenske", "Zadnjica", "Meča"],
+  legs: [
+    "Sprednje stegenske",
+    "Zadnje stegenske",
+    "Zadnjica",
+    "Notranje stegenske",
+    "Meča",
+  ],
   full: muscleGroups,
 };
 export function primaryMuscle(c: Candidate): MuscleGroup {

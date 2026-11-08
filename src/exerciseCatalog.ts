@@ -1,4 +1,5 @@
 import type { Exercise, LoadMode } from "./model";
+import { catalogAdditions } from "./catalogAdditions";
 
 export interface Candidate {
   id: string;
@@ -727,6 +728,7 @@ export const catalog: Candidate[] = [
     "Brez nihanja približaj kolena trupu in jih počasi spusti. Izberi različico z oporo, če je vis neprijeten. Kg so dodatna obtežitev.",
     ["Dvig kolen v visu"],
   ),
+  ...catalogAdditions,
 ];
 export const byId = (id: string) => catalog.find((c) => c.id === id);
 
@@ -762,7 +764,19 @@ export function candidateForExercise(
 }
 
 export function loadLabel(c: Candidate): string {
-  if (c.id === "goblet_squat" || c.id === "dumbbell_overhead_extension")
+  if (c.id === "t_bar_row") return "kg naloženih plošč";
+  if (
+    [
+      "goblet_squat",
+      "dumbbell_overhead_extension",
+      "dumbbell_pullover",
+      "dumbbell_hip_thrust",
+      "preacher_dumbbell_curl",
+      "concentration_curl",
+      "leaning_dumbbell_lateral_raise",
+      "dumbbell_triceps_kickback",
+    ].includes(c.id)
+  )
     return "kg ene uteži";
   return c.mode === "dumbbell"
     ? "kg ene ročke"

@@ -54,8 +54,8 @@
   ],
   "output": {
     "file": "athlete-optimized.glb",
-    "bytes": 1162208,
-    "sha256": "c1b6635be96a9a7e88c3c614e4120c43013cd50e499b555683928115f73faca6"
+    "bytes": 1163736,
+    "sha256": "675623b52541b598639622db2e2a88fe3a69a1db1404e21cee3a444c78c1bf69"
   },
-  "modifications": "Adult male macro/muscle shape, original modest muscle-relief sculpt, compression shorts, cropped hair, rigging and mesh optimization. No MyFitCoach assets are used."
+  "modifications": "Lean adult male muscle/proportion morphs, original pectoral/abdominal relief and upper-arm/deltoid volume sculpt, compression shorts, cropped hair, rigging and mesh optimization. No MyFitCoach assets are used."
 }

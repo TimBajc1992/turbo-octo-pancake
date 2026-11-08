@@ -1,30 +1,34 @@
 # Prikaz mišic in izvedbe
 
-Nadgradnja nadaljuje objavljeno Moč & Formo iz `main` (`924809e`), vključno z naknadnim ročnim vnosom, knjižnico 55 vaj in obstoječo zgodovino Težišča. Povezana Instagram objava `DejKeMjsoE-` je 8. 11. 2026 pri odpiranju in iskanju vrnila omejitev dostopa. Prikaz zato izhaja iz uporabnikovega opisa; ujemanje z dejanskim videom ni preverjeno. Grafika je izvirna, ni kopija slik ali posnetkov druge aplikacije.
+Nadgradnja nadaljuje Moč & Formo iz `main` (`924809e`). Referenca so uporabnikovi posnetki MyFitCoach. Prvotni shematski 2D prikaz je zamenjan z dejanskim skinned 3D modelom, izvirno opremo ter vijoličnimi glavnimi in zlatimi pomožnimi mišicami. Slike, modeli in animacije MyFitCoach niso uporabljeni.
 
 ## Uporaba
 
-- **Knjižnica vaj → dotik slike** odpre prikaz konkretne vaje. Sam ogled ne izbere ali doda vaje v trening.
-- **Mišice** pokaže telo od spredaj in zadaj. Turkizna označuje glavne mišice, jantarna pomožne. Dotik imena poudari predel in prikaže njegovo vlogo.
-- **Izvedba** omogoča predvajanje, premor, drsnik in izbiro začetnega/končnega položaja. To je shematski 2D prikaz, ne video ali 3D model. Predvajanje se začne samo na uporabnikovo zahtevo in se ustavi, ko prikaz ni več viden.
-- Med hitro vadbo je prikaz pod **Mišice, izvedba in podlaga teže**. Vidna ostane ista ena vaja in naslednja serija; nad osnovno beleženje ni dodanih novih podatkov ali polj.
+- Knjižnica vsebuje **132 vaj in različic**: palice, ročke, drogove/bradljo, naprave, kable in lastno težo. To je obsežen izbran katalog, ne trditev o vseh mogočih različicah.
+- Dotik slike odpre ločen prikaz iste vaje brez dodajanja v trening. Kartice uporabljajo vnaprej izrisane slike; vsaka kartica ne ustvarja svojega grafičnega konteksta.
+- **Izvedba** je privzeti 3D prikaz. Predvajanje, premor, položaj giba in zasuk delujejo na uporabnikovo zahtevo. Izbrano mišico je mogoče poudariti.
+- **Mišice** ohranja zemljevid od spredaj/zadaj in razlago 19 anatomskih predelov. Barvi opisujeta vlogo, ne odstotkov aktivacije ali lestvice učinkovitosti.
+- Med vadbo je prikaz pod **Mišice, izvedba in podlaga teže**. Osnovno potrjevanje naslednje serije ne zahteva novega tipkanja ali dodatnega obrazca.
+- Če 3D ni na voljo, ostaneta shranjena slika konkretne vaje in zemljevid mišic. Slike, model in program so vključeni v lokalni paket za uporabo brez povezave po namestitvi.
 
-Podlaga prikaza je grafitna, neodvisna od potrjenega kovinskega vmesnika Stara šola. Prikaz deluje brez zunanjih slik, knjižnic za 3D ali omrežnih zahtev. Novo besedilo in ikone so v slovenščini oziroma v obstoječih imenih vaj.
+## Model in gibanje
 
-## Kaj pomenijo oznake mišic
+Človeško telo izvira iz MakeHuman core **grafičnih podatkov CC0**, pripetih na revizijo `a8bc2d54ff0ac92e78ff71431b1023eda42bf482`. Vse izvorne datoteke in SHA-256 so v `src/assets/athlete-source.json`; licenca je ob modelu in v `public/licenses`. Programskega dela MakeHuman ne vključujemo. Three.js in Meshoptimizer sta pod MIT.
 
-Podatki v `exerciseAnatomy.ts` so ločeni od kataloga in zgodovine. Opisujejo običajne gibalne vloge 19 mišičnih predelov, vključno z razlikovanjem sprednjega/stranskega/zadnjega dela ramen ter široke hrbtne mišice in zgornjega dela hrbta. Glavne in pomožne mišice so uporabniške razlage; prikaz ne meri aktivacije, ne navaja odstotkov EMG in ne razvršča učinkovitosti vaj. Tehnika, prijem, naklon ter oprema lahko spremenijo poudarek.
+`scripts/build-athlete.py` iz podatkov ustvari odraslega atleta s 163 kostmi, bolj pusto in mišičasto postavo, izvirnim reliefom prsnih/trebušnih mišic, poudarjenimi nadlahtmi/rameni ter kratkimi hlačami. `scripts/optimize-athlete.mjs` izdela stisnjeni model in osveži njegov hash. `scripts/render-exercise-posters.mjs` iz dejanskih prizorov izdela slike knjižnice. Naprave so izvirna proceduralna geometrija.
 
-Prikaz se opira na splošno funkcionalno anatomijo. Za pregled izbire mišičnih skupin sta bila uporabljena [ACE Exercise Library](https://www.acefitness.org/resources/everyone/exercise-library/) in [NASM Barbell Bench Press](https://www.nasm.org/resource-center/exercise-library/barbell-bench-press). Vira ne potrjujeta prikazane geometrije ali kvantitativne stopnje aktivacije.
+Komolec rešuje dvosegmentni tečaj v skupni ravnini. Razdeljene kožne kosti ohranjajo isti togi premik segmenta. Vizualna animacija omeji upogib komolca na 6–145° in pronacijo/supinacijo podlakti na ±85°; zapestje pri prijemu ohrani nevtralni lokalni položaj. Pri opori na odprto dlan je izteg zapestja izrecno omejen na največ 75°. To so omejitve tega prikaza, ne individualno predpisan obseg vadbe. Pri zgibih se prijem dodatno poravna s fiksnim drogom. Prikazi ostajajo orientacijski za običajno izvedbo in ne reproducirajo vsakega modela naprave.
 
-Pri splošno poimenovani **Napravi za trup** ni izmišljenega zemljevida: najprej je treba vedeti, za kateri gib gre. Pri sedečih mečih je pojasnjen poudarek na globlji mišici soleus. Pri dvigu kolen v visu so upogibalke kolka ločene od trebušnih mišic, ki sodelujejo pri nadzoru in privihu medenice. Površinski prikaz je poenostavljen; ne prikazuje posamezne globoke mišice.
+Splošno poimenovana **Naprava za trup** nima izmišljenega giba: izvedbo je treba najprej določiti. Zato ima katalog 132 vnosov in 131 konkretnih 3D prikazov. Pri deski je položaj pravilno statičen.
 
-## Ohranjeni podatki
+## Ohranjanje podatkov
 
-Shema, IndexedDB `tezisce/state/current`, ID-ji vaj, predloge, osnutki prihodnjih in naknadnih treningov, aktivna vadba, uvozi in `device:*` ostanejo isti. Branje prikaza nima zapisov v shrambo. Pravila največ dveh vaj na glavno skupino še naprej uporabljajo izvirni `training.ts`; dodatne anatomske oznake ne spreminjajo sestavljanja treningov ali predlaganja tež. Worker, D1 in ključi povezave niso spremenjeni.
+Izvirnih **55 ID-jev, imen, vzdevkov, opreme in načinov zapisovanja** ni spremenjenih. To preverja shranjeni seznam iz predhodne revizije. Nove različice dobijo nove ID-je in svojo zgodovino. Smithova naprava, prosta palica, enoročna izvedba in asistenca niso ista obremenitev. Stare lastne vaje se ne preimenujejo.
+
+Shema IndexedDB `tezisce/state/current`, zgodovina, predloge, osnutki, aktivna vadba, uvozi in `device:*` ostajajo isti. Ogled ne zapisuje podatkov. Dodana je mišična skupina notranjih stegenskih za novo adukcijsko napravo; obstoječa omejitev dveh vaj na glavno skupino ostaja. Worker, D1, ključ povezave in priporočanje tež niso spremenjeni.
 
 ## Preverjanje
 
-Prvi celotni preizkus WebKit je odkril obstanek obstoječe posodobitvene strani pri prehodu iz stare objave `23b576f`. Stran zato ponovno uporabi že obstoječo registracijo service workerja, namesto ponovnega registriranja in takojšnjega dodatnega preverjanja. Vse začetne asinkrone operacije imajo časovno omejitev in ob obstanku vrnejo možnost ponovnega poskusa. Dodatni preizkusi simulirajo neodziven Safari in primerjajo celotne shranjene podatke. Posodobitvena stran ne briše podatkov ali registracij.
+Preizkus z dejanskim modelom vzorči celoten cikel vsake konkretne vaje: enake dolžine nadlakti/podlakti, dovoljene kote komolcev, nevtralna zapestja in zveznost rotacij. Preizkusi kataloga preverjajo stare identitete, enolične vzdevke in pokritost prikazov. Brskalniški tokovi preverjajo predvajanje, drsnik, zemljevid, mobilne širine, uporabo brez povezave, varni rezervni prikaz in enakost celotne sintetične zbirke ter ključev.
 
-Preizkusi vključujejo pokritost kataloga, negotovo napravo, glavne/pomožne mišice, aktivno vadbo z vso sintetično zgodovino, dejansko predvajanje in drsnik, dotik sličice brez dodajanja vaje, širine 320/390/1440 px, prikaz brez povezave ter nespremenjene lokalne ključe. Oba prikaza sta preverjena z axe za WCAG 2 A/AA in 2.1 AA. Obstoječi preizkusi še naprej preverjajo stare posodobitve PWA, ročni vnos, podatke in sinhronizacijo. Pravega iPhona in nedostopne Instagram objave ti preizkusi ne vključujejo.
+Ohranjena je tudi predhodna izboljšava `posodobi.html`: stran ponovno uporabi registracijo service workerja in opazuje namestitev tudi, če Safari ne zaključi obljube `update()`. Nobena posodobitev ne briše zbirke ali registracij. Preizkusi uporabljajo Chromium in WebKit; to ni preizkus na fizičnem iPhonu.

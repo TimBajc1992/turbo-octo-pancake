@@ -35,9 +35,9 @@ for line in (DATA / '3dobjs/base.obj').read_text().splitlines():
 # Independent macro and muscle/weight groups; no copied MakeHuman program logic.
 for name, factor in [
     ('caucasian-male-young.target', 1.0),
-    ('universal-male-young-maxmuscle-averageweight.target', .65),
-    ('universal-male-young-maxmuscle-minweight.target', .35),
-    ('proportions/male-young-maxmuscle-averageweight-idealproportions.target', .6),
+    ('universal-male-young-maxmuscle-averageweight.target', .35),
+    ('universal-male-young-maxmuscle-minweight.target', .65),
+    ('proportions/male-young-maxmuscle-averageweight-idealproportions.target', .85),
 ]:
     for line in (DATA / 'targets/macrodetails' / name).read_text().splitlines():
         if not line or line.startswith('#'):
@@ -47,14 +47,17 @@ for name, factor in [
 
 floor = min(v.y for v in vertices[:13380])
 vertices = [Vector((v.x * .1, (v.y - floor) * .1, v.z * .1)) for v in vertices]
-# A small original surface sculpt defines the pectorals and abdominal relief.
+# Original surface relief: a leaner waist, distinct pecs/abs and fuller muscle
+# bellies. These are mesh changes, so lighting and muscle overlays retain them.
 for point in vertices[:13380]:
     if point.z > .05 and abs(point.x) < .22:
         relief = 0
         for side in [-1, 1]:
             for height in [1.065, 1.125, 1.185]:
-                relief += .009 * math.exp(-((point.x - side * .047) / .034) ** 2 - ((point.y - height) / .026) ** 2)
-            relief += .010 * math.exp(-((point.x - side * .098) / .072) ** 2 - ((point.y - 1.29) / .054) ** 2)
+                relief += .016 * math.exp(-((point.x - side * .047) / .034) ** 2 - ((point.y - height) / .025) ** 2)
+            relief += .022 * math.exp(-((point.x - side * .098) / .073) ** 2 - ((point.y - 1.29) / .050) ** 2)
+            relief += .006 * math.exp(-((point.x - side * .133) / .030) ** 2 - ((point.y - 1.14) / .095) ** 2)
+        relief -= .005 * math.exp(-(point.x / .014) ** 2 - ((point.y - 1.19) / .16) ** 4)
         point.z += relief
 rig = json.loads((DATA / 'rigs/default.mhskel').read_text())
 weights = json.loads((DATA / 'rigs/default_weights.mhw').read_text())['weights']
@@ -62,6 +65,21 @@ weights = json.loads((DATA / 'rigs/default_weights.mhw').read_text())['weights']
 def joint(name):
     ids = rig['joints'][name]
     return sum((vertices[i] for i in ids), Vector()) / len(ids)
+
+# Radial volume around fixed skeletal landmarks; joint locations and limb
+# lengths are untouched. Smooth falloff avoids a seam at elbow and shoulder.
+for side in ['L', 'R']:
+    shoulder = joint(rig['bones']['upperarm01.' + side]['head'])
+    elbow = joint(rig['bones']['lowerarm01.' + side]['head'])
+    shaft = elbow - shoulder
+    for point in vertices[:13380]:
+        t = (point - shoulder).dot(shaft) / shaft.length_squared
+        center = shoulder + shaft * max(0, min(1, t))
+        radial = point - center
+        if -.08 < t < 1 and radial.length < .115 and abs(point.x) > .19:
+            belly = .19 * math.exp(-((t - .53) / .34) ** 2)
+            delt = .16 * math.exp(-((t - .06) / .22) ** 2)
+            point += radial * (belly + delt)
 
 def blender(v):
     return Vector((v.x, -v.z, v.y))

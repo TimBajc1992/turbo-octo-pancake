@@ -1,0 +1,731 @@
+[
+  {
+    "id": "leg_press",
+    "name": "Leg Press",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Potisk z nogami",
+    "pattern": "leg-push",
+    "muscles": [
+      "Sprednje stegenske",
+      "Zadnjica"
+    ]
+  },
+  {
+    "id": "hack_squat",
+    "name": "Hack Squat",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Hack squat naprava",
+    "pattern": "leg-push",
+    "muscles": [
+      "Sprednje stegenske",
+      "Zadnjica"
+    ]
+  },
+  {
+    "id": "seated_leg_curl",
+    "name": "Seated Leg Curl",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Sedeči upogib kolen",
+    "pattern": "knee-flexion",
+    "muscles": [
+      "Zadnje stegenske"
+    ]
+  },
+  {
+    "id": "leg_curl",
+    "name": "Lying Leg Curl",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Ležeči upogib kolen",
+    "pattern": "knee-flexion",
+    "muscles": [
+      "Zadnje stegenske"
+    ]
+  },
+  {
+    "id": "leg_extension",
+    "name": "Leg Extension",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Izteg kolen",
+    "pattern": "knee-extension",
+    "muscles": [
+      "Sprednje stegenske"
+    ]
+  },
+  {
+    "id": "glute_drive",
+    "name": "Glute Drive / Hip Thrust",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Naprava za izteg kolka",
+    "pattern": "hip-extension",
+    "muscles": [
+      "Zadnjica"
+    ]
+  },
+  {
+    "id": "seated_calf",
+    "name": "Seated Calf Raise",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Sedeči dvig na prste",
+    "pattern": "calf",
+    "muscles": [
+      "Meča"
+    ]
+  },
+  {
+    "id": "standing_calf",
+    "name": "Standing Calf Raise",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Stoječi dvig na prste",
+    "pattern": "calf",
+    "muscles": [
+      "Meča"
+    ]
+  },
+  {
+    "id": "machine_chest_press",
+    "name": "Machine Chest Press",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Prsna potisna naprava",
+    "pattern": "horizontal-push",
+    "muscles": [
+      "Prsi",
+      "Triceps"
+    ]
+  },
+  {
+    "id": "chest_press_alt",
+    "name": "Chest Press · druga naprava",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Druga prsna potisna naprava",
+    "pattern": "horizontal-push",
+    "muscles": [
+      "Prsi",
+      "Triceps"
+    ]
+  },
+  {
+    "id": "chest_supported_row",
+    "name": "Chest-Supported Row",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Veslanje s prsno oporo",
+    "pattern": "horizontal-pull",
+    "muscles": [
+      "Hrbet",
+      "Biceps"
+    ]
+  },
+  {
+    "id": "seated_row",
+    "name": "Seated Cable Row",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Sedeče veslanje na kablu",
+    "pattern": "horizontal-pull",
+    "muscles": [
+      "Hrbet",
+      "Biceps"
+    ]
+  },
+  {
+    "id": "lat_pulldown",
+    "name": "Lat Pulldown",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Poteg na prsi",
+    "pattern": "vertical-pull",
+    "muscles": [
+      "Hrbet",
+      "Biceps"
+    ]
+  },
+  {
+    "id": "lat_pulldown_alt",
+    "name": "Lat Pulldown · druga naprava",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Druga naprava za poteg na prsi",
+    "pattern": "vertical-pull",
+    "muscles": [
+      "Hrbet",
+      "Biceps"
+    ]
+  },
+  {
+    "id": "machine_shoulder_press",
+    "name": "Machine Shoulder Press",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Ramenska potisna naprava",
+    "pattern": "vertical-push",
+    "muscles": [
+      "Ramena",
+      "Triceps"
+    ]
+  },
+  {
+    "id": "reverse_fly",
+    "name": "Reverse Pec Deck",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Obratni metulj",
+    "pattern": "rear-delt",
+    "muscles": [
+      "Zadnji del ramen"
+    ]
+  },
+  {
+    "id": "cable_reverse_fly",
+    "name": "Cable Reverse Fly",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Kabelski obratni razmik",
+    "pattern": "rear-delt",
+    "muscles": [
+      "Zadnji del ramen"
+    ]
+  },
+  {
+    "id": "cable_lateral_raise",
+    "name": "Machine / Cable Lateral Raise",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Stranski dvig na napravi ali kablu",
+    "pattern": "lateral-raise",
+    "muscles": [
+      "Ramena"
+    ]
+  },
+  {
+    "id": "pec_deck",
+    "name": "Pec Deck",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Metulj za prsi",
+    "pattern": "chest-fly",
+    "muscles": [
+      "Prsi"
+    ]
+  },
+  {
+    "id": "tricep_pushdown",
+    "name": "Cable Triceps Pushdown",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Kabelski potisk navzdol",
+    "pattern": "elbow-extension",
+    "muscles": [
+      "Triceps"
+    ]
+  },
+  {
+    "id": "oh_extension",
+    "name": "Overhead Extension",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Kabelski izteg nad glavo",
+    "pattern": "elbow-extension",
+    "muscles": [
+      "Triceps"
+    ]
+  },
+  {
+    "id": "biceps_machine",
+    "name": "Biceps Curl · naprava",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Naprava za upogib komolca",
+    "pattern": "elbow-flexion",
+    "muscles": [
+      "Biceps"
+    ]
+  },
+  {
+    "id": "cable_biceps",
+    "name": "Biceps Curl · kabel",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Kabelski upogib komolca",
+    "pattern": "elbow-flexion",
+    "muscles": [
+      "Biceps"
+    ]
+  },
+  {
+    "id": "pallof_press",
+    "name": "Cable Pallof Press",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Kabel za Pallof Press",
+    "pattern": "trunk",
+    "muscles": [
+      "Trup"
+    ]
+  },
+  {
+    "id": "trunk_machine",
+    "name": "Naprava za trup",
+    "mode": "machine",
+    "aliases": [],
+    "equipment": "Naprava za trup",
+    "pattern": "trunk-machine",
+    "muscles": [
+      "Trup"
+    ]
+  },
+  {
+    "id": "bench_press",
+    "name": "Bench Press",
+    "mode": "barbell",
+    "aliases": [
+      "Barbell Bench Press",
+      "Potisk s prsi s palico"
+    ],
+    "equipment": "Palica in ravna klop",
+    "pattern": "horizontal-push",
+    "muscles": [
+      "Prsi",
+      "Triceps"
+    ]
+  },
+  {
+    "id": "incline_bench_press",
+    "name": "Incline Bench Press",
+    "mode": "barbell",
+    "aliases": [
+      "Incline Barbell Bench Press",
+      "Poševni potisk s palico"
+    ],
+    "equipment": "Palica in poševna klop",
+    "pattern": "horizontal-push",
+    "muscles": [
+      "Prsi",
+      "Triceps"
+    ]
+  },
+  {
+    "id": "dumbbell_bench_press",
+    "name": "Dumbbell Bench Press",
+    "mode": "dumbbell",
+    "aliases": [
+      "DB Bench Press",
+      "Potisk s prsi z ročkama"
+    ],
+    "equipment": "Ročki in ravna klop",
+    "pattern": "horizontal-push",
+    "muscles": [
+      "Prsi",
+      "Triceps"
+    ]
+  },
+  {
+    "id": "incline_dumbbell_press",
+    "name": "Incline Dumbbell Press",
+    "mode": "dumbbell",
+    "aliases": [
+      "Incline DB Press",
+      "Incline Dumbbell Bench Press",
+      "Poševni potisk z ročkama"
+    ],
+    "equipment": "Ročki in poševna klop",
+    "pattern": "horizontal-push",
+    "muscles": [
+      "Prsi",
+      "Triceps"
+    ]
+  },
+  {
+    "id": "push_up",
+    "name": "Push-up / Skleca",
+    "mode": "bodyweight",
+    "aliases": [
+      "Push Up",
+      "Push-up",
+      "Skleca",
+      "Sklece"
+    ],
+    "equipment": "Tla ali dvignjena opora",
+    "pattern": "horizontal-push",
+    "muscles": [
+      "Prsi",
+      "Triceps"
+    ]
+  },
+  {
+    "id": "barbell_row",
+    "name": "Barbell Row",
+    "mode": "barbell",
+    "aliases": [
+      "Bent Over Row",
+      "Bent-over Barbell Row",
+      "Veslanje s palico"
+    ],
+    "equipment": "Palica",
+    "pattern": "horizontal-pull",
+    "muscles": [
+      "Hrbet",
+      "Biceps"
+    ]
+  },
+  {
+    "id": "dumbbell_row",
+    "name": "One-arm Dumbbell Row",
+    "mode": "dumbbell",
+    "aliases": [
+      "Dumbbell Row",
+      "One Arm Dumbbell Row",
+      "Enoročno veslanje z ročko"
+    ],
+    "equipment": "Ročka in klop",
+    "pattern": "horizontal-pull",
+    "muscles": [
+      "Hrbet",
+      "Biceps"
+    ]
+  },
+  {
+    "id": "pull_up",
+    "name": "Pull-up / Zgib",
+    "mode": "bodyweight",
+    "aliases": [
+      "Pull Up",
+      "Pull-up",
+      "Zgib",
+      "Zgibi"
+    ],
+    "equipment": "Drog za zgibe",
+    "pattern": "vertical-pull",
+    "muscles": [
+      "Hrbet",
+      "Biceps"
+    ]
+  },
+  {
+    "id": "assisted_pull_up",
+    "name": "Assisted Pull-up",
+    "mode": "assisted",
+    "aliases": [
+      "Asistirani zgib"
+    ],
+    "equipment": "Naprava za asistirani zgib",
+    "pattern": "vertical-pull",
+    "muscles": [
+      "Hrbet",
+      "Biceps"
+    ]
+  },
+  {
+    "id": "overhead_press",
+    "name": "Overhead Press",
+    "mode": "barbell",
+    "aliases": [
+      "Barbell Overhead Press",
+      "Military Press",
+      "Ramenski potisk s palico"
+    ],
+    "equipment": "Palica",
+    "pattern": "vertical-push",
+    "muscles": [
+      "Ramena",
+      "Triceps"
+    ]
+  },
+  {
+    "id": "dumbbell_shoulder_press",
+    "name": "Dumbbell Shoulder Press",
+    "mode": "dumbbell",
+    "aliases": [
+      "DB Shoulder Press",
+      "Ramenski potisk z ročkama"
+    ],
+    "equipment": "Ročki in klop z naslonom",
+    "pattern": "vertical-push",
+    "muscles": [
+      "Ramena",
+      "Triceps"
+    ]
+  },
+  {
+    "id": "dumbbell_lateral_raise",
+    "name": "Dumbbell Lateral Raise",
+    "mode": "dumbbell",
+    "aliases": [
+      "Stranski dvig z ročkama"
+    ],
+    "equipment": "Ročki",
+    "pattern": "lateral-raise",
+    "muscles": [
+      "Ramena"
+    ]
+  },
+  {
+    "id": "dumbbell_reverse_fly",
+    "name": "Dumbbell Reverse Fly",
+    "mode": "dumbbell",
+    "aliases": [
+      "Obratni razmik z ročkama"
+    ],
+    "equipment": "Ročki in poševna klop",
+    "pattern": "rear-delt",
+    "muscles": [
+      "Zadnji del ramen"
+    ]
+  },
+  {
+    "id": "dumbbell_biceps_curl",
+    "name": "Dumbbell Biceps Curl",
+    "mode": "dumbbell",
+    "aliases": [
+      "Dumbbell Curl",
+      "DB Curl",
+      "Upogib komolca z ročkama"
+    ],
+    "equipment": "Ročki",
+    "pattern": "elbow-flexion",
+    "muscles": [
+      "Biceps"
+    ]
+  },
+  {
+    "id": "incline_dumbbell_curl",
+    "name": "Incline Dumbbell Curl",
+    "mode": "dumbbell",
+    "aliases": [
+      "Incline DB Curl",
+      "Upogib komolca na poševni klopi"
+    ],
+    "equipment": "Ročki in poševna klop",
+    "pattern": "elbow-flexion",
+    "muscles": [
+      "Biceps"
+    ]
+  },
+  {
+    "id": "barbell_curl",
+    "name": "Barbell / EZ-bar Curl",
+    "mode": "barbell",
+    "aliases": [
+      "Barbell Curl",
+      "EZ Bar Curl",
+      "Upogib komolca s palico"
+    ],
+    "equipment": "Ravna ali EZ-palica",
+    "pattern": "elbow-flexion",
+    "muscles": [
+      "Biceps"
+    ]
+  },
+  {
+    "id": "dumbbell_overhead_extension",
+    "name": "Dumbbell Overhead Triceps Extension",
+    "mode": "dumbbell",
+    "aliases": [
+      "Dumbbell Triceps Extension",
+      "Izteg tricepsa z ročko"
+    ],
+    "equipment": "Ena ročka",
+    "pattern": "elbow-extension",
+    "muscles": [
+      "Triceps"
+    ]
+  },
+  {
+    "id": "barbell_back_squat",
+    "name": "Barbell Back Squat",
+    "mode": "barbell",
+    "aliases": [
+      "Back Squat",
+      "Počep s palico"
+    ],
+    "equipment": "Palica in stojalo z varovali",
+    "pattern": "leg-push",
+    "muscles": [
+      "Sprednje stegenske",
+      "Zadnjica"
+    ]
+  },
+  {
+    "id": "goblet_squat",
+    "name": "Goblet Squat",
+    "mode": "dumbbell",
+    "aliases": [
+      "Goblet počep"
+    ],
+    "equipment": "Ena ročka ali kettlebell",
+    "pattern": "leg-push",
+    "muscles": [
+      "Sprednje stegenske",
+      "Zadnjica"
+    ]
+  },
+  {
+    "id": "bulgarian_split_squat",
+    "name": "Bulgarian Split Squat",
+    "mode": "dumbbell",
+    "aliases": [
+      "Rear Foot Elevated Split Squat",
+      "Bolgarski počep"
+    ],
+    "equipment": "Ročki in klop",
+    "pattern": "split-squat",
+    "muscles": [
+      "Sprednje stegenske",
+      "Zadnjica"
+    ]
+  },
+  {
+    "id": "reverse_lunge",
+    "name": "Dumbbell Reverse Lunge",
+    "mode": "dumbbell",
+    "aliases": [
+      "Reverse Lunge",
+      "Vzvratni izpadni korak"
+    ],
+    "equipment": "Ročki",
+    "pattern": "split-squat",
+    "muscles": [
+      "Sprednje stegenske",
+      "Zadnjica"
+    ]
+  },
+  {
+    "id": "romanian_deadlift",
+    "name": "Romanian Deadlift",
+    "mode": "barbell",
+    "aliases": [
+      "Barbell Romanian Deadlift",
+      "Romunski mrtvi dvig"
+    ],
+    "equipment": "Palica",
+    "pattern": "hip-hinge",
+    "muscles": [
+      "Zadnje stegenske",
+      "Zadnjica"
+    ]
+  },
+  {
+    "id": "dumbbell_romanian_deadlift",
+    "name": "Dumbbell Romanian Deadlift",
+    "mode": "dumbbell",
+    "aliases": [
+      "DB RDL",
+      "Romunski mrtvi dvig z ročkama"
+    ],
+    "equipment": "Ročki",
+    "pattern": "hip-hinge",
+    "muscles": [
+      "Zadnje stegenske",
+      "Zadnjica"
+    ]
+  },
+  {
+    "id": "deadlift",
+    "name": "Conventional Deadlift",
+    "mode": "barbell",
+    "aliases": [
+      "Deadlift",
+      "Mrtvi dvig"
+    ],
+    "equipment": "Palica in plošče",
+    "pattern": "deadlift",
+    "muscles": [
+      "Zadnjica",
+      "Zadnje stegenske",
+      "Hrbet"
+    ]
+  },
+  {
+    "id": "barbell_hip_thrust",
+    "name": "Barbell Hip Thrust",
+    "mode": "barbell",
+    "aliases": [
+      "Izteg kolka s palico"
+    ],
+    "equipment": "Palica, podloga in klop",
+    "pattern": "hip-extension",
+    "muscles": [
+      "Zadnjica"
+    ]
+  },
+  {
+    "id": "hip_abduction_machine",
+    "name": "Hip Abduction Machine",
+    "mode": "machine",
+    "aliases": [
+      "Hip Abduction",
+      "Odmik kolkov"
+    ],
+    "equipment": "Naprava za odmik kolkov",
+    "pattern": "hip-abduction",
+    "muscles": [
+      "Zadnjica"
+    ]
+  },
+  {
+    "id": "cable_glute_kickback",
+    "name": "Cable Glute Kickback",
+    "mode": "machine",
+    "aliases": [
+      "Glute Kickback",
+      "Izteg kolka na kablu"
+    ],
+    "equipment": "Spodnji kabel in manšeta",
+    "pattern": "hip-extension",
+    "muscles": [
+      "Zadnjica"
+    ]
+  },
+  {
+    "id": "back_extension",
+    "name": "Back Extension",
+    "mode": "bodyweight",
+    "aliases": [
+      "Hip Extension Bench",
+      "Izteg na klopi"
+    ],
+    "equipment": "Klop za izteg hrbta",
+    "pattern": "hip-hinge",
+    "muscles": [
+      "Zadnjica",
+      "Zadnje stegenske",
+      "Hrbet"
+    ]
+  },
+  {
+    "id": "cable_crunch",
+    "name": "Cable Crunch",
+    "mode": "machine",
+    "aliases": [
+      "Kneeling Cable Crunch",
+      "Upogib trupa na kablu"
+    ],
+    "equipment": "Zgornji kabel in vrv",
+    "pattern": "trunk-flexion",
+    "muscles": [
+      "Trup"
+    ]
+  },
+  {
+    "id": "hanging_knee_raise",
+    "name": "Hanging Knee Raise",
+    "mode": "bodyweight",
+    "aliases": [
+      "Dvig kolen v visu"
+    ],
+    "equipment": "Drog ali opora za podlakti",
+    "pattern": "knee-raise",
+    "muscles": [
+      "Trup"
+    ]
+  }
+]

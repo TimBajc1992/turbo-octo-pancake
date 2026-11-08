@@ -123,6 +123,23 @@ const profiles: Record<string, Anatomy> = {
   "knee-flexion": { primary: ["hamstrings"], secondary: ["calves"] },
   "hip-extension": { primary: ["glutes"], secondary: ["hamstrings"] },
   "hip-abduction": { primary: ["hipAbductors"], secondary: [] },
+  "hip-adduction": { primary: ["adductors"], secondary: [] },
+  dip: { primary: ["chest"], secondary: ["triceps", "frontDelts"] },
+  "high-row": {
+    primary: ["lats", "upperBack"],
+    secondary: ["biceps", "rearDelts"],
+  },
+  "face-pull": { primary: ["rearDelts"], secondary: ["upperBack", "forearms"] },
+  "straight-arm-pull": { primary: ["lats"], secondary: ["triceps"] },
+  pullover: { primary: ["lats"], secondary: ["chest", "triceps"] },
+  "front-raise": { primary: ["frontDelts"], secondary: ["sideDelts"] },
+  "upright-row": { primary: ["sideDelts", "upperBack"], secondary: ["biceps"] },
+  shrug: { primary: ["upperBack"], secondary: ["forearms"] },
+  "lying-extension": { primary: ["triceps"], secondary: [] },
+  "triceps-kickback": { primary: ["triceps"], secondary: [] },
+  "step-up": { primary: ["quads", "glutes"], secondary: ["hipAbductors"] },
+  "reverse-crunch": { primary: ["abs"], secondary: ["hipFlexors"] },
+  plank: { primary: ["abs", "obliques"], secondary: ["frontDelts", "glutes"] },
   "hip-hinge": {
     primary: ["hamstrings", "glutes"],
     secondary: ["spinalErectors"],
@@ -142,6 +159,8 @@ const profiles: Record<string, Anatomy> = {
 };
 
 export function anatomyForExercise(c: Candidate): Anatomy {
+  if (c.id === "close_grip_bench_press")
+    return { primary: ["triceps"], secondary: ["chest", "frontDelts"] };
   if (c.id === "trunk_machine")
     return {
       primary: [],

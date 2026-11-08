@@ -125,7 +125,7 @@ export function ExerciseLibrary({
         </button>
       </div>
       <p>
-        Uveljavljene vaje za vse glavne mišične skupine. Izberi opremo in
+        {catalog.length} vaj in različic za glavne mišične skupine. Izberi opremo in
         izvedbo, ki ti ustrezata.{" "}
         {trainingType && (
           <>

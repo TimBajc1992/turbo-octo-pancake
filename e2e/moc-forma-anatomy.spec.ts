@@ -37,6 +37,10 @@ test("muscle roles, touch controls and offline movement guide preserve the entir
     .click();
   const guide = page.locator("section.exercise-visual");
   await expect(
+    guide.getByRole("img", { name: /Bench Press: 3D prikaz/ }),
+  ).toBeVisible();
+  await guide.getByRole("button", { name: "Mišice", exact: true }).click();
+  await expect(
     guide.getByRole("img", { name: /Bench Press: mišice pri vaji/ }),
   ).toBeVisible();
   await expect(
@@ -65,28 +69,37 @@ test("muscle roles, touch controls and offline movement guide preserve the entir
     })),
   ).toEqual([]);
   await guide.getByRole("button", { name: "Izvedba", exact: true }).click();
+  const renderer = guide.locator(".exercise-3d-stage");
+  await expect(renderer).not.toHaveAttribute("data-renderer", "loading");
   const slider = guide.getByRole("slider", {
     name: "Položaj giba",
     exact: true,
   });
   await expect(slider).toHaveValue("0");
-  await guide
-    .getByRole("button", { name: "Predvajaj prikaz gibanja", exact: true })
-    .click();
-  await expect
-    .poll(async () => Number(await slider.inputValue()))
-    .toBeGreaterThan(4);
-  await guide
-    .getByRole("button", { name: "Ustavi prikaz gibanja", exact: true })
-    .click();
-  await guide
-    .getByRole("button", { name: "02 · Zaključek", exact: true })
-    .click();
-  await expect(slider).toHaveValue("100");
-  await guide
-    .getByRole("button", { name: "Vrni gib na začetek", exact: true })
-    .click();
-  await expect(slider).toHaveValue("0");
+  const animated = (await renderer.getAttribute("data-renderer")) === "webgl";
+  if (process.env.TEST_BROWSER !== "webkit") expect(animated).toBe(true);
+  if (animated) {
+    await guide
+      .getByRole("button", { name: "Predvajaj prikaz gibanja", exact: true })
+      .click();
+    await expect
+      .poll(async () => Number(await slider.inputValue()), { timeout: 20000 })
+      .toBeGreaterThan(4);
+    await guide
+      .getByRole("button", { name: "Ustavi prikaz gibanja", exact: true })
+      .click();
+    await guide
+      .getByRole("button", { name: "02 · Zaključek", exact: true })
+      .click();
+    await expect(slider).toHaveValue("100");
+    await guide
+      .getByRole("button", { name: "Vrni gib na začetek", exact: true })
+      .click();
+    await expect(slider).toHaveValue("0");
+  } else {
+    await expect(guide.locator(".exercise-3d-poster")).toBeVisible();
+    await expect(slider).toBeDisabled();
+  }
   await guide.screenshot({ path: info.outputPath("movement-bench.png") });
   const movementAccessibility = await new AxeBuilder({ page })
     .include("section.exercise-visual")
@@ -113,7 +126,7 @@ test("muscle roles, touch controls and offline movement guide preserve the entir
     .getByText("Mišice, izvedba in podlaga teže", { exact: true })
     .click();
   await expect(
-    guide.getByRole("img", { name: /Bench Press: mišice pri vaji/ }),
+    guide.getByRole("img", { name: /Bench Press: 3D prikaz/ }),
   ).toBeVisible();
   expect(await readWorkoutState(page)).toEqual(source);
   expect(
@@ -146,7 +159,11 @@ test("a catalogue thumbnail opens the correct guide without selecting or adding 
     exact: true,
   });
   await dialog.getByLabel("Poišči vajo", { exact: true }).fill("Leg Extension");
-  const card = dialog.locator(".library-card");
+  const card = dialog
+    .locator(".library-card")
+    .filter({
+      has: page.getByRole("heading", { name: "Leg Extension", exact: true }),
+    });
   await expect(card).toHaveCount(1);
   await card
     .getByRole("button", {
@@ -154,7 +171,15 @@ test("a catalogue thumbnail opens the correct guide without selecting or adding 
       exact: true,
     })
     .click();
-  const guide = card.locator("section.exercise-visual");
+  const visualDialog = page.getByRole("dialog", {
+    name: "Prikaz vaje: Leg Extension",
+    exact: true,
+  });
+  const guide = visualDialog.locator("section.exercise-visual");
+  await expect(
+    guide.getByRole("img", { name: /Leg Extension: 3D prikaz/ }),
+  ).toBeVisible();
+  await guide.getByRole("button", { name: "Mišice", exact: true }).click();
   await expect(
     guide.getByRole("img", { name: /Leg Extension: mišice pri vaji/ }),
   ).toBeVisible();
@@ -166,8 +191,58 @@ test("a catalogue thumbnail opens the correct guide without selecting or adding 
   );
   await guide.screenshot({ path: info.outputPath("anatomy-legs.png") });
   expect(await readWorkoutState(page)).toEqual(source);
+  await visualDialog
+    .getByRole("button", { name: "Zapri prikaz vaje", exact: true })
+    .click();
+  await expect(
+    card.getByRole("button", {
+      name: "Prikaži mišice in izvedbo: Leg Extension",
+      exact: true,
+    }),
+  ).toBeFocused();
   await dialog
     .getByRole("button", { name: "Zapri knjižnico", exact: true })
     .click();
+  expect(await readWorkoutState(page)).toEqual(source);
+});
+
+test("a browser without 3D keeps the exercise poster, muscle map and all existing workout data", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const getContext = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (
+      kind: string,
+      ...args: any[]
+    ) {
+      if (
+        kind === "webgl" ||
+        kind === "webgl2" ||
+        kind === "experimental-webgl"
+      )
+        return null;
+      return (getContext as any).call(this, kind, ...args);
+    } as any;
+  });
+  const source = await seed(page);
+  await page
+    .getByText("Mišice, izvedba in podlaga teže", { exact: true })
+    .click();
+  const guide = page.locator("section.exercise-visual");
+  await expect(guide.locator(".exercise-3d-stage")).toHaveAttribute(
+    "data-renderer",
+    "poster",
+  );
+  await expect(guide.locator(".exercise-3d-poster")).toBeVisible();
+  await expect(
+    guide.getByRole("button", {
+      name: "Predvajaj prikaz gibanja",
+      exact: true,
+    }),
+  ).toBeDisabled();
+  await guide.getByRole("button", { name: "Mišice", exact: true }).click();
+  await expect(
+    guide.getByRole("img", { name: /Bench Press: mišice pri vaji/ }),
+  ).toBeVisible();
   expect(await readWorkoutState(page)).toEqual(source);
 });
