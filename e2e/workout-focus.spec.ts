@@ -181,7 +181,7 @@ test("catalogue search shows sketches and adds a new variant with a clearly opti
   expect(after.active!.exercises.slice(0, 2)).toEqual(before.active!.exercises);
   expect(after.workouts).toEqual(before.workouts);
   await page
-    .getByText("Skica, izvedba in podlaga teže", { exact: true })
+    .getByText("Mišice, izvedba in podlaga teže", { exact: true })
     .click();
   await expect(
     page.getByRole("img", { name: /Incline Dumbbell Press/ }),

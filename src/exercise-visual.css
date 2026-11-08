@@ -1,0 +1,390 @@
+/* Self-contained original anatomy illustrations; no remote assets or user data. */
+.exercise-visual.exercise-visual {
+  --anatomy-primary: #34bba6;
+  --anatomy-primary-light: #94f2d8;
+  --anatomy-secondary: #ca8e42;
+  --anatomy-secondary-light: #f8ce89;
+  container-type: inline-size;
+  background: #141e26;
+  border: 1px solid #364751;
+  border-radius: 18px;
+  color: #e8f0f3;
+  color-scheme: dark;
+  overflow: hidden;
+  margin: 14px 0;
+  font-family: inherit;
+  min-width: 0;
+}
+.exercise-visual.exercise-visual button {
+  font: inherit;
+  color: inherit;
+  touch-action: manipulation;
+}
+.exercise-visual.exercise-visual button:focus-visible {
+  outline: 3px solid var(--anatomy-primary-light);
+  outline-offset: 2px;
+}
+.exercise-visual .visual-heading {
+  padding: 20px 20px 15px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+.exercise-visual .visual-heading > svg {
+  color: var(--anatomy-primary-light);
+}
+.exercise-visual .visual-kicker {
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 1.8px;
+  color: #9eb4be;
+  display: block;
+  margin-bottom: 7px;
+}
+.exercise-visual .visual-heading h4 {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.45;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+.exercise-visual .visual-switch {
+  margin: 0 16px 14px;
+  padding: 4px;
+  display: flex;
+  gap: 4px;
+  background: #0d171e;
+  border: 1px solid #2d3d46;
+  border-radius: 12px;
+}
+.exercise-visual .visual-switch button {
+  min-height: 44px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 12px;
+  border-radius: 8px;
+  color: #b0c2ca;
+}
+.exercise-visual .visual-switch button[aria-pressed="true"] {
+  background: #263b44;
+  color: #a7f4df;
+  box-shadow: inset 0 1px #4d6d76;
+}
+.exercise-visual .anatomy-stage {
+  background:
+    radial-gradient(ellipse at 50% 40%, #427c8126, transparent 65%),
+    repeating-linear-gradient(0deg, transparent 0 39px, #8db0bb06 39px 40px),
+    #101c24;
+  border-block: 1px solid #2a3a44;
+  padding: 15px 10px 8px;
+}
+.exercise-visual .anatomy-legend {
+  display: flex;
+  justify-content: center;
+  gap: 22px;
+  font-size: 10px;
+  font-weight: 500;
+  color: #bdced5;
+}
+.exercise-visual .anatomy-legend span {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.exercise-visual .anatomy-legend i,
+.exercise-visual .anatomy-muscles i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--anatomy-primary-light);
+}
+.exercise-visual .anatomy-legend .secondary-dot,
+.exercise-visual .anatomy-muscles.secondary i {
+  background: var(--anatomy-secondary-light);
+}
+.exercise-visual .muscle-map {
+  display: block;
+  width: 100%;
+  max-width: 500px;
+  margin: 12px auto 0;
+  height: auto;
+}
+.exercise-visual .anatomy-body {
+  stroke: #8499a5;
+  stroke-width: 0.8;
+}
+.exercise-visual .anatomy-region {
+  stroke: #162a33;
+  stroke-width: 1.1;
+  stroke-linejoin: round;
+}
+.exercise-visual .anatomy-region[data-activation="rest"] {
+  opacity: 0.55;
+}
+.exercise-visual .anatomy-region.is-selected {
+  stroke: #f0ffff;
+  stroke-width: 1.5;
+  filter: drop-shadow(0 0 3px #a7f4df50);
+}
+.exercise-visual .anatomy-seam {
+  fill: none;
+  stroke: #1d303a;
+  stroke-width: 1.5;
+}
+.exercise-visual .anatomy-shadow {
+  fill: #030a0f;
+  opacity: 0.6;
+}
+.exercise-visual .anatomy-divider {
+  stroke: #49606a;
+  stroke-width: 0.6;
+  stroke-dasharray: 3 7;
+}
+.exercise-visual.exercise-visual .anatomy-view-label {
+  fill: #adbfca;
+  font-size: 15px;
+  font-family: inherit;
+  font-weight: 500;
+  letter-spacing: 2.5px;
+}
+.exercise-visual .anatomy-information {
+  padding: 18px;
+}
+.exercise-visual .anatomy-muscles + .anatomy-muscles {
+  margin-top: 17px;
+}
+.exercise-visual .anatomy-muscles h5 {
+  font-size: 10px;
+  font-weight: 500;
+  color: #b8cbd3;
+  margin: 0 0 9px;
+}
+.exercise-visual .anatomy-muscles > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.exercise-visual .anatomy-muscles button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  font-size: 11px;
+  padding: 8px 12px;
+  border: 1px solid #365b5c;
+  border-radius: 9px;
+  color: #a3ead7;
+  background: #1b3438;
+}
+.exercise-visual .anatomy-muscles.secondary button {
+  background: #352f27;
+  color: #f5ce93;
+  border-color: #60503a;
+}
+.exercise-visual .anatomy-muscles button[aria-pressed="true"] {
+  outline: 1px solid currentColor;
+  outline-offset: 1px;
+}
+.exercise-visual.exercise-visual p.anatomy-explanation {
+  margin: 18px 0 0;
+  color: #d6e5eb;
+  font-size: 12px;
+  line-height: 1.8;
+  padding-left: 12px;
+  border-left: 2px solid #72968e;
+}
+.exercise-visual.exercise-visual p.visual-caption {
+  color: #a8bec8;
+  font-size: 10px;
+  line-height: 1.7;
+  margin: 13px 0 0;
+}
+.exercise-visual .movement-stage {
+  background:
+    radial-gradient(ellipse at 50% 65%, #32566150, transparent 67%), #101c24;
+  position: relative;
+  border-block: 1px solid #2a3a44;
+}
+.exercise-visual .movement-stage svg {
+  width: 100%;
+  max-height: 360px;
+  display: block;
+}
+.exercise-visual .movement-status {
+  position: absolute;
+  top: 14px;
+  left: 18px;
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  color: #b0c9d2;
+}
+.exercise-visual .movement-controls {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 18px 18px 0;
+}
+.exercise-visual .movement-controls label {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+.exercise-visual.exercise-visual .movement-controls input[type="range"] {
+  width: 100%;
+  accent-color: var(--anatomy-primary-light);
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.exercise-visual .visual-play,
+.exercise-visual .visual-reset {
+  min-height: 44px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+.exercise-visual.exercise-visual .visual-play {
+  font-size: 11px;
+  padding: 10px 12px;
+  background: #9cebd5;
+  color: #102b2c;
+  font-weight: 600;
+}
+.exercise-visual .visual-reset {
+  width: 44px;
+  flex-shrink: 0;
+  border: 1px solid #47606c;
+}
+.exercise-visual .movement-positions {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 18px;
+}
+.exercise-visual .movement-positions button {
+  min-height: 44px;
+  padding: 8px 3px;
+  color: #b5cad3;
+  font-size: 10px;
+}
+.exercise-visual .movement-demo > .visual-caption {
+  padding: 0 18px;
+  margin-top: 0;
+}
+.exercise-visual.exercise-visual .visual-instructions {
+  margin: 17px 18px 20px;
+  padding-top: 17px;
+  color: #d3e1e6;
+  font-size: 12px;
+  line-height: 1.8;
+  border-top: 1px solid #3a4b55;
+}
+.exercise-visual.exercise-visual .sketch-person {
+  fill: #b0c6ce;
+  stroke: #819da8;
+  stroke-width: 1;
+}
+.exercise-visual.exercise-visual .sketch-person .sketch-body {
+  stroke: #90aab4;
+  stroke-width: 15;
+}
+.exercise-visual.exercise-visual .sketch-arm {
+  stroke: #a5bdc6;
+  stroke-width: 8;
+}
+.exercise-visual.exercise-visual .sketch-leg {
+  stroke: #809ba7;
+  stroke-width: 11;
+}
+.exercise-visual.exercise-visual .sketch-person .sketch-weight {
+  stroke: #83dfcc;
+  stroke-width: 4;
+  fill: none;
+}
+.exercise-visual.exercise-visual .sketch-equipment {
+  stroke: #607c8b;
+  stroke-width: 3;
+  fill: none;
+}
+.exercise-visual.exercise-visual .sketch-floor {
+  stroke: #47616f;
+}
+.exercise-visual.exercise-visual .sketch-background {
+  fill: #13212b;
+  stroke: none;
+}
+.exercise-visual.exercise-visual .exercise-sketch text {
+  fill: #b5cad3;
+  font-size: 9px;
+}
+.exercise-visual.exercise-visual .sketch-arrow {
+  stroke: #83dfcc;
+}
+.exercise-visual.exercise-visual.visual-compact {
+  margin: 0;
+  border-radius: 12px;
+  display: block;
+}
+.exercise-preview {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border-radius: 12px;
+  background: transparent;
+}
+.exercise-visual.visual-compact .muscle-map {
+  height: 190px;
+  margin: 8px auto;
+}
+.exercise-visual .visual-preview-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px;
+  color: #b5d8dd;
+  font-size: 9px;
+  border-top: 1px solid #344a56;
+}
+.exercise-visual .sr-only {
+  position: absolute;
+  height: 1px;
+  width: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+@container (min-width: 580px) {
+  .exercise-visual .visual-anatomy {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    border-top: 1px solid #2a3a44;
+  }
+  .exercise-visual .anatomy-stage {
+    border: 0;
+    border-right: 1px solid #2a3a44;
+  }
+  .exercise-visual .anatomy-information {
+    align-self: center;
+    padding: 25px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .exercise-visual *,
+  .exercise-visual *::before,
+  .exercise-visual *::after {
+    transition: none;
+  }
+}
