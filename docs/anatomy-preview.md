@@ -25,3 +25,9 @@ Glavna koda je v `src/anatomy/`. Originalne sheme gibov ostanejo v `ExerciseSket
 `npm test`: 114 uspešnih testov. Produkcijska gradnja za `/turbo-octo-pancake/` je uspešna. Celoten Chromium nabor na računalniku in telefonu: 36 uspešnih preizkusov, vključno s prehodom stare objave, naknadnim vnosom, ohranitvijo celotne zgodovine in aktivne vadbe, barvnimi nastavitvami, kontrolami animacije, delovanjem brez povezave in axe WCAG A/AA. WebKit v tej lokalni seji ni nameščen; teh novih prikazov z njim nismo preverjali.
 
 Ta nadgradnja se pripravlja v ločeni veji in na ločenem Netlify predogledu. Podatki prejšnje produkcijske objave so v `docs/moc-forma-release.json`. Pregledovanje predogleda ni prenos zasebnih podatkov na nov izvor.
+
+## Objavljeni predogled
+
+https://6af09559599d044cc8e0b60b--flourishing-cuchufli-ba8975.netlify.app
+
+Odpri **Vadba → Knjižnica vaj** in klikni ilustracijo. Dodatni štirje brskalniški preizkusi za korensko pot Netlify so uspešni. Dejanski predogled je preverjen v Chromiumu na računalniku in telefonu: oba pogleda mišic, vse tri palete, kontrola giba, brez napak JavaScript in brez vodoravnega preseganja. Izvorna različica je `53b7cf217fc72b05202acc18587170ec0cdad22a`; metapodatki so v `anatomy-preview.json`.

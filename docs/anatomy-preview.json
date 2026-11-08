@@ -1,0 +1,47 @@
+{
+  "status": "visual_preview_published",
+  "repository": "TimBajc1992/turbo-octo-pancake",
+  "source_branch": "feat/exercise-anatomy-atlas",
+  "source_commit": "53b7cf217fc72b05202acc18587170ec0cdad22a",
+  "preview_url": "https://6af09559599d044cc8e0b60b--flourishing-cuchufli-ba8975.netlify.app",
+  "preview_deploy_id": "6af09559599d044cc8e0b60b",
+  "prepared_at": "2026-11-08T15:32:15.943582+00:00",
+  "reference_url": "https://www.instagram.com/p/DejKeMjsoE-/",
+  "reference_viewed": false,
+  "reference_access": "Instagram host is blocked by managed network policy (HTTP CONNECT 403). User asked for the app name; exact visual matching awaits the reference image/video or name.",
+  "palettes": [
+    "Železo in baker",
+    "Bron in oljka",
+    "Jeklo in modrina"
+  ],
+  "checks": {
+    "unit_tests": 114,
+    "complete_browser_suite_at_production_path": 36,
+    "root_path_preview_browser_tests": 4,
+    "live_desktop_and_mobile": [
+      {
+        "device": "desktop",
+        "atlas_views": 2,
+        "palettes": 3,
+        "motion_controls": "passed",
+        "javascript_errors": [],
+        "horizontal_overflow": false
+      },
+      {
+        "device": "mobile",
+        "atlas_views": 2,
+        "palettes": 3,
+        "motion_controls": "passed",
+        "javascript_errors": [],
+        "horizontal_overflow": false
+      }
+    ],
+    "new_webkit_checks": false
+  },
+  "history": "No data model or stored records were changed; preview has its own empty local origin.",
+  "previous_main_commit": "924809eb180182344e68f1f26f3585981bdc45a5",
+  "previous_pages_commit": "eb50d62f6c9c7009372a81f84222f45025a2f0f0",
+  "production_updated": false,
+  "netlify_previous_production_deploy": "6aecf38368610ee9e39ac5d9",
+  "netlify_production_unchanged": true
+}

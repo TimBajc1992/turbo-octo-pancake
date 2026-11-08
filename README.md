@@ -1,5 +1,7 @@
 # Moč & Forma — Stara šola
 
+V tej veji je pripravljen [vizualni predogled atlasa vaj](https://6af09559599d044cc8e0b60b--flourishing-cuchufli-ba8975.netlify.app). Podrobnosti in preverjanja: [atlas mišic in izvedbe](docs/anatomy-preview.md).
+
 Osebna aplikacija v potrjenem kovinskem videzu. Ta različica združuje videz Moč & Forma, celotno knjižnico 55 vaj Težišča in njegovo izvirno podatkovno zbirko. Spletni naslov ostaja `https://timbajc1992.github.io/turbo-octo-pancake/`; obstoječi šifrirani Cloudflare Worker in povezava med napravami ostaneta ista.
 
 Kratka navodila za posodobitev, pripravo vadbe in naknadni vnos so v [navodilih za uporabo](docs/UPORABA-MOC-FORMA.md).
