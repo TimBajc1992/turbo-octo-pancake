@@ -18,7 +18,8 @@ import { backup, restoreBackup } from "./db";
 
 describe("User-built training", () => {
   it("retains the complete Težišče catalog and covers every group for all four training types", () => {
-    expect(catalog).toHaveLength(55);
+    expect(catalog.length).toBeGreaterThanOrEqual(132);
+    expect(new Set(catalog.map((c) => c.id)).size).toBe(catalog.length);
     for (const type of trainingTypes)
       for (const group of dayGroups[type])
         expect(

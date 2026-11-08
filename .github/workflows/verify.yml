@@ -58,12 +58,12 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npx playwright install --with-deps chromium webkit
-      - name: Preveri tokove v Chromium
-        run: npm run test:e2e
       - name: Preveri tokove z WebKit kot v Safariju
         run: npm run test:e2e
         env:
           TEST_BROWSER: webkit
+      - name: Preveri tokove v Chromium
+        run: npm run test:e2e
       - name: Shrani diagnostiko neuspešnih preizkusov
         if: failure()
         uses: actions/upload-artifact@v4

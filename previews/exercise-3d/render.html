@@ -1,0 +1,16 @@
+<!doctype html><html lang="sl"><meta charset="utf-8"><title>Exercise poster renderer</title>
+<style>body{margin:0;background:#10171f}#stage{width:480px;height:480px}canvas{display:block;width:100%;height:100%}</style>
+<div id="stage"></div>
+<script type="module">
+import { ExerciseScene } from '../../src/exercise3d/scene';
+import { catalog, byId } from '../../src/exerciseCatalog';
+import { exerciseFamily } from '../../src/exercise3d/motions';
+const scene = new ExerciseScene(document.querySelector('#stage'), byId('machine_chest_press'));
+await scene.ready;
+window.exercises = catalog.filter(c=>exerciseFamily(c)).map(c=>({id:c.id,name:c.name,family:exerciseFamily(c)}));
+window.renderExercise = async (id,progress=.45) => {
+  await scene.changeExercise(byId(id),progress);
+  window.lastPosterDebug = scene.debug();
+  return scene.renderer.domElement.toDataURL('image/webp',.88).split(',')[1];
+};
+</script></html>

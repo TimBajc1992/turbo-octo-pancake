@@ -137,11 +137,19 @@ test("catalogue search shows sketches and adds a new variant with a clearly opti
   await dialog
     .getByRole("combobox", { name: "Oprema", exact: true })
     .selectOption("dumbbell");
-  await expect(dialog.locator(".library-card")).toHaveCount(1);
+  await expect(dialog.locator(".library-card")).toHaveCount(2);
+  const press = dialog
+    .locator(".library-card")
+    .filter({
+      has: page.getByRole("heading", {
+        name: "Incline Dumbbell Press",
+        exact: true,
+      }),
+    });
   await expect(
     dialog.getByRole("img", { name: /Incline Dumbbell Press/ }),
   ).toBeVisible();
-  await dialog.getByText("Kako izvedem vajo?", { exact: true }).click();
+  await press.getByText("Kako izvedem vajo?", { exact: true }).click();
   await expect(dialog).toContainText("Beleži eno ročko");
   expect(
     await page.evaluate(
@@ -181,7 +189,7 @@ test("catalogue search shows sketches and adds a new variant with a clearly opti
   expect(after.active!.exercises.slice(0, 2)).toEqual(before.active!.exercises);
   expect(after.workouts).toEqual(before.workouts);
   await page
-    .getByText("Skica, izvedba in podlaga teže", { exact: true })
+    .getByText("Mišice, izvedba in podlaga teže", { exact: true })
     .click();
   await expect(
     page.getByRole("img", { name: /Incline Dumbbell Press/ }),

@@ -488,7 +488,7 @@ export function FocusWorkout({
         )}
         {!e.cardio && (
           <details className="focus-details">
-            <summary>Skica, izvedba in podlaga teže</summary>
+            <summary>Mišice, izvedba in podlaga teže</summary>
             {cat && (
               <>
                 <ExerciseSketch exercise={cat} />

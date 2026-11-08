@@ -15,7 +15,7 @@ export default defineConfig({
     browserName: safari ? "webkit" : "chromium",
     launchOptions: safari
       ? {}
-      : { executablePath: executable, args: ["--no-sandbox"] },
+      : { executablePath: executable, args: ["--no-sandbox", "--enable-unsafe-swiftshader", "--use-angle=swiftshader", "--disable-dev-shm-usage"] },
   },
   projects: [
     {

@@ -1,6 +1,6 @@
 # Moč & Forma — Stara šola
 
-Osebna aplikacija v potrjenem kovinskem videzu. Ta različica združuje videz Moč & Forma, celotno knjižnico 55 vaj Težišča in njegovo izvirno podatkovno zbirko. Spletni naslov ostaja `https://timbajc1992.github.io/turbo-octo-pancake/`; obstoječi šifrirani Cloudflare Worker in povezava med napravami ostaneta ista.
+Osebna aplikacija v potrjenem kovinskem videzu s knjižnico 132 vaj in različic ter 3D prikazi mišic in izvedbe. Vseh 55 izvirnih vaj Težišča in njegova podatkovna zbirka ostajata ohranjeni. Spletni naslov je `https://timbajc1992.github.io/turbo-octo-pancake/`; obstoječi šifrirani Cloudflare Worker in povezava med napravami ostaneta ista.
 
 Kratka navodila za posodobitev, pripravo vadbe in naknadni vnos so v [navodilih za uporabo](docs/UPORABA-MOC-FORMA.md).
 
