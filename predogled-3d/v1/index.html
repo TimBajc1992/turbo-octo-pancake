@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="sl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="theme-color" content="#10171f" />
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="data:," />
+    <title>Moč & Forma · 3D predogled</title>
+    <style>
+      *{box-sizing:border-box}body{margin:0;background:#0c121a;color:#eef0f5;font:15px/1.5 system-ui,-apple-system,sans-serif;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}button,input{font:inherit}button{cursor:pointer;border:1px solid #364053;border-radius:10px;background:#192331;color:#e0e6f0;min-height:44px;padding:10px 14px;touch-action:manipulation}button:focus-visible,input:focus-visible{outline:3px solid #d1b6ff;outline-offset:3px}button:disabled{opacity:.45;cursor:wait}header{max-width:1120px;margin:auto;display:flex;justify-content:space-between;align-items:center;padding:22px 24px;border-bottom:1px solid #27303e;font-size:11px;letter-spacing:2px}header b{font-size:15px;letter-spacing:1px}header span{color:#ccb6f7}main{max-width:1120px;margin:auto;padding:26px 24px 50px}h1{font-size:32px;letter-spacing:-1.2px;line-height:1.15;margin:0 0 10px}p{color:#a4afc1;font-size:13px;margin:0 0 24px}.choices{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}.choices button[aria-pressed=true]{color:#e4d8ff;background:#322647;border-color:#ae8ade}.layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:22px}.viewer{border:1px solid #303b4b;border-radius:18px;overflow:hidden;background:#10171f;min-width:0}#stage{width:100%;height:500px;position:relative}canvas{display:block;width:100%;height:100%}.loading{position:absolute;inset:0;display:grid;place-items:center;color:#d4c3f4;font-size:13px;pointer-events:none}.legend{display:flex;justify-content:center;gap:22px;font-size:11px;padding:13px;background:#151e2a;border-block:1px solid #273140}.legend span{display:flex;gap:7px;align-items:center}.dot{width:8px;height:8px;background:#ad8be9;border-radius:50%;display:inline-block}.dot.secondary{background:#eebf7f}.controls{padding:15px;display:flex;align-items:center;gap:10px}#play{background:#c4a5f5;color:#20162d;font-weight:650;border-color:#c4a5f5;min-width:108px}input[type=range]{width:100%;min-height:44px;accent-color:#c4a5f5;min-width:0}.rotate{display:flex;align-items:center;justify-content:space-between;padding:0 15px 15px;gap:8px}.rotate button{font-size:12px}.hint{color:#9ba9bd;font-size:11px;text-align:center;margin:0 0 14px}aside{padding-top:8px}aside h2{font-size:23px;letter-spacing:-.5px;line-height:1.25;margin:0 0 8px}aside .equipment{font-size:12px;color:#a6b0c0;margin-bottom:26px}aside h3{font-size:11px;color:#a9b4c5;font-weight:500;letter-spacing:.6px;margin:20px 0 9px}.tags{display:flex;flex-wrap:wrap;gap:7px}.tag{display:inline-block;padding:8px 11px;border-radius:9px;background:#2c2440;border:1px solid #65537e;color:#dbc5ff;font-size:12px}.tag.secondary{background:#352e26;border-color:#6d5941;color:#f1ce9c}aside .instructions{font-size:13px;color:#c2cbda;line-height:1.8;margin-top:28px}.note{margin-top:28px;border-top:1px solid #293342;padding-top:17px;font-size:12px;color:#a4afc1}.small{font-size:11px;color:#98a4b7;margin-top:12px}.state{font-size:11px;color:#c4a5f5}.error{color:#f3c89e;padding:24px}.error p{color:inherit}.hidden{display:none!important}@media(max-width:740px){header{padding:17px 18px}header b{font-size:12px}header span{font-size:9px}main{padding:22px 16px 40px}h1{font-size:28px}p{margin-bottom:19px}.layout{grid-template-columns:1fr;gap:12px}.choices{display:grid;grid-template-columns:1fr 1fr;gap:7px}.choices button{font-size:12px;padding:9px}.viewer{border-radius:14px}#stage{height:430px}aside{padding:10px 3px}aside h2{font-size:22px}.controls{padding:13px;gap:8px}.rotate{padding:0 13px 13px}aside .equipment{margin-bottom:18px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+    </style>
+    <script type="module" crossorigin src="/turbo-octo-pancake/predogled-3d/v1/assets/preview-3d-Baxgj0PD.js"></script>
+  </head>
+  <body>
+    <header><b>MOČ & FORMA</b><span>DELOVNI 3D PREDOGLED</span></header>
+    <main>
+      <h1>Vaja v gibanju.</h1>
+      <p>Trenutni prikaz za primerjavo z referenco. Izberi vajo in preveri model, gibanje ter označene mišice.</p>
+      <div class="choices" aria-label="Izbira vaje"></div>
+      <div class="layout">
+        <section class="viewer" aria-label="3D prikaz vaje">
+          <div id="stage" role="img" aria-label="Pripravljam 3D prikaz"><div class="loading" role="status">Pripravljam 3D model …</div></div>
+          <div class="legend"><span><i class="dot"></i> Glavne mišice</span><span><i class="dot secondary"></i> Pomožne mišice</span></div>
+          <div class="controls"><button id="play" disabled>Predvajaj</button><input id="progress" type="range" min="0" max="100" value="0" aria-label="Položaj giba" disabled></div>
+          <div class="rotate"><button id="left" disabled>↶ Zasuk levo</button><button id="start" disabled>Na začetek</button><button id="right" disabled>Zasuk desno ↷</button></div>
+          <p class="hint">Model lahko obračaš tudi s potegom; s povečavo si oglej podrobnosti.</p>
+        </section>
+        <aside><h2 id="name"></h2><div class="equipment" id="equipment"></div><h3>GLAVNE MIŠICE</h3><div class="tags" id="primary"></div><div id="secondary-wrap"><h3>POMOŽNE MIŠICE</h3><div class="tags" id="secondary"></div></div><div class="instructions" id="instructions"></div><div class="note">To je vizualni predogled. Gib je orientacijski; obseg in nastavitve prilagodi svoji opremi.</div><div class="small">Model: <a href="./licenses/MakeHuman-CC0.txt" style="color:inherit">MakeHuman · CC0</a>. Naprave, gibanje in barvni prikaz so pripravljeni za Moč & Formo. <a href="./licenses/Three-MIT.txt" style="color:inherit">Three.js</a> · <a href="./licenses/Meshoptimizer-MIT.txt" style="color:inherit">Meshoptimizer</a>.</div></aside>
+      </div>
+    </main>
+  </body>
+</html>
