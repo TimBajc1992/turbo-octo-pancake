@@ -25,4 +25,6 @@ Shema, IndexedDB `tezisce/state/current`, ID-ji vaj, predloge, osnutki prihodnji
 
 ## Preverjanje
 
+Prvi celotni preizkus WebKit je odkril obstanek obstoječe posodobitvene strani pri prehodu iz stare objave `23b576f`. Stran zato ponovno uporabi že obstoječo registracijo service workerja, namesto ponovnega registriranja in takojšnjega dodatnega preverjanja. Vse začetne asinkrone operacije imajo časovno omejitev in ob obstanku vrnejo možnost ponovnega poskusa. Dodatni preizkusi simulirajo neodziven Safari in primerjajo celotne shranjene podatke. Posodobitvena stran ne briše podatkov ali registracij.
+
 Preizkusi vključujejo pokritost kataloga, negotovo napravo, glavne/pomožne mišice, aktivno vadbo z vso sintetično zgodovino, dejansko predvajanje in drsnik, dotik sličice brez dodajanja vaje, širine 320/390/1440 px, prikaz brez povezave ter nespremenjene lokalne ključe. Oba prikaza sta preverjena z axe za WCAG 2 A/AA in 2.1 AA. Obstoječi preizkusi še naprej preverjajo stare posodobitve PWA, ročni vnos, podatke in sinhronizacijo. Pravega iPhona in nedostopne Instagram objave ti preizkusi ne vključujejo.

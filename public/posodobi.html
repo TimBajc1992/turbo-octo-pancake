@@ -44,6 +44,28 @@
     (() => {
       const button = document.querySelector("#update");
       const statusElement = document.querySelector("#status");
+      const withinDeadline = (operation) =>
+        new Promise((resolve, reject) => {
+          const timer = setTimeout(
+            () =>
+              reject(
+                Error(
+                  "Preverjanje traja predolgo. Preveri povezavo in poskusi znova.",
+                ),
+              ),
+            30000,
+          );
+          operation.then(
+            (value) => {
+              clearTimeout(timer);
+              resolve(value);
+            },
+            (error) => {
+              clearTimeout(timer);
+              reject(error);
+            },
+          );
+        });
       button.onclick = async () => {
         button.disabled = true;
         statusElement.textContent = "Preverjam novo različico …";
@@ -52,16 +74,22 @@
             location.replace("./");
             return;
           }
-          const registration = await navigator.serviceWorker.register(
-            "./sw.js",
-            {
-              scope: "./",
-              updateViaCache: "none",
-            },
+          const scope = new URL("./", location.href).href;
+          let registration = await withinDeadline(
+            navigator.serviceWorker.getRegistration(scope),
           );
-          // Safari rejects a second update while the initial worker is still installing.
-          if (!registration.installing && !registration.waiting)
-            await registration.update();
+          if (!registration || registration.scope !== scope) {
+            registration = await withinDeadline(
+              navigator.serviceWorker.register("./sw.js", {
+                scope: "./",
+                updateViaCache: "none",
+              }),
+            );
+          } else if (!registration.installing && !registration.waiting) {
+            // Re-registering and immediately updating an existing worker can
+            // leave Safari waiting on its own update job. Reuse its registration.
+            await withinDeadline(registration.update());
+          }
           if (registration.installing) {
             const installing = registration.installing;
             await new Promise((resolve, reject) => {
