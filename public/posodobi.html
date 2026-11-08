@@ -47,14 +47,22 @@
       const withinDeadline = (operation, registration) =>
         new Promise((resolve, reject) => {
           let settled = false;
+          let poll;
           const finish = (callback, value) => {
             if (settled) return;
             settled = true;
             clearTimeout(timer);
+            clearInterval(poll);
             registration?.removeEventListener("updatefound", progress);
             callback(value);
           };
           const progress = () => {
+            if (registration)
+              statusElement.dataset.workers = JSON.stringify({
+                active: registration.active?.state,
+                installing: registration.installing?.state,
+                waiting: registration.waiting?.state,
+              });
             if (registration?.installing || registration?.waiting)
               finish(resolve, registration);
           };
@@ -69,6 +77,9 @@
             30000,
           );
           registration?.addEventListener("updatefound", progress);
+          // Some Safari versions update the worker slots without delivering
+          // updatefound or settling update(). Observe those slots as well.
+          if (registration) poll = setInterval(progress, 100);
           operation.then(
             (value) => finish(resolve, value),
             (error) => finish(reject, error),
@@ -77,6 +88,7 @@
         });
       button.onclick = async () => {
         button.disabled = true;
+        statusElement.dataset.phase = "lookup";
         statusElement.textContent = "Preverjam novo različico …";
         try {
           if (!("serviceWorker" in navigator)) {
@@ -84,10 +96,20 @@
             return;
           }
           const scope = new URL("./", location.href).href;
-          let registration = await withinDeadline(
-            navigator.serviceWorker.getRegistration(scope),
-          );
+          const lookups = [navigator.serviceWorker.getRegistration(scope)];
+          // With an existing controller ready can already be fulfilled while
+          // WebKit leaves a fresh registration lookup queued behind an update.
+          if (navigator.serviceWorker.controller)
+            lookups.push(
+              navigator.serviceWorker.ready.then((r) => {
+                if (r.scope !== scope)
+                  throw Error("Povezava aplikacije ni prava.");
+                return r;
+              }),
+            );
+          let registration = await withinDeadline(Promise.any(lookups));
           if (!registration || registration.scope !== scope) {
+            statusElement.dataset.phase = "register";
             registration = await withinDeadline(
               navigator.serviceWorker.register("./sw.js", {
                 scope: "./",
@@ -95,11 +117,13 @@
               }),
             );
           } else if (!registration.installing && !registration.waiting) {
+            statusElement.dataset.phase = "update";
             // Re-registering and immediately updating an existing worker can
             // leave Safari waiting on its own update job. Reuse its registration.
             await withinDeadline(registration.update(), registration);
           }
           if (registration.installing) {
+            statusElement.dataset.phase = "install";
             const installing = registration.installing;
             await new Promise((resolve, reject) => {
               const timer = setTimeout(
@@ -128,6 +152,7 @@
             });
           }
           if (registration.waiting) {
+            statusElement.dataset.phase = "activate";
             await new Promise((resolve, reject) => {
               const timer = setTimeout(
                 () => reject(Error("Ponovno odpri to stran in poskusi znova.")),
@@ -146,6 +171,7 @@
           }
           statusElement.textContent =
             "Različica je pripravljena. Odpiram tvoje podatke …";
+          statusElement.dataset.phase = "complete";
           location.replace("./");
         } catch (error) {
           statusElement.textContent =

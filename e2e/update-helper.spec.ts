@@ -7,7 +7,13 @@ import {
 
 async function simulate(
   page: Page,
-  stalled: "none" | "lookup" | "update" | "update-promise",
+  stalled:
+    | "none"
+    | "lookup"
+    | "update"
+    | "update-promise"
+    | "update-silent"
+    | "lookup-ready",
 ) {
   const source = workoutFixture();
   await seedWorkout(page, source);
@@ -19,12 +25,13 @@ async function simulate(
       installing: null as (EventTarget & { state: string }) | null,
       update: () => {
         sessionStorage.setItem("synthetic-update-count", "1");
-        if (stalled === "update-promise") {
+        if (stalled === "update-promise" || stalled === "update-silent") {
           queueMicrotask(() => {
             registration.installing = Object.assign(new EventTarget(), {
               state: "installed",
             });
-            registration.dispatchEvent(new Event("updatefound"));
+            if (stalled !== "update-silent")
+              registration.dispatchEvent(new Event("updatefound"));
           });
           return never();
         }
@@ -34,8 +41,12 @@ async function simulate(
     Object.defineProperty(navigator, "serviceWorker", {
       configurable: true,
       value: {
+        controller: stalled === "lookup-ready" ? { state: "activated" } : null,
+        ready: Promise.resolve(registration),
         getRegistration: () =>
-          stalled === "lookup" ? never() : Promise.resolve(registration),
+          stalled === "lookup" || stalled === "lookup-ready"
+            ? never()
+            : Promise.resolve(registration),
         register: () => {
           throw Error("Existing registration must be reused");
         },
@@ -61,6 +72,23 @@ test("update helper reuses its existing registration without rewriting any worko
   ).toBe("1");
   expect(await readWorkoutState(page)).toEqual(source);
 });
+
+for (const stage of ["update-silent", "lookup-ready"] as const)
+  test(`Safari ${stage} can use native worker state without changing saved data`, async ({
+    page,
+  }) => {
+    const source = await simulate(page, stage);
+    const app = page.url();
+    await page.goto("./posodobi.html");
+    await page
+      .getByRole("button", { name: "Posodobi in odpri TEŽIŠČE", exact: true })
+      .click();
+    await expect(page).toHaveURL(app);
+    await expect(
+      page.getByRole("heading", { name: /Tvoj tempo/ }),
+    ).toBeVisible();
+    expect(await readWorkoutState(page)).toEqual(source);
+  });
 
 test("a worker installation progresses even when Safari leaves its update promise pending", async ({
   page,

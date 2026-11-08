@@ -104,7 +104,24 @@ test("upgrades the published Težišče to Moč & Forma while preserving all his
       .click();
     await expect(
       page.getByRole("heading", { name: original.active!.name, exact: true }),
-    ).toBeVisible({ timeout: 45000 });
+    )
+      .toBeVisible({ timeout: 45000 })
+      .catch(async (error) => {
+        console.error(
+          "Upgrade diagnostics",
+          await page.evaluate(() => ({
+            url: location.href,
+            phase:
+              document.querySelector<HTMLElement>("#status")?.dataset.phase,
+            workers:
+              document.querySelector<HTMLElement>("#status")?.dataset.workers,
+            controller: navigator.serviceWorker.controller?.state,
+            status: document.querySelector("#status")?.textContent,
+          })),
+        );
+        expect(await readWorkoutState(page)).toEqual(original);
+        throw error;
+      });
     await expect(
       page.getByRole("button", { name: "Vse serije", exact: true }),
     ).toBeVisible();
