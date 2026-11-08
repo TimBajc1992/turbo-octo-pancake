@@ -1,0 +1,737 @@
+/* Self-contained visual layer: the workout model and records are unchanged. */
+[data-anatomy-palette] {
+  --anatomy-primary: #d17a4d;
+  --anatomy-primary-light: #f0bb8b;
+  --anatomy-primary-dark: #81442b;
+  --anatomy-secondary: #c8a76d;
+  --anatomy-secondary-light: #eee0b7;
+}
+[data-anatomy-palette="olive"] {
+  --anatomy-primary: #d9ad63;
+  --anatomy-primary-light: #f2dfac;
+  --anatomy-primary-dark: #806330;
+  --anatomy-secondary: #94ab7b;
+  --anatomy-secondary-light: #d2dec0;
+}
+[data-anatomy-palette="blue"] {
+  --anatomy-primary: #70b7e0;
+  --anatomy-primary-light: #c3e6f6;
+  --anatomy-primary-dark: #3a6b8b;
+  --anatomy-secondary: #a1b2cc;
+  --anatomy-secondary-light: #e0e6f0;
+}
+.anatomy-light {
+  stop-color: var(--anatomy-primary-light);
+}
+.anatomy-primary {
+  stop-color: var(--anatomy-primary);
+}
+.anatomy-primary-dark {
+  stop-color: var(--anatomy-primary-dark);
+}
+.anatomy-secondary {
+  stop-color: var(--anatomy-secondary);
+}
+.anatomy-secondary-light {
+  stop-color: var(--anatomy-secondary-light);
+}
+
+.muscle-atlas {
+  position: relative;
+  border: 1px solid #4a5962;
+  border-radius: 20px;
+  background:
+    radial-gradient(ellipse at 50% 28%, #3d4b54 0, transparent 67%),
+    repeating-linear-gradient(0deg, #ffffff04 0 1px, transparent 1px 4px),
+    #1e292f;
+  color: #e4eaed;
+  overflow: hidden;
+  isolation: isolate;
+}
+.atlas-topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 20px 0;
+  font: 9px/1.5 var(--mono, monospace);
+  letter-spacing: 0.1em;
+  color: #bdc8cf;
+}
+.atlas-bodies {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  position: relative;
+  padding: 12px 16px 14px;
+}
+.atlas-bodies::before {
+  content: "";
+  position: absolute;
+  top: 34px;
+  bottom: 40px;
+  left: 50%;
+  width: 1px;
+  background: linear-gradient(transparent, #71808b66, transparent);
+}
+.atlas-body-view {
+  margin: 0;
+  min-width: 0;
+}
+.muscle-body {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 470px;
+}
+.anatomy-extremities {
+  stroke: #243944;
+  stroke-width: 0.6;
+}
+.atlas-body-view figcaption {
+  text-align: center;
+  font: 9px var(--mono, monospace);
+  letter-spacing: 0.16em;
+  color: #c3cdd3;
+  margin-top: 6px;
+}
+.muscle-body g[data-muscle-role] {
+  transition: opacity 0.2s ease;
+}
+.atlas-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 18px;
+  border-top: 1px solid #5c6a7359;
+  padding: 15px 12px;
+}
+.atlas-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #dce4e8;
+  font: 10px/1.5 var(--mono, monospace);
+}
+.atlas-legend i,
+.insight-role h4 i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  flex: 0 0 auto;
+}
+.legend-primary,
+.insight-role-primary h4 i {
+  background: var(--anatomy-primary);
+}
+.legend-secondary,
+.insight-role-secondary h4 i {
+  background:
+    repeating-linear-gradient(135deg, #21354280 0 1px, transparent 1px 3px),
+    var(--anatomy-secondary);
+}
+.legend-stabilizer,
+.insight-role-stabilizer h4 i {
+  border: 1px dashed #b1c3cc;
+  background: #506674;
+}
+.muscle-atlas-compact {
+  border: 0;
+  border-radius: 16px;
+}
+.muscle-atlas-compact .atlas-bodies {
+  grid-template-columns: 1fr;
+  padding: 8px 12px 12px;
+}
+.muscle-atlas-compact .atlas-bodies::before {
+  display: none;
+}
+.muscle-atlas-compact .muscle-body {
+  height: 218px;
+}
+.muscle-atlas-compact figcaption {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  color: #c3cdd3;
+  font-size: 8px;
+}
+
+.library-atlas-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin: 12px 0 18px;
+}
+.library-atlas-toolbar .library-result-count {
+  margin: 0;
+}
+.exercise-library-dialog .library-card {
+  padding: 10px 10px 16px;
+}
+.library-card > :not(.library-anatomy-preview) {
+  margin-left: 4px;
+  margin-right: 4px;
+}
+.library-anatomy-preview {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid #52616a;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #1e292f;
+  text-align: left;
+  cursor: pointer;
+}
+.library-anatomy-preview:hover {
+  border-color: #b17b54;
+}
+.library-anatomy-preview:hover .library-anatomy-caption > svg {
+  transform: translate(2px, -2px);
+}
+.library-anatomy-caption {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  color: #fff1df;
+  pointer-events: none;
+}
+.library-anatomy-caption > span {
+  font: 700 21px/1 var(--display, sans-serif);
+  text-transform: uppercase;
+  max-width: 120px;
+  text-shadow: 0 1px 8px #17242e;
+}
+.library-anatomy-caption small {
+  display: block;
+  margin-top: 6px;
+  font: 9px/1.5 var(--mono, monospace);
+  text-transform: none;
+  color: #e0e5e8 !important;
+}
+.library-anatomy-caption > svg {
+  border: 1px solid #9aa7af88;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  padding: 7px;
+  transition: transform 0.2s;
+  background: #23333dde;
+}
+.anatomy-palette-picker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  color: #50616a;
+}
+.anatomy-palette-picker > span {
+  font: 10px var(--mono, monospace);
+}
+.anatomy-palette-picker > div {
+  display: flex;
+  gap: 5px;
+}
+.anatomy-palette-picker button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 42px;
+  min-height: 42px;
+  padding: 6px;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+}
+.anatomy-palette-picker button[aria-pressed="true"] {
+  border-color: #5b6c74;
+  background: #c1ccd248;
+}
+.anatomy-palette-picker button > span:first-child {
+  height: 23px;
+  width: 23px;
+  flex: 0 0 auto;
+  border: 1px solid #14273266;
+  border-radius: 50%;
+  box-shadow: inset 0 1px 2px #fff8;
+}
+.palette-name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.exercise-insight-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 44px;
+  border: 1px solid #84959e;
+  border-radius: 999px;
+  padding: 10px 17px;
+  background: #dce5e9;
+  color: #314650;
+  font-size: 12px;
+}
+.focus-exercise-heading > .exercise-insight-button {
+  width: 44px;
+  min-height: 44px;
+  padding: 10px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+}
+.focus-exercise-heading .insight-button-label {
+  display: none;
+}
+.insight-button-compact {
+  padding: 7px 11px;
+  min-height: 36px;
+  font-size: 10px;
+  gap: 6px;
+}
+.exercise-order .exercise-insight-button {
+  width: auto;
+  flex: 0 0 auto;
+}
+
+.exercise-insight-dialog {
+  width: min(1090px, calc(100% - 32px));
+  max-height: calc(100svh - 32px);
+  padding: 0;
+  border: 1px solid #798e98;
+  border-radius: 26px;
+  background: #dce3e6;
+  color: #263740;
+  box-shadow:
+    0 28px 100px #07151f80,
+    inset 0 1px #fff9;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.exercise-insight-dialog::backdrop {
+  background: #08161ebd;
+  backdrop-filter: blur(6px);
+}
+.insight-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 27px 30px 22px;
+  border-bottom: 1px solid #acb9c0;
+  background: linear-gradient(115deg, #e8edef, #ced8de);
+}
+.insight-eyebrow {
+  color: #566b77;
+  font: 9px/1.8 var(--mono, monospace);
+  letter-spacing: 0.13em;
+}
+.insight-header h2 {
+  font: 700 43px/1.06 var(--display, "Arial Narrow", sans-serif);
+  text-transform: uppercase;
+  margin: 8px 0 9px;
+  color: #24343d;
+}
+.insight-header p {
+  font-size: 12px;
+  color: #4d626d;
+  margin: 0;
+}
+.insight-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border: 1px solid #94a5af;
+  border-radius: 50%;
+  color: #334b58;
+  background: #e6ecef;
+}
+.insight-layout {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 30px;
+  padding: 24px 30px 30px;
+  align-items: start;
+}
+.insight-visual {
+  min-width: 0;
+}
+.insight-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 4px;
+  margin: 0 0 14px;
+  gap: 4px;
+  border: 1px solid #a7b6bf;
+  background: #c3cfd5;
+  border-radius: 999px;
+}
+.insight-switch button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 43px;
+  border-radius: 999px;
+  border: 0;
+  background: transparent;
+  color: #425762;
+  font-size: 12px;
+}
+.insight-switch button[aria-pressed="true"] {
+  background: #263b47;
+  color: #f2eee5;
+  box-shadow: inset 0 1px #7b919b;
+}
+.insight-visual > .anatomy-palette-picker {
+  margin: 14px 4px 0;
+}
+.insight-information {
+  min-width: 0;
+  padding-top: 9px;
+}
+.insight-section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: #526976;
+  font: 9px/1.7 var(--mono, monospace);
+  letter-spacing: 0.08em;
+}
+.insight-information h3 {
+  font: 700 33px/1.15 var(--display, "Arial Narrow", sans-serif);
+  text-transform: uppercase;
+  margin: 12px 0 9px;
+  color: #273a44;
+}
+.insight-explain {
+  font-size: 11px;
+  color: #526976;
+  line-height: 1.8;
+  margin-bottom: 21px;
+}
+.insight-muscle-groups {
+  display: grid;
+  gap: 18px;
+}
+.insight-role h4 {
+  font-size: 10px;
+  font-weight: 600;
+  color: #475f6e;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 9px;
+}
+.insight-role h4 i {
+  border: 1px solid #6f747266;
+}
+.insight-role > div {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.insight-role button {
+  border: 1px solid #9fadb5;
+  border-radius: 999px;
+  min-height: 37px;
+  padding: 8px 12px;
+  color: #344c59;
+  background: #e9eef0;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.insight-role button[aria-pressed="true"] {
+  color: #f6eee3;
+  background: #314a58;
+  border-color: #314a58;
+}
+.insight-muscle-note {
+  border-left: 3px solid var(--anatomy-primary-dark);
+  background: #eef2f3;
+  padding: 14px;
+  margin-top: 18px;
+  border-radius: 0 12px 12px 0;
+}
+.insight-muscle-note strong {
+  display: block;
+  font-size: 12px;
+}
+.insight-muscle-note small {
+  display: block;
+  color: #576f7c;
+  font-size: 10px;
+  margin-top: 4px;
+}
+.insight-muscle-note p {
+  font-size: 12px;
+  line-height: 1.8;
+  color: #425b69;
+  margin-top: 8px;
+}
+.insight-muscle-note button {
+  background: transparent;
+  color: #3b596a;
+  border: 0;
+  text-decoration: underline;
+  min-height: 35px;
+  font-size: 10px;
+  padding: 6px 0 0;
+}
+.insight-movement-note {
+  font-size: 11px;
+  line-height: 1.9;
+  color: #516976;
+  margin: 20px 0 0;
+}
+.insight-instructions {
+  margin-top: 23px;
+  padding-top: 20px;
+  border-top: 1px solid #aab9c0;
+}
+.insight-instructions > p {
+  color: #344e5c;
+  font-size: 12px;
+  line-height: 1.95;
+  margin-top: 10px;
+}
+.insight-history {
+  display: grid;
+  gap: 8px;
+  margin: 20px 0 0;
+  padding: 15px;
+  border: 1px solid #a0b1bb;
+  background: #e6ecef;
+  border-radius: 13px;
+}
+.insight-history strong {
+  color: #344f5d;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.anatomy-quiet {
+  color: #526a77;
+  font-size: 10px;
+  line-height: 1.8;
+  margin: 19px 0 0;
+}
+.insight-footer {
+  padding: 15px 30px;
+  border-top: 1px solid #9fadb6;
+  background: #d3dde2ed;
+  position: sticky;
+  bottom: 0;
+  backdrop-filter: blur(12px);
+  display: flex;
+  justify-content: flex-end;
+}
+.insight-footer .button {
+  border-radius: 999px;
+  background: #2e4655;
+  color: #f8f0e4;
+  border: 1px solid #233b49;
+  font-size: 12px;
+  min-height: 46px;
+  padding: 12px 23px;
+}
+.insight-footer .button:disabled {
+  color: #536975;
+  background: #c7d2d8;
+  border-color: #91a5b0;
+  opacity: 1;
+}
+
+.motion-stage {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid #52636d;
+  background: radial-gradient(ellipse at 50% 40%, #465c6b, #1f303b 75%);
+}
+.motion-stage > svg {
+  display: block;
+  width: 100%;
+  height: 407px;
+  padding: 20px 8px 0;
+}
+.motion-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 18px 19px 0;
+  font: 9px var(--mono, monospace);
+  color: #cad6dd;
+  letter-spacing: 0.08em;
+}
+.motion-equipment {
+  stroke: #a6b5be;
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.65;
+}
+.motion-load {
+  stroke: var(--anatomy-primary);
+  stroke-width: 3;
+  fill: none;
+}
+.motion-progress {
+  height: 3px;
+  background: #61758355;
+  margin: 4px 20px 20px;
+}
+.motion-progress > span {
+  height: 100%;
+  display: block;
+  background: var(--anatomy-primary);
+}
+.motion-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 14px;
+}
+.motion-controls button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 42px;
+  padding: 9px 11px;
+  border: 1px solid #8fa4b0;
+  border-radius: 999px;
+  background: #e5ecef;
+  color: #355164;
+  font-size: 10px;
+}
+.motion-controls .anatomy-play,
+.motion-controls button[aria-pressed="true"] {
+  background: #2b4758;
+  color: #f2eee6;
+  border-color: #2b4758;
+}
+.motion-static {
+  margin-top: 14px;
+}
+.motion-static > summary {
+  color: #405f71;
+  font-size: 11px;
+  min-height: 40px;
+  padding: 11px 0;
+}
+.motion-static .exercise-sketch {
+  max-width: none;
+  width: 100%;
+}
+.exercise-insight-dialog button:focus-visible {
+  outline: 3px solid #745034;
+  outline-offset: 3px;
+}
+
+@media (min-width: 1250px) {
+  .library-grid .muscle-atlas-compact .muscle-body {
+    height: 235px;
+  }
+}
+@media (max-width: 760px) {
+  .exercise-insight-dialog {
+    width: calc(100% - 20px);
+    max-height: calc(100svh - 20px);
+    border-radius: 22px;
+  }
+  .insight-header {
+    padding: 21px 20px 18px;
+  }
+  .insight-header h2 {
+    font-size: 34px;
+  }
+  .insight-layout {
+    grid-template-columns: 1fr;
+    padding: 18px 20px 22px;
+    gap: 24px;
+  }
+  .muscle-body {
+    max-height: 370px;
+  }
+  .atlas-topline {
+    font-size: 8px;
+    padding: 17px 15px 0;
+  }
+  .atlas-topline > span:last-child {
+    display: none;
+  }
+  .atlas-bodies {
+    padding: 9px 8px 15px;
+  }
+  .atlas-legend {
+    gap: 8px 11px;
+  }
+  .atlas-legend > span {
+    font-size: 9px;
+  }
+  .insight-footer {
+    padding: 13px 20px;
+  }
+  .insight-footer .button {
+    width: 100%;
+  }
+  .motion-stage > svg {
+    height: 320px;
+  }
+  .insight-information {
+    padding-top: 0;
+  }
+}
+@media (max-width: 380px) {
+  .insight-header {
+    padding: 18px 15px 15px;
+  }
+  .insight-header h2 {
+    font-size: 30px;
+  }
+  .insight-layout {
+    padding: 15px;
+  }
+  .anatomy-palette-picker {
+    gap: 9px;
+  }
+  .anatomy-palette-picker > span {
+    font-size: 9px;
+  }
+  .anatomy-palette-picker button {
+    min-width: 37px;
+    min-height: 40px;
+  }
+  .atlas-legend {
+    justify-content: flex-start;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .muscle-body g[data-muscle-role],
+  .library-anatomy-caption > svg {
+    transition: none;
+  }
+}

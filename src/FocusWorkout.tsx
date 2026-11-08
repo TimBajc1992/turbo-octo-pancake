@@ -11,6 +11,7 @@ import { BusyDevice, CoachExerciseInfo } from "./Trainer";
 import { reconcileExercise } from "./coach";
 import { candidateForExercise, loadLabel } from "./exerciseCatalog";
 import { ExerciseSketch } from "./ExerciseSketch";
+import { ExerciseInsightButton } from "./anatomy/ExerciseDetails";
 import { ExerciseLibraryButton } from "./ExerciseLibrary";
 import {
   applyLoadAdvice,
@@ -247,6 +248,9 @@ export function FocusWorkout({
                   : modes[e.mode]}
             </p>
           </div>
+          {!e.cardio && cat && (
+            <ExerciseInsightButton exercise={cat} state={state} compact />
+          )}
           <span className="focus-count">
             {finished}
             <small>/{e.sets.length}</small>

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { ExerciseLibrary } from "./ExerciseLibrary";
 import { ExerciseSketch } from "./ExerciseSketch";
+import { ExerciseInsightButton } from "./anatomy/ExerciseDetails";
 import { byId, type Candidate } from "./exerciseCatalog";
 import { type State, type Workout } from "./model";
 import {
@@ -259,6 +260,11 @@ export function TrainingBuilder({ state, update, start }: Props) {
                     <span>
                       {index + 1}. {byId(id)!.name}
                     </span>
+                    <ExerciseInsightButton
+                      exercise={byId(id)!}
+                      state={state}
+                      compact
+                    />
                     {index < ids.length - 1 && (
                       <button
                         className="icon-button"

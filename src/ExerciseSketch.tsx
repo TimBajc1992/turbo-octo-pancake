@@ -1,8 +1,8 @@
 import { useId, type ReactNode } from "react";
 import type { Candidate } from "./exerciseCatalog";
 
-type Point = [number, number];
-type Pose = {
+export type Point = [number, number];
+export type Pose = {
   head: Point;
   back: Point[];
   arms: Point[][];
@@ -26,7 +26,7 @@ function Person({ pose }: { pose: Pose }) {
     </g>
   );
 }
-function scene(
+export function exerciseScene(
   c: Candidate,
   end: boolean,
 ): { pose: Pose; equipment?: ReactNode } {
@@ -909,7 +909,7 @@ export function ExerciseSketch({
           className="sketch-background"
         />
         {[false, true].map((end, i) => {
-          const { pose, equipment } = scene(exercise, end);
+          const { pose, equipment } = exerciseScene(exercise, end);
           return (
             <g key={i} transform={`translate(${i * 180 + 6},25)`}>
               <path d="M14 139H148" className="sketch-floor" />
