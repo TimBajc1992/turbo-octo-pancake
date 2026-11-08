@@ -1,3 +1,5 @@
+> Posodobitev 8. 11. 2026: trenutna izdaja je **0.4.0**, izvor `d54ad53981ce71f6a60b8530efd2c59829be39d0`, Pages `af52d2ce1735aea4d88f78a767ce5e0c46703ca1`. PR #9 je združen. Knjižnica ima 132 vnosov in 131 konkretnih 3D prikazov. Preverjenih je 117 enotskih preizkusov ter po 44 tokov v Chromiumu in WebKitu, vključno s staro posodobitvijo in nespremenjeno zgodovino/ključi. Ista zbirka `tezisce/state/current` in Cloudflare ostajata ohranjena. Trenutni podatki objave so v `docs/moc-forma-release.json`, podrobnosti prikaza pa v `docs/exercise-anatomy.md`. Spodnje besedilo o prvi prenovi ostaja zgodovinska podlaga.
+
 # Predaja v uporabnikovo drugo nit
 
 Ciljna nit: `01a14128-8b6e-70db-90ca-0174858a3067`.

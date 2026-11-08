@@ -11,10 +11,18 @@ Naslov ostaja https://timbajc1992.github.io/turbo-octo-pancake/. Safari in aplik
 ## Priprava nove vadbe
 
 1. V zavihku **Vadba** izberi Push Day, Pull Day, Legs ali Celotno telo. Sistem predlaga naslednji sklop; izbiro lahko spremeniš.
-2. Dodaj vaje iz knjižnice. Prikazane so samo vaje za izbrani sklop, z navodili, skicami in preteklimi rezultati.
+2. Dodaj vaje iz knjižnice. Prikazane so samo vaje za izbrani sklop, z navodili, prikazi vaj in preteklimi rezultati.
 3. Pri mišičnih skupinah spremljaj števce. Izbereš lahko največ dve vaji za isto glavno mišično skupino.
 4. Pred začetkom preglej prazne skupine. Dodaj ustrezno vajo ali izrecno potrdi, da jih danes izpuščaš.
 5. Začni vadbo in potrjuj samo dejansko opravljene serije. Vmesne spremembe se shranjujejo na napravo.
+
+## Mišice in 3D izvedba
+
+Knjižnica vsebuje 132 vaj in različic s palico, ročkami, drogom/bradljo, napravami, kabli in lastno težo. Dotakni se slike vaje, da odpreš njen prikaz; sam ogled ne doda vaje v trening. **Predvajaj** začne animacijo, drsnik spreminja položaj, poteg ali gumba Levo/Desno pa obračata pogled.
+
+Vijolična označuje glavne, zlata pomožne mišice. Dotik imena poudari predel in pokaže razlago. Zavihek **Mišice** ohranja zemljevid od spredaj in zadaj. Če brskalnik ne more odpreti 3D, ostaneta shranjena slika in zemljevid. Splošna nedoločena naprava za trup najprej potrebuje točen gib.
+
+Med hitro vadbo je prikaz v podrobnostih **Mišice, izvedba in podlaga teže**. Osnovni pogled še vedno pokaže eno vajo in naslednjo serijo. Nova grafika ne preimenuje starih vaj ali spremeni shranjenih kilogramov.
 
 ## Če telefon ostane doma
 
