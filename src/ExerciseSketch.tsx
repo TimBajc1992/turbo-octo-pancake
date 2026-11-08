@@ -23,6 +23,8 @@ export function ExerciseSketch({
   const [expanded, setExpanded] = useState(false);
   const heading = useId();
   const anatomy = anatomyForExercise(exercise);
+  const activeView =
+    view === "movement" && anatomy.primary.length ? "movement" : "muscles";
   const selectedRegion =
     selected && [...anatomy.primary, ...anatomy.secondary].includes(selected)
       ? selected
@@ -59,20 +61,26 @@ export function ExerciseSketch({
       <div className="visual-switch" role="group" aria-label="Prikaz vaje">
         <button
           type="button"
-          aria-pressed={view === "muscles"}
+          aria-pressed={activeView === "muscles"}
           onClick={() => setView("muscles")}
         >
           <Layers size={16} /> Mišice
         </button>
         <button
           type="button"
-          aria-pressed={view === "movement"}
+          aria-pressed={activeView === "movement"}
+          disabled={!anatomy.primary.length}
+          title={
+            !anatomy.primary.length
+              ? "Najprej določi gib in točno napravo."
+              : undefined
+          }
           onClick={() => setView("movement")}
         >
           <Activity size={16} /> Izvedba
         </button>
       </div>
-      {view === "muscles" ? (
+      {activeView === "muscles" ? (
         <div className="visual-anatomy">
           <div className="anatomy-stage">
             <div className="anatomy-legend">
