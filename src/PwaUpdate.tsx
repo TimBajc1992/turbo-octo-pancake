@@ -29,7 +29,7 @@ export function PwaUpdate({
       registration = r;
       sync();
       r.addEventListener("updatefound", update);
-      r.update().catch(() => {});
+      if (navigator.onLine) r.update().catch(() => {});
     });
     return () => {
       stopped = true;
@@ -54,6 +54,12 @@ export function PwaUpdate({
         className="button secondary"
         onClick={async () => {
           setInfo("Preverjam posodobitev …");
+          if (!navigator.onLine) {
+            setInfo(
+              "Za preverjanje posodobitve se poveži z internetom. Tvoji podatki ostanejo shranjeni.",
+            );
+            return;
+          }
           try {
             const registration =
               await navigator.serviceWorker?.getRegistration();

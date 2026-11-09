@@ -59,9 +59,9 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chromium webkit
       - name: Preveri tokove z WebKit kot v Safariju
-        # WebKit shares native service-worker update jobs across its browser
-        # contexts. Run these offline/upgrade scenarios serially; all assertions
-        # and both viewport projects still run.
+        # Isolate native WebKit updates from simultaneous browser work. These
+        # scenarios install complete offline releases; all assertions and both
+        # viewport projects still run.
         run: npm run test:e2e -- --workers=1
         env:
           TEST_BROWSER: webkit
