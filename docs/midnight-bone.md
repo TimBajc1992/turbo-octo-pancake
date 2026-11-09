@@ -14,7 +14,7 @@ Podrobni graf, tedenska povprečja, vse posamične meritve in urejanje ostanejo 
 
 ## Ohranjanje podatkov in objava
 
-Izvor, pot aplikacije, identiteta namestitve in zbirka `tezisce/state/current` ostajajo isti. Ta nadgradnja ne spremeni modela podatkov, vaj in njihovih ID-jev, zgodovine, treninga v teku, osnutkov, naknadnega vnosa, podatkov Apple Health ali šifrirane povezave s Cloudflarom. Posodobitveni pomočnik ohranja preverjeno logiko za Safari; spremenjene so samo njegove barve.
+Izvor, pot aplikacije, identiteta namestitve in zbirka `tezisce/state/current` ostajajo isti. Ta nadgradnja ne spremeni modela podatkov, vaj in njihovih ID-jev, zgodovine, treninga v teku, osnutkov, naknadnega vnosa, podatkov Apple Health ali šifrirane povezave s Cloudflarom. Posodobitveni pomočnik ohranja preverjeno logiko za Safari; spremenjene so samo njegove barve. Glavna aplikacija ponovno uporabi aktivno registracijo service workerja in preverja posodobitev samo, ko je na voljo internet, da odpiranje že shranjene aplikacije brez povezave ne sproži odvečne omrežne registracije.
 
 Samostojni predogled je v `previews/midnight-bone/` in na `/predogled-videz/v2/`. Uporablja sintetične podatke samo v pomnilniku, ne vključuje glavne aplikacije ali njene povezave s shrambo in ne registrira service workerja. Preverjanje vseh treh zaslonov na telefonu in računalniku beleži nič klicev IndexedDB ali shrambe brskalnika. Produkcijska objava ohranja stare datoteke za nemoteno posodobitev že odprtih namestitev.
 
