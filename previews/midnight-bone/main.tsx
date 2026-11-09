@@ -26,7 +26,7 @@ function Preview() {
   };
   const update = async (fn: (s: State) => State) => setState(fn);
   return (
-    <div className="iron-shell design-preview">
+    <div className={`iron-shell design-preview design-preview-${tab}`}>
       <aside className="design-preview-banner">
         <span>OBLIKOVNI PREDOGLED · VZORČNI PODATKI</span>
         <button

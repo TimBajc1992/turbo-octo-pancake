@@ -1,6 +1,5 @@
 import App from "./LegacyApp";
 import "./style.css";
-import "./midnight-bone.css";
 export default function LegacyEntry() {
   return (
     <>

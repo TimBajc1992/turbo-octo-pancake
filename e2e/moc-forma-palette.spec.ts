@@ -67,6 +67,20 @@ test("the measurement outline uses recorded waist data and retains the detailed 
     background: "rgb(242, 238, 230)",
     ink: "rgb(31, 42, 68)",
   });
+  expect(
+    await page
+      .getByRole("button", { name: "Dodaj meritev", exact: true })
+      .evaluate((e) => ({
+        background: getComputedStyle(e).backgroundColor,
+        color: getComputedStyle(e).color,
+      })),
+  ).toEqual({ background: "rgb(31, 42, 68)", color: "rgb(242, 238, 230)" });
+  expect(
+    await page
+      .locator(".body-measure strong")
+      .first()
+      .evaluate((e) => getComputedStyle(e).fontFamily),
+  ).toContain("IBM Plex Mono");
 });
 
 test("gold marks an earned weekly goal while navigating remains read-only", async ({

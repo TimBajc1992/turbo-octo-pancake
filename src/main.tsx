@@ -1,7 +1,17 @@
 import React, { lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
-const Iron = lazy(() => import("./IronEntry"));
-const Legacy = lazy(() => import("./LegacyEntry"));
+// Load the shared theme after the selected interface's CSS. Otherwise Vite can
+// hoist it before the modern interface stylesheet and undo its final overrides.
+const Iron = lazy(async () => {
+  const entry = await import("./IronEntry");
+  await import("./midnight-bone.css");
+  return entry;
+});
+const Legacy = lazy(async () => {
+  const entry = await import("./LegacyEntry");
+  await import("./midnight-bone.css");
+  return entry;
+});
 const legacy = localStorage.getItem("moc-forma:interface") === "legacy";
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
