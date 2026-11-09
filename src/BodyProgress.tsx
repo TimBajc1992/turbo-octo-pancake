@@ -15,7 +15,11 @@ export function bodyProgress(measurements: Measurement[]) {
     waist: waists.at(-1),
     firstWaist: waists[0],
     ratio: waists.length > 1 ? waists.at(-1)!.value / waists[0].value : 1,
-    hasComparison: waists.length > 1,
+    weightRatio:
+      weights.length > 1 ? weights.at(-1)!.value / weights[0].value : 1,
+    hasWaistComparison: waists.length > 1,
+    hasWeightComparison: weights.length > 1,
+    hasComparison: waists.length > 1 || weights.length > 1,
   };
 }
 
@@ -31,7 +35,11 @@ export function BodyProgress({
     <section className="body-progress panel" aria-label="Telo in tvoje meritve">
       <div className="body-progress-figure">
         <span className="eyebrow">TVOJA ZGODBA V OBRISU</span>
-        <BodyMotif ratio={p.ratio} comparison={p.hasComparison} />
+        <BodyMotif
+          ratio={p.hasWaistComparison ? p.ratio : undefined}
+          weightRatio={p.weightRatio}
+          comparison={p.hasComparison}
+        />
         <div className="body-progress-legend">
           <span>
             <i />
@@ -91,8 +99,12 @@ export function BodyProgress({
         </div>
         <p className="body-progress-note">
           {p.hasComparison
-            ? "Obris shematsko ponazarja spremembo izmerjenega pasu."
-            : "Zabeleži obseg pasu za primerjavo obrisa skozi čas."}
+            ? p.hasWaistComparison && p.hasWeightComparison
+              ? "Shematski obris sledi spremembam telesne teže in obsega pasu."
+              : p.hasWeightComparison
+                ? "Shematski obris sledi spremembi telesne teže."
+                : "Shematski obris sledi spremembi obsega pasu."
+            : "Zabeleži težo ali obseg pasu za primerjavo obrisa skozi čas."}
         </p>
       </div>
     </section>

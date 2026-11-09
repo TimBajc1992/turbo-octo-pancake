@@ -20,6 +20,7 @@ import {
   nextTrainingSuggestion,
 } from "../training";
 import { BodyMotif } from "../BodyMotif";
+import { bodyProgress } from "../BodyProgress";
 import { HabitRows, habitCount } from "./IronHabits";
 
 export function IronMark({ size = 48 }: { size?: number }) {
@@ -64,6 +65,7 @@ export function IronToday({
   const today = localDate(),
     week = weekStart(),
     suggestion = nextTrainingSuggestion(state);
+  const body = bodyProgress(state.measurements);
   const workouts = state.workouts.filter(
     (w) =>
       w.date >= week &&
@@ -121,7 +123,10 @@ export function IronToday({
             <ArrowRight size={18} />
           </button>
         </div>
-        <BodyMotif />
+        <BodyMotif
+          ratio={body.hasWaistComparison ? body.ratio : undefined}
+          weightRatio={body.weightRatio}
+        />
         {(state.profile.weeklyGoal ?? 0) > 0 &&
           workouts.length >= (state.profile.weeklyGoal ?? 0) && (
             <div className="achievement-stamp" role="status">

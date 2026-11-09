@@ -101,3 +101,35 @@ test("gold marks an earned weekly goal while navigating remains read-only", asyn
   await expect(page.locator(".achievement-stamp")).toHaveCount(0);
   expect(await readWorkoutState(page)).toEqual(s);
 });
+
+test("weight alone changes the same natural silhouette on progress and home without rewriting measurements", async ({
+  page,
+}) => {
+  const s = workoutFixture(false);
+  s.measurements = [
+    { id: "initial-weight", date: "2026-09-01", kind: "weight", value: 100 },
+    { id: "current-weight", date: "2026-11-01", kind: "weight", value: 80 },
+  ];
+  await seed(page, s);
+  const homePath = await page
+    .locator(".body-current > path")
+    .first()
+    .getAttribute("d");
+  await nav(page).click();
+  await expect(page.locator(".body-current")).toHaveAttribute(
+    "data-weight-ratio",
+    "0.8000",
+  );
+  const current = await page
+    .locator(".body-current > path")
+    .first()
+    .getAttribute("d");
+  expect(current).toBe(homePath);
+  expect(current).not.toBe(
+    await page.locator(".body-baseline").getAttribute("d"),
+  );
+  await expect(page.locator(".body-progress-note")).toHaveText(
+    "Shematski obris sledi spremembi telesne teže.",
+  );
+  expect(await readWorkoutState(page)).toEqual(s);
+});

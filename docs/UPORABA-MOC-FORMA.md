@@ -10,7 +10,7 @@ Naslov ostaja https://timbajc1992.github.io/turbo-octo-pancake/. Safari in aplik
 
 ## Nova podoba in obris napredka
 
-Različica 0.5.0 uporablja kostno belo in polnočno modro. Zlati znak se pokaže ob doseženem tedenskem cilju. V **Napredek** vidiš zadnjo težo in pas ter primerjavo obrisa iz dejansko zabeleženih obsegov pasu. Obris je shematski; ne ocenjuje mišic ali maščobe iz teže. Za dosedanji graf odpri **Podroben graf meritev**. Meritve in zgodovina ostanejo shranjene.
+Različica 0.5.0 uporablja kostno belo in polnočno modro. Zlati znak se pokaže ob doseženem tedenskem cilju. V **Napredek** vidiš zadnjo težo in pas ter primerjavo obrisa iz dejanskih meritev: teža spreminja splošni volumen, obseg posebej prilagodi pas. Obris je shematski; ne ocenjuje mišic ali maščobe. Za dosedanji graf odpri **Podroben graf meritev**. Meritve in zgodovina ostanejo shranjene.
 
 ## Priprava nove vadbe
 

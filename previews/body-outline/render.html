@@ -1,0 +1,24 @@
+<!doctype html><html lang="sl"><meta charset="utf-8"><title>Body outline source renderer</title><style>body{margin:0;background:#F2EEE6}canvas{display:block;max-height:100vh}</style>
+<script type="module">
+import * as T from 'three';
+import { athleteModel, Athlete } from '../../src/exercise3d/rig';
+import rig from '../../src/assets/athlete-rig.json';
+const athlete = new Athlete(await athleteModel());
+const relaxed = new Map([...athlete.bones].filter(([name])=>name.startsWith('finger')).map(([name,bone])=>[name,bone.quaternion.clone()]));
+athlete.pose({ family:'squat', hip:rig.bones.root.head, lean:0, spineBend:0, footPitch:0,
+  hands:[[.32,.91,.035],[-.32,.91,.035]], elbows:[[.45,1.2,-.06],[-.45,1.2,-.06]],
+  feet:[rig.bones.foot_L.head,rig.bones.foot_R.head], knees:[[.16,.5,.3],[-.16,.5,.3]],
+});
+for(const [name,q] of relaxed) athlete.bones.get(name).quaternion.copy(q);
+athlete.group.updateMatrixWorld(true);
+const scene = new T.Scene(); scene.add(athlete.group);
+scene.traverse(o=>{if(o.isMesh)o.material=new T.MeshBasicMaterial({color:'#1F2A44'});});
+const renderer = new T.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
+renderer.setSize(1080,1350); renderer.setClearColor('#000000',0); document.body.append(renderer.domElement);
+const camera = new T.OrthographicCamera(-.78,.78,1.87,-.08,.01,10);
+camera.position.set(0,0,4); camera.lookAt(0,0,0); renderer.render(scene,camera);
+const canvas=document.createElement('canvas');canvas.width=1080;canvas.height=1350;
+const ctx=canvas.getContext('2d');ctx.drawImage(renderer.domElement,0,0);
+window.bodyPixels={width:1080,height:1350,alpha:Array.from(ctx.getImageData(0,0,1080,1350).data).filter((_,i)=>i%4===3)};
+window.bodyRendered=true;
+</script></html>
