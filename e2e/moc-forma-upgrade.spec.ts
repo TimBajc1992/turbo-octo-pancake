@@ -20,6 +20,9 @@ test("upgrades the published Težišče to Moč & Forma while preserving all his
   );
   expect(existsSync(path.resolve(previous!, "index.html"))).toBe(true);
   let next = false;
+  const workerRequests: { next: boolean; at: number }[] = [];
+  let newAssetRequests = 0;
+  const failedRequests: string[] = [];
   const base = "/turbo-octo-pancake/";
   const oldDir = path.resolve(previous!),
     newDir = path.resolve("dist");
@@ -43,6 +46,8 @@ test("upgrades the published Težišče to Moč & Forma while preserving all his
         return;
       }
       const relative = pathname.slice(base.length) || "index.html";
+      if (relative === "sw.js") workerRequests.push({ next, at: Date.now() });
+      if (next && relative.startsWith("assets/")) newAssetRequests++;
       let file = path.resolve(next ? newDir : oldDir, relative);
       if (!file.startsWith((next ? newDir : oldDir) + path.sep)) {
         res.writeHead(404).end();
@@ -62,6 +67,7 @@ test("upgrades the published Težišče to Moč & Forma while preserving all his
       });
       res.end(data);
     } catch {
+      failedRequests.push(req.url || "/");
       res.writeHead(404).end();
     }
   });
@@ -107,6 +113,11 @@ test("upgrades the published Težišče to Moč & Forma while preserving all his
     )
       .toBeVisible({ timeout: 45000 })
       .catch(async (error) => {
+        console.error("Upgrade asset server", {
+          workerRequests,
+          newAssetRequests,
+          failedRequests: failedRequests.slice(-8),
+        });
         console.error(
           "Upgrade diagnostics",
           await page.evaluate(() => ({
