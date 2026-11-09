@@ -59,7 +59,10 @@ jobs:
       - run: npm run build
       - run: npx playwright install --with-deps chromium webkit
       - name: Preveri tokove z WebKit kot v Safariju
-        run: npm run test:e2e
+        # Isolate native WebKit updates from simultaneous browser work. These
+        # scenarios install complete offline releases; all assertions and both
+        # viewport projects still run.
+        run: npm run test:e2e -- --workers=1
         env:
           TEST_BROWSER: webkit
       - name: Preveri tokove v Chromium

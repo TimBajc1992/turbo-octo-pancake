@@ -56,7 +56,7 @@ export class MuscleTint {
     material.onBeforeCompile = (shader) => {
       Object.assign(shader.uniforms, {
         uMusclePrimary: { value: this.primary }, uMuscleSecondary: { value: this.secondary }, uMuscleSelected: { value: this.selected },
-        uMusclePrimaryColor: { value: new T.Color("#a88ae9") }, uMuscleSecondaryColor: { value: new T.Color("#edbe7e") },
+        uMusclePrimaryColor: { value: new T.Color("#7D8FA8") }, uMuscleSecondaryColor: { value: new T.Color("#A39E93") },
       });
       shader.vertexShader = `attribute vec3 _anatomy;varying vec3 vAnatomy;\n` + shader.vertexShader;
       shader.vertexShader = shader.vertexShader.replace("#include <begin_vertex>", "#include <begin_vertex>\nvAnatomy=_anatomy;");

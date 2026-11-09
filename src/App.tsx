@@ -1,4 +1,5 @@
 import { ManualWorkoutDialog } from "./ManualWorkoutDialog";
+import { BodyProgress } from "./BodyProgress";
 import { createManualWorkoutDraft } from "./manualWorkout";
 import { IronToday, IronMark } from "./iron/IronToday";
 import { IronHabits } from "./iron/IronHabits";
@@ -213,8 +214,8 @@ function Chart({
           x2="0"
           y2="1"
         >
-          <stop offset="0%" stopColor="#91482e" stopOpacity=".17" />
-          <stop offset="100%" stopColor="#91482e" stopOpacity="0" />
+          <stop offset="0%" stopColor="#7D8FA8" stopOpacity=".2" />
+          <stop offset="100%" stopColor="#7D8FA8" stopOpacity="0" />
         </linearGradient>
       </defs>
       {[0, 0.5, 1].map((f) => (
@@ -224,7 +225,7 @@ function Chart({
             x2={W - 22}
             y1={top + f * (bottom - top)}
             y2={top + f * (bottom - top)}
-            stroke="#343a34"
+            stroke="#A39E93"
             strokeDasharray="3 6"
           />
           {!compact && (
@@ -243,7 +244,7 @@ function Chart({
           <polyline
             points={points}
             fill="none"
-            stroke="#91482e"
+            stroke="#1F2A44"
             strokeWidth="2.5"
             strokeLinejoin="round"
           />
@@ -255,7 +256,9 @@ function Chart({
           cx={x(r.date)}
           cy={y(r.value)}
           r={sorted.length > 30 ? 2 : 4}
-          fill="#91482e"
+          fill="#7D8FA8"
+          stroke="#1F2A44"
+          strokeWidth="1"
         >
           <title>
             {dateLabel(r.date, true)}: {num(r.value)} {unit}
@@ -278,19 +281,19 @@ function WorkoutArt() {
     <svg className="workout-art" viewBox="0 0 400 320" aria-hidden="true">
       <defs>
         <radialGradient id="halo">
-          <stop stopColor="#b6d780" stopOpacity=".15" />
-          <stop offset="1" stopColor="#b6d780" stopOpacity="0" />
+          <stop stopColor="#7D8FA8" stopOpacity=".15" />
+          <stop offset="1" stopColor="#7D8FA8" stopOpacity="0" />
         </radialGradient>
       </defs>
       <circle cx="210" cy="165" r="170" fill="url(#halo)" />
-      <g fill="none" stroke="#aebc9b" strokeWidth="1" opacity=".25">
+      <g fill="none" stroke="#7D8FA8" strokeWidth="1" opacity=".25">
         <ellipse cx="210" cy="276" rx="145" ry="22" />
         <ellipse cx="210" cy="276" rx="120" ry="16" />
         <path d="M35 276H380M210 15V304M60 230L350 315M350 230L60 315" />
       </g>
       <g
         fill="none"
-        stroke="#c8dfa5"
+        stroke="#7D8FA8"
         strokeWidth="3"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -304,12 +307,12 @@ function WorkoutArt() {
           strokeWidth="9"
         />
       </g>
-      <g fill="#b5d98a" opacity=".6">
+      <g fill="#7D8FA8" opacity=".6">
         <circle cx="199" cy="133" r="5" />
         <circle cx="186" cy="199" r="5" />
         <circle cx="256" cy="202" r="5" />
       </g>
-      <text x="285" y="225" fill="#97a187" fontSize="10" letterSpacing="3">
+      <text x="285" y="225" fill="#7D8FA8" fontSize="10" letterSpacing="3">
         01 / 04
       </text>
     </svg>
@@ -1184,48 +1187,24 @@ export default function App() {
                 <Strength state={state} />
               ) : (
                 <>
-                  <section className="panel">
-                    <div className="section-title">
-                      <div>
-                        <h2>
-                          {progressKind === "weight"
-                            ? "Telesna teža"
-                            : "Obseg pasu"}
-                        </h2>
-                        <p>Posamezne meritve po dejanskih datumih</p>
-                      </div>
-                      <span className="metric-value small">
-                        {(progressKind === "weight" ? lastWeight : lastWaist)
-                          ? num(
-                              (progressKind === "weight"
-                                ? lastWeight
-                                : lastWaist)!.value,
-                            )
-                          : "—"}
-                        <span>{progressKind === "weight" ? "kg" : "cm"}</span>
+                  <BodyProgress
+                    measurements={state.measurements}
+                    measure={openMeasure}
+                  />
+                  <details className="measurement-chart">
+                    <summary>
+                      Podroben graf meritev{" "}
+                      <span>
+                        {progressKind === "weight"
+                          ? "Telesna teža"
+                          : "Obseg pasu"}
                       </span>
-                    </div>
+                    </summary>
                     <Chart
                       rows={progressKind === "weight" ? weights : waists}
                       unit={progressKind === "weight" ? "kg" : "cm"}
                     />
-                    {(progressKind === "weight" ? weights : waists).length >
-                      1 && (
-                      <p>
-                        Sprememba od prve meritve:{" "}
-                        <strong>
-                          {num(
-                            (progressKind === "weight" ? weights : waists).at(
-                              -1,
-                            )!.value -
-                              (progressKind === "weight" ? weights : waists)[0]
-                                .value,
-                          )}{" "}
-                          {progressKind === "weight" ? "kg" : "cm"}
-                        </strong>
-                      </p>
-                    )}
-                  </section>
+                  </details>
                   {progressKind === "weight" && weights.length > 0 && (
                     <div className="two-col">
                       <section className="panel">

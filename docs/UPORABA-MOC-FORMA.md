@@ -8,6 +8,10 @@
 
 Naslov ostaja https://timbajc1992.github.io/turbo-octo-pancake/. Safari in aplikacija, dodana na začetni zaslon, lahko uporabljata ločeni shrambi; za prvi prehod uporabi tisto obstoječo namestitev, v kateri je tvoja zgodovina. Aplikacije ne odstranjuj in ne briši podatkov brskalnika. V nastavitvah lahko izvoziš trenutno celotno varnostno kopijo ali lokalno kopijo pred prenovo. Če uporabljaš več naprav, ostane na voljo ista šifrirana povezava s Cloudflarom.
 
+## Nova podoba in obris napredka
+
+Različica 0.5.0 uporablja kostno belo in polnočno modro. Zlati znak se pokaže ob doseženem tedenskem cilju. V **Napredek** vidiš zadnjo težo in pas ter primerjavo obrisa iz dejanskih meritev: teža spreminja splošni volumen, obseg posebej prilagodi pas. Obris je shematski; ne ocenjuje mišic ali maščobe. Za dosedanji graf odpri **Podroben graf meritev**. Meritve in zgodovina ostanejo shranjene.
+
 ## Priprava nove vadbe
 
 1. V zavihku **Vadba** izberi Push Day, Pull Day, Legs ali Celotno telo. Sistem predlaga naslednji sklop; izbiro lahko spremeniš.

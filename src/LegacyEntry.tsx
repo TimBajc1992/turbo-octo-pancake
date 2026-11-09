@@ -6,8 +6,8 @@ export default function LegacyEntry() {
       <aside
         style={{
           padding: "10px 20px",
-          background: "#313936",
-          color: "#fff",
+          background: "#1F2A44",
+          color: "#F2EEE6",
           fontSize: 12,
           position: "relative",
           zIndex: 100,

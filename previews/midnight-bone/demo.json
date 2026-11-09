@@ -1,0 +1,328 @@
+{
+  "schema": 1,
+  "profile": {
+    "name": "Tim",
+    "goal": "Moč in dobro počutje",
+    "time": 60,
+    "equipment": "Fitnes",
+    "experience": "Redno treniram",
+    "limitations": "Brez omejitev",
+    "confirmed": true,
+    "schedule": "flexible",
+    "days": [],
+    "weeklyGoal": 3
+  },
+  "workouts": [
+    {
+      "id": "original-workout-8",
+      "date": "2026-11-01",
+      "name": "Obstoječi trening",
+      "splitId": "original-split",
+      "durationMin": 46,
+      "reviewDuration": false,
+      "note": "Prvotna opomba",
+      "source": "pulse-v3",
+      "externalId": "external-8",
+      "raw": {
+        "synthetic": true
+      },
+      "exercises": [
+        {
+          "id": "legacy-bench-id",
+          "name": "Bench Press",
+          "mode": "barbell",
+          "equipment": "Rack A",
+          "sets": [
+            {
+              "id": "a098bc75-3ce8-4856-98d3-5ce832a1e107",
+              "weight": 90,
+              "reps": 10,
+              "done": true,
+              "kind": "work",
+              "rir": 2
+            },
+            {
+              "id": "f6729fb9-109f-4888-a596-eb92c3fbc5dc",
+              "weight": 90,
+              "reps": 10,
+              "done": true,
+              "kind": "work",
+              "rir": 2
+            },
+            {
+              "id": "d0f2bd71-d610-4878-88ba-0a0eddf0d4dd",
+              "weight": 85,
+              "reps": 10,
+              "done": true,
+              "kind": "work",
+              "rir": 2
+            }
+          ],
+          "note": "",
+          "pain": false,
+          "minReps": 8,
+          "maxReps": 12,
+          "increment": 2.5,
+          "rest": 90,
+          "confirmed": true
+        }
+      ]
+    },
+    {
+      "id": "original-workout-1",
+      "date": "2026-11-08",
+      "name": "Obstoječi trening",
+      "splitId": "original-split",
+      "durationMin": 46,
+      "reviewDuration": false,
+      "note": "Prvotna opomba",
+      "source": "pulse-v3",
+      "externalId": "external-1",
+      "raw": {
+        "synthetic": true
+      },
+      "exercises": [
+        {
+          "id": "legacy-bench-id",
+          "name": "Bench Press",
+          "mode": "barbell",
+          "equipment": "Rack A",
+          "sets": [
+            {
+              "id": "a2b599ff-bc63-4eb2-9b1a-96189e1c030b",
+              "weight": 45,
+              "reps": 10,
+              "done": true,
+              "kind": "work",
+              "rir": 2
+            },
+            {
+              "id": "ecb51daf-bfaa-4875-a9ac-dfc45481ae96",
+              "weight": 45,
+              "reps": 10,
+              "done": true,
+              "kind": "work",
+              "rir": 2
+            },
+            {
+              "id": "fdd38daa-e660-4219-b68b-a9406a9ca703",
+              "weight": 40,
+              "reps": 10,
+              "done": true,
+              "kind": "work",
+              "rir": 2
+            }
+          ],
+          "note": "",
+          "pain": false,
+          "minReps": 8,
+          "maxReps": 12,
+          "increment": 2.5,
+          "rest": 90,
+          "confirmed": true
+        }
+      ]
+    }
+  ],
+  "measurements": [
+    {
+      "id": "w1",
+      "date": "2026-09-10",
+      "kind": "weight",
+      "value": 87.6
+    },
+    {
+      "id": "w2",
+      "date": "2026-10-10",
+      "kind": "weight",
+      "value": 86.2
+    },
+    {
+      "id": "w3",
+      "date": "2026-11-09",
+      "kind": "weight",
+      "value": 84.8
+    },
+    {
+      "id": "p1",
+      "date": "2026-09-10",
+      "kind": "waist",
+      "value": 94
+    },
+    {
+      "id": "p2",
+      "date": "2026-10-10",
+      "kind": "waist",
+      "value": 92
+    },
+    {
+      "id": "p3",
+      "date": "2026-11-09",
+      "kind": "waist",
+      "value": 89.5
+    }
+  ],
+  "daily": [
+    {
+      "id": "demo-daily",
+      "date": "2026-11-09",
+      "steps": 8124
+    }
+  ],
+  "cardio": [
+    {
+      "id": "original-cardio",
+      "date": "2026-11-08",
+      "minutes": 25
+    }
+  ],
+  "templates": [
+    {
+      "id": "524bcf68-dd4f-47be-ae9a-da4bcbb57864",
+      "name": "Legs",
+      "exercises": [
+        {
+          "id": "legacy-bench-id",
+          "name": "Bench Press",
+          "mode": "barbell",
+          "equipment": "Rack A",
+          "sets": [
+            {
+              "id": "cd2f9c41-562b-4a5c-9edc-d9760086912a",
+              "weight": 10,
+              "reps": 10,
+              "done": false,
+              "kind": "work"
+            },
+            {
+              "id": "d5e1a76d-680e-4ae2-8844-cb95909c983d",
+              "weight": 10,
+              "reps": 10,
+              "done": false,
+              "kind": "work"
+            },
+            {
+              "id": "0da1a520-625b-4053-8f1c-719aa986407f",
+              "weight": 10,
+              "reps": 10,
+              "done": false,
+              "kind": "work"
+            }
+          ],
+          "note": "",
+          "pain": false,
+          "minReps": 8,
+          "maxReps": 12,
+          "increment": 2.5,
+          "rest": 90,
+          "confirmed": true
+        }
+      ]
+    },
+    {
+      "id": "d749a7e0-3d0a-4a81-94f6-60340bae28c9",
+      "name": "Push",
+      "exercises": []
+    },
+    {
+      "id": "ed3dec65-c7f0-454f-ab2e-eeadd75bd1fa",
+      "name": "Pull",
+      "exercises": []
+    },
+    {
+      "id": "067254a3-ff70-4c7c-a0c8-0544d16471f8",
+      "name": "Upper",
+      "exercises": []
+    }
+  ],
+  "imports": [],
+  "nextTemplate": 4,
+  "active": {
+    "id": "existing-active",
+    "date": "2026-11-09",
+    "name": "Zgornji del · svoj ritem",
+    "splitId": "524bcf68-dd4f-47be-ae9a-da4bcbb57864",
+    "durationMin": 0,
+    "reviewDuration": false,
+    "startedAt": 1794256874803,
+    "note": "Ohrani tudi aktivni trening",
+    "exercises": [
+      {
+        "id": "legacy-bench-id",
+        "name": "Bench Press",
+        "mode": "barbell",
+        "equipment": "Rack A",
+        "sets": [
+          {
+            "id": "01834776-8ada-4541-a61b-154b6c3c66fe",
+            "weight": 32.5,
+            "reps": 8,
+            "done": true,
+            "kind": "work",
+            "rir": 2
+          },
+          {
+            "id": "854ff128-6129-4348-ba4d-5624b39f6d04",
+            "weight": 30,
+            "reps": 10,
+            "done": false,
+            "kind": "work"
+          },
+          {
+            "id": "ed408181-29ae-4e7e-9189-5d1039bad394",
+            "weight": 0,
+            "reps": 10,
+            "done": false,
+            "kind": "work",
+            "loadPending": true
+          }
+        ],
+        "note": "",
+        "pain": false,
+        "minReps": 8,
+        "maxReps": 12,
+        "increment": 2.5,
+        "rest": 90,
+        "confirmed": true
+      },
+      {
+        "id": "lat_pulldown",
+        "name": "Lat Pulldown",
+        "mode": "machine",
+        "equipment": "Lat A",
+        "sets": [
+          {
+            "id": "cc4532da-1b30-413d-9593-621132cee77d",
+            "weight": 30,
+            "reps": 10,
+            "done": false,
+            "kind": "work"
+          },
+          {
+            "id": "23a71294-a880-44bc-825c-7d6af0579977",
+            "weight": 30,
+            "reps": 10,
+            "done": false,
+            "kind": "work"
+          }
+        ],
+        "note": "",
+        "pain": false,
+        "minReps": 8,
+        "maxReps": 12,
+        "increment": 2.5,
+        "rest": 90,
+        "confirmed": false
+      }
+    ]
+  },
+  "habits": [
+    {
+      "id": "2026-11-09",
+      "date": "2026-11-09",
+      "protein": true,
+      "water": true,
+      "plants": false
+    }
+  ]
+}

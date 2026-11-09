@@ -40,7 +40,7 @@ export class ExerciseScene {
       powerPreference: "low-power",
     });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
-    this.renderer.setClearColor("#10171f");
+    this.renderer.setClearColor("#F2EEE6");
     this.renderer.outputColorSpace = T.SRGBColorSpace;
     this.renderer.toneMapping = T.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.05;
@@ -75,7 +75,7 @@ export class ExerciseScene {
     this.scene.add(fill);
     this.floor = new T.Mesh(
       new T.PlaneGeometry(12, 12),
-      new T.ShadowMaterial({ color: "#000000", opacity: 0.25 }),
+      new T.ShadowMaterial({ color: "#1F2A44", opacity: 0.12 }),
     );
     this.floor.rotation.x = -Math.PI / 2;
     this.floor.position.y = -0.012;
