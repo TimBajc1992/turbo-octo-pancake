@@ -1,0 +1,784 @@
+@import "@fontsource-variable/dm-sans";
+@import "@fontsource/ibm-plex-mono/latin-400.css";
+@import "@fontsource/ibm-plex-mono/latin-ext-400.css";
+
+:root {
+  --bone: #f2eee6;
+  --ink: #1f2a44;
+  --gold: #b08d57;
+  --chart-blue: #7d8fa8;
+  --chart-gray: #a39e93;
+  --bg: var(--bone);
+  --panel: #f8f5ee;
+  --muted: #5e6776;
+  --line: #d7d1c6;
+  --white: var(--ink);
+  --lime: var(--ink);
+  --rust: var(--ink);
+  --mono: "IBM Plex Mono", monospace;
+  --display: Georgia, "Times New Roman", serif;
+  --paper-grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.78' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' opacity='.055' filter='url(%23paper)'/%3E%3C/svg%3E");
+  font-family:
+    "DM Sans Variable",
+    -apple-system,
+    sans-serif;
+  color: var(--ink);
+  background: var(--bone);
+  color-scheme: light;
+  font-variant-numeric: tabular-nums;
+}
+body {
+  background: var(--bone);
+  background-image: var(--paper-grain);
+  background-size: 180px;
+  background-attachment: scroll;
+}
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+input:not([type="checkbox"]):not([type="range"]),
+select,
+textarea,
+.iron-shell input:not([type="checkbox"]):not([type="range"]),
+.iron-shell select,
+.iron-shell textarea {
+  background: var(--panel);
+  color: var(--ink);
+  border-color: var(--line);
+  box-shadow: none;
+}
+input[type="checkbox"],
+input[type="range"] {
+  accent-color: var(--ink);
+}
+dialog,
+.iron-shell dialog,
+.exercise-library-dialog,
+.iron-shell .manual-workout-dialog {
+  background: var(--bone);
+  background-image: var(--paper-grain);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: none;
+}
+dialog::backdrop {
+  background: rgb(31 42 68 / 0.34);
+}
+.panel,
+.metric-card,
+.exercise-card,
+.focus-exercise,
+.library-card,
+.iron-shell .panel,
+.iron-shell .metric-card,
+.iron-shell .exercise-card,
+.iron-shell .focus-exercise,
+.iron-shell .library-card,
+.manual-exercise {
+  background: var(--panel);
+  background-image: var(--paper-grain);
+  color: var(--ink);
+  border-color: var(--line);
+  box-shadow: none;
+  border-radius: 12px;
+}
+.button,
+.iron-shell .button,
+.focus-complete,
+.iron-shell .focus-complete {
+  background: var(--ink);
+  color: var(--bone);
+  border: 1px solid var(--ink);
+  box-shadow: none;
+  border-radius: 8px;
+}
+.button:hover:not(:disabled),
+.iron-shell .button:hover:not(:disabled) {
+  background: #2d3c5c;
+  color: var(--bone);
+  box-shadow: none;
+}
+.button.secondary,
+.iron-shell .button.secondary {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line);
+  box-shadow: none;
+}
+.button.secondary:hover:not(:disabled),
+.iron-shell .button.secondary:hover:not(:disabled) {
+  background: #e7e5df;
+  color: var(--ink);
+}
+.icon-button,
+.text-button,
+.iron-shell .icon-button,
+.iron-shell .text-button {
+  color: var(--ink);
+}
+.iron-rail,
+.sidebar,
+.iron-header,
+.mobile-header,
+.bottom-nav,
+.iron-dock {
+  background: var(--bone);
+  background-image: var(--paper-grain);
+  color: var(--ink);
+  border-color: var(--line);
+  box-shadow: none;
+}
+.iron-rail {
+  border-top: 0;
+}
+.iron-rail nav button,
+.sidebar nav button,
+.bottom-nav button,
+.iron-dock button {
+  color: var(--muted);
+}
+.iron-rail nav button.active,
+.sidebar nav button.selected,
+.bottom-nav button.selected,
+.iron-dock button.active {
+  background: var(--ink);
+  color: var(--bone);
+  box-shadow: none;
+  border-radius: 12px;
+}
+.iron-rail nav button:hover:not(.active) {
+  background: #e6e4de;
+}
+.iron-rail-caption,
+.iron-rail-bottom > span,
+.iron-rail-bottom button,
+.iron-storage,
+.iron-breadcrumb {
+  color: var(--muted);
+}
+.iron-rail-bottom strong,
+.iron-rail-bottom strong em,
+.iron-wordmark,
+.iron-wordmark i,
+.iron-wordmark > span {
+  color: var(--ink);
+}
+.iron-wordmark {
+  font: 500 27px/1.2 var(--display);
+  letter-spacing: -0.8px;
+}
+.iron-wordmark i {
+  font: italic 23px var(--display);
+}
+.iron-wordmark > span {
+  font-size: 13px;
+}
+.iron-header {
+  border-bottom: 1px solid var(--line);
+}
+.iron-mark {
+  color: var(--ink);
+}
+.iron-shell .page-heading h1,
+.iron-page-heading h1 {
+  font: 500 clamp(34px, 4.5vw, 54px)/1.12 var(--display);
+  text-transform: none;
+  letter-spacing: -1.7px;
+}
+.iron-shell .page-heading h1 > span,
+.iron-page-heading h1 em {
+  color: var(--ink);
+  font-style: italic;
+}
+.iron-shell .panel h2,
+.iron-shell .section-title h2,
+.iron-section-head h2,
+.builder-heading h2,
+.builder-summary h2,
+.manual-workout-dialog .modal-head h2,
+.exercise-library-dialog .modal-head h2 {
+  font: 500 30px/1.17 var(--display);
+  text-transform: none;
+  letter-spacing: -0.7px;
+}
+.iron-shell .panel h3,
+.muscle-group h3,
+.manual-exercise-head h3 {
+  font: 500 25px/1.2 var(--display);
+  text-transform: none;
+}
+.builder-summary h2 {
+  font-size: 34px !important;
+}
+.iron-shell .focus-exercise h2 {
+  font: 500 30px/1.16 var(--display);
+  text-transform: none;
+}
+.metric-value,
+.iron-stats strong,
+.iron-stats strong span,
+.muscle-count,
+.builder-total > strong,
+.data-row > strong,
+.quick-stepper input,
+.set-row input,
+.manual-set-row input {
+  font-family: var(--mono);
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.06em;
+}
+.iron-stats strong {
+  font-size: 42px;
+  line-height: 1.15;
+}
+.iron-stats strong span {
+  font-size: 19px;
+}
+.muscle-count {
+  font-size: 30px;
+}
+.builder-total > strong {
+  font-size: 48px;
+}
+.iron-stat-icon {
+  border-radius: 50%;
+  color: var(--ink);
+}
+.iron-hero {
+  border-color: var(--line);
+  min-height: 390px;
+}
+.iron-hero h2 {
+  font: 500 clamp(56px, 7.3vw, 94px)/1.02 var(--display);
+  text-transform: none;
+  letter-spacing: -3.6px;
+  margin: 27px 0 20px;
+}
+.iron-hero h2 em {
+  color: var(--ink);
+  font-style: italic;
+}
+.iron-hero-copy > .eyebrow {
+  color: var(--muted);
+}
+.iron-hero-copy > .eyebrow i {
+  background: var(--chart-blue);
+}
+.iron-hero p {
+  max-width: 320px;
+}
+.body-motif {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  height: 370px;
+}
+.body-motif svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+.body-guide {
+  fill: none;
+  stroke: var(--chart-gray);
+  stroke-width: 0.6;
+  stroke-dasharray: 2 7;
+  opacity: 0.65;
+}
+.body-current {
+  fill: rgb(125 143 168 / 0.045);
+  stroke: var(--ink);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.body-detail {
+  fill: none;
+  stroke: var(--chart-blue);
+  stroke-width: 0.8;
+}
+.body-baseline {
+  fill: none;
+  stroke: var(--chart-gray);
+  stroke-width: 1.2;
+  stroke-dasharray: 4 5;
+}
+.body-waist-guide {
+  fill: var(--ink);
+  stroke: var(--chart-blue);
+  stroke-width: 0.8;
+}
+.body-motif-caption {
+  position: absolute;
+  inset: auto 14% 0;
+  display: flex;
+  justify-content: space-between;
+  font: 8px var(--mono);
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+.iron-hero > .body-motif {
+  align-self: center;
+}
+.achievement-stamp {
+  position: absolute;
+  right: 10px;
+  bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 190px;
+  padding: 12px 15px;
+  color: var(--ink);
+  background: var(--bone);
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  font: 9px/1.5 var(--mono);
+}
+.achievement-stamp svg,
+.achievement-mark {
+  color: var(--gold);
+}
+.iron-next.panel {
+  --muted: #5e6776;
+  background: var(--panel);
+  background-image: var(--paper-grain);
+  color: var(--ink);
+  border-color: var(--line);
+}
+.iron-next .eyebrow,
+.iron-next-title small,
+.iron-next-title p,
+.iron-next-bottom > span {
+  color: var(--muted);
+}
+.iron-next h2,
+.iron-next-title > span {
+  color: var(--ink);
+}
+.iron-next-title > span {
+  font: 500 86px/0.9 var(--display);
+  transform: none;
+}
+.iron-next-title > span i {
+  color: var(--chart-blue);
+}
+.iron-next-title h3 {
+  font: 500 28px/1.2 var(--display);
+  text-transform: none;
+}
+.iron-next-bottom {
+  border-color: var(--line);
+}
+.iron-next-bottom > button {
+  background: var(--ink);
+  color: var(--bone);
+}
+.segmented,
+.iron-shell .segmented {
+  background: #e6e4dd;
+  border-color: var(--line);
+  border-radius: 9px;
+}
+.segmented button,
+.iron-shell .segmented button {
+  color: var(--ink);
+  border-radius: 6px;
+}
+.segmented button.active,
+.segmented button.selected,
+.iron-shell .segmented button.active,
+.iron-shell .segmented button.selected {
+  background: var(--ink);
+  color: var(--bone);
+}
+.iron-week-days span.done {
+  background: var(--ink);
+  color: var(--bone);
+}
+.focus-exercise-list button.selected,
+.iron-shell .focus-exercise-list button.selected,
+.quick-rir button[aria-pressed="true"],
+.iron-shell .quick-rir button[aria-pressed="true"] {
+  background: #e1e6eb;
+  color: var(--ink);
+  border-color: var(--chart-blue);
+}
+.focus-exercise-list button.selected small,
+.iron-shell .focus-exercise-list button.selected small {
+  color: var(--muted);
+}
+.iron-shell .focus-workout .quick-stepper,
+.quick-stepper {
+  background: var(--bone);
+  border-color: var(--line);
+}
+.iron-shell .focus-workout .quick-stepper button,
+.quick-stepper button {
+  background: #e6e8e8;
+  color: var(--ink);
+}
+.notice,
+.iron-shell .notice,
+.iron-shell .active-toolbar {
+  background: #e8e8e2;
+  border-color: var(--chart-gray);
+  color: var(--ink);
+}
+.toast,
+.iron-shell .toast {
+  background: var(--bone);
+  border-color: var(--line);
+  color: var(--ink);
+}
+.chart text {
+  fill: var(--muted);
+  font-family: var(--mono);
+}
+.body-progress.panel {
+  display: grid;
+  grid-template-columns: minmax(250px, 0.9fr) minmax(0, 1.15fr);
+  padding: 0;
+  overflow: hidden;
+}
+.body-progress-figure {
+  position: relative;
+  padding: 28px 24px 20px;
+  border-right: 1px solid var(--line);
+  background: var(--bone);
+}
+.body-progress-figure > .eyebrow {
+  display: block;
+  text-align: center;
+  font-size: 9px;
+}
+.body-progress .body-motif {
+  height: 355px;
+  margin: 12px 0;
+}
+.body-progress-legend {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  font: 10px var(--mono);
+  color: var(--muted);
+}
+.body-progress-legend span {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+}
+.body-progress-legend i {
+  width: 18px;
+  border-top: 1.5px solid var(--ink);
+}
+.body-progress-legend span + span i {
+  border-color: var(--chart-gray);
+  border-top-style: dashed;
+}
+.body-progress-copy {
+  padding: 38px 34px;
+  align-self: center;
+}
+.body-progress-copy > h2 {
+  font: 500 38px/1.1 var(--display) !important;
+  margin: 14px 0;
+  max-width: 300px;
+}
+.body-progress-copy > p {
+  max-width: 360px;
+}
+.body-measures {
+  margin-top: 28px;
+}
+.body-measure {
+  padding: 20px 0;
+  border-top: 1px solid var(--line);
+}
+.body-measure > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+  align-items: center;
+}
+.body-measure .text-button {
+  font-size: 11px;
+  min-height: 32px;
+}
+.body-measure > strong {
+  display: block;
+  font: 400 42px/1.2 var(--mono);
+  letter-spacing: -2px;
+  margin: 9px 0 4px;
+}
+.body-measure > strong small {
+  font-size: 15px;
+  letter-spacing: 0;
+  margin-left: 10px;
+  color: var(--muted);
+}
+.body-measure > p {
+  font-size: 10px;
+}
+.body-measure-change {
+  display: block;
+  font: 10px/1.8 var(--mono);
+  color: var(--ink);
+}
+.body-progress-note {
+  font-size: 10px !important;
+  line-height: 1.8;
+}
+.measurement-chart {
+  margin-top: 20px;
+  padding: 18px 24px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel);
+}
+.measurement-chart summary {
+  cursor: pointer;
+  min-height: 30px;
+  font-size: 12px;
+}
+.measurement-chart summary span {
+  margin-left: 8px;
+  color: var(--muted);
+}
+.exercise-visual.exercise-visual {
+  --anatomy-primary: #647c9b;
+  --anatomy-primary-light: #7d8fa8;
+  --anatomy-secondary: #8c877d;
+  --anatomy-secondary-light: #a39e93;
+  background: var(--panel);
+  color: var(--ink);
+  color-scheme: light;
+  border-color: var(--line);
+}
+.exercise-visual.exercise-visual button {
+  color: var(--ink);
+}
+.exercise-visual .visual-switch {
+  background: #e8e6df;
+  border-color: var(--line);
+}
+.exercise-visual .visual-switch button[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--bone);
+  box-shadow: none;
+}
+.exercise-visual > .anatomy-legend,
+.exercise-visual .anatomy-stage {
+  background: var(--bone);
+  color: var(--ink);
+  border-color: var(--line);
+}
+.exercise-visual .exercise-3d-stage,
+.exercise-visual .exercise-preview-poster {
+  background: var(--bone);
+}
+.exercise-visual .exercise-3d-badge,
+.exercise-visual .exercise-3d-hint,
+.exercise-visual .exercise-3d-loading {
+  background: #f2eee6e8;
+  color: var(--ink);
+}
+.exercise-visual .anatomy-muscles button {
+  background: #e2e7ec;
+  color: var(--ink);
+  border-color: var(--chart-blue);
+}
+.exercise-visual .anatomy-muscles.secondary button {
+  background: #e7e3da;
+  color: var(--ink);
+  border-color: var(--chart-gray);
+}
+.exercise-visual.exercise-visual .visual-play {
+  color: var(--bone);
+  background: var(--ink);
+}
+.exercise-visual.exercise-visual p.anatomy-explanation,
+.exercise-visual.exercise-visual p.visual-caption,
+.exercise-visual.exercise-visual .visual-instructions,
+.exercise-visual .visual-credits a {
+  color: var(--muted);
+}
+.exercise-guide-dialog,
+.exercise-guide-head {
+  background: var(--bone);
+  color: var(--ink);
+  border-color: var(--line);
+}
+.exercise-guide-head > span,
+.exercise-guide-head button,
+.exercise-visual .visual-preview-label {
+  color: var(--ink);
+}
+.exercise-guide-dialog::backdrop {
+  background: rgb(31 42 68 / 0.34);
+}
+.exercise-visual .anatomy-body {
+  stroke: var(--chart-gray);
+}
+.exercise-visual .anatomy-region,
+.exercise-visual .anatomy-seam {
+  stroke: var(--bone);
+}
+.exercise-visual .anatomy-region.is-selected {
+  stroke: var(--ink);
+  filter: none;
+}
+.exercise-visual .anatomy-shadow {
+  fill: #a39e93;
+  opacity: 0.12;
+}
+
+@media (max-width: 699px) {
+  .iron-wordmark {
+    font-size: 23px;
+  }
+  .iron-wordmark i {
+    font-size: 20px;
+  }
+  .iron-shell .page-heading h1,
+  .iron-page-heading h1 {
+    font-size: 39px;
+    letter-spacing: -1.5px;
+  }
+  .iron-hero {
+    min-height: 370px;
+    padding-top: 24px;
+  }
+  .iron-hero h2 {
+    font-size: 60px;
+    letter-spacing: -2.8px;
+    max-width: 80%;
+  }
+  .iron-hero p {
+    max-width: 58%;
+  }
+  .iron-hero > .body-motif {
+    position: absolute;
+    width: 59%;
+    height: 265px;
+    right: -21px;
+    bottom: 24px;
+    z-index: 1;
+  }
+  .iron-hero .body-motif-caption {
+    display: none;
+  }
+  .achievement-stamp {
+    right: 1px;
+    bottom: 4px;
+    font-size: 8px;
+    padding: 7px 9px;
+    max-width: 155px;
+  }
+  .iron-stats strong {
+    font-size: 30px;
+    letter-spacing: -1.5px;
+  }
+  .iron-stats strong span {
+    font-size: 15px;
+  }
+  .iron-section-head h2,
+  .iron-shell .panel h2,
+  .iron-shell .section-title h2 {
+    font-size: 26px;
+  }
+  .builder-heading h2 {
+    font-size: 35px;
+  }
+  .iron-shell .focus-exercise h2 {
+    font-size: 28px;
+  }
+  .body-progress.panel {
+    grid-template-columns: 1fr;
+  }
+  .body-progress-figure {
+    padding: 24px 18px 18px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .body-progress .body-motif {
+    height: 285px;
+  }
+  .body-progress-copy {
+    padding: 27px 24px;
+  }
+  .body-progress-copy > h2 {
+    font-size: 32px !important;
+  }
+  .body-measures {
+    margin-top: 22px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .body-measure > div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .body-measure > strong {
+    font-size: 31px;
+    letter-spacing: -1.5px;
+  }
+  .body-measure > strong small {
+    font-size: 12px;
+    margin-left: 5px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .body-motif * {
+    transition: none;
+  }
+}
+
+.day-picker button.active,
+.week-days .day-done,
+.set-done .set-check,
+.iron-habit-row.done .iron-habit-check,
+.iron-sleep button.selected {
+  background: var(--ink);
+  color: var(--bone);
+}
+.focus-reference strong,
+.strength-highlight strong {
+  font-family: var(--mono);
+  font-weight: 400;
+}
+
+.training-type-tabs > button.active {
+  background: var(--ink);
+  color: var(--bone);
+  border-color: var(--ink);
+}
+.training-type-tabs > button.active :is(span, small, svg) {
+  color: inherit;
+}
+.iron-week-days .done.today {
+  color: var(--bone);
+}
+.body-measure .text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}

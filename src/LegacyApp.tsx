@@ -204,8 +204,8 @@ function Chart({
           x2="0"
           y2="1"
         >
-          <stop offset="0%" stopColor="#c5ed88" stopOpacity=".17" />
-          <stop offset="100%" stopColor="#c5ed88" stopOpacity="0" />
+          <stop offset="0%" stopColor="#7D8FA8" stopOpacity=".17" />
+          <stop offset="100%" stopColor="#7D8FA8" stopOpacity="0" />
         </linearGradient>
       </defs>
       {[0, 0.5, 1].map((f) => (
@@ -215,7 +215,7 @@ function Chart({
             x2={W - 22}
             y1={top + f * (bottom - top)}
             y2={top + f * (bottom - top)}
-            stroke="#343a34"
+            stroke="#A39E93"
             strokeDasharray="3 6"
           />
           {!compact && (
@@ -234,7 +234,7 @@ function Chart({
           <polyline
             points={points}
             fill="none"
-            stroke="#c5ed88"
+            stroke="#7D8FA8"
             strokeWidth="2.5"
             strokeLinejoin="round"
           />
@@ -246,7 +246,7 @@ function Chart({
           cx={x(r.date)}
           cy={y(r.value)}
           r={sorted.length > 30 ? 2 : 4}
-          fill="#c5ed88"
+          fill="#7D8FA8"
         >
           <title>
             {dateLabel(r.date, true)}: {num(r.value)} {unit}
@@ -269,19 +269,19 @@ function WorkoutArt() {
     <svg className="workout-art" viewBox="0 0 400 320" aria-hidden="true">
       <defs>
         <radialGradient id="halo">
-          <stop stopColor="#b6d780" stopOpacity=".15" />
-          <stop offset="1" stopColor="#b6d780" stopOpacity="0" />
+          <stop stopColor="#7D8FA8" stopOpacity=".15" />
+          <stop offset="1" stopColor="#7D8FA8" stopOpacity="0" />
         </radialGradient>
       </defs>
       <circle cx="210" cy="165" r="170" fill="url(#halo)" />
-      <g fill="none" stroke="#aebc9b" strokeWidth="1" opacity=".25">
+      <g fill="none" stroke="#7D8FA8" strokeWidth="1" opacity=".25">
         <ellipse cx="210" cy="276" rx="145" ry="22" />
         <ellipse cx="210" cy="276" rx="120" ry="16" />
         <path d="M35 276H380M210 15V304M60 230L350 315M350 230L60 315" />
       </g>
       <g
         fill="none"
-        stroke="#c8dfa5"
+        stroke="#7D8FA8"
         strokeWidth="3"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -295,12 +295,12 @@ function WorkoutArt() {
           strokeWidth="9"
         />
       </g>
-      <g fill="#b5d98a" opacity=".6">
+      <g fill="#7D8FA8" opacity=".6">
         <circle cx="199" cy="133" r="5" />
         <circle cx="186" cy="199" r="5" />
         <circle cx="256" cy="202" r="5" />
       </g>
-      <text x="285" y="225" fill="#97a187" fontSize="10" letterSpacing="3">
+      <text x="285" y="225" fill="#7D8FA8" fontSize="10" letterSpacing="3">
         01 / 04
       </text>
     </svg>
@@ -745,7 +745,9 @@ export default function App() {
                     <h2>Podatki & zasebnost</h2>
                     <ShieldCheck size={18} />
                   </div>
-                  <p>Različica 0.4.0 · 3D prikazi in razširjena knjižnica vaj</p>
+                  <p>
+                    Različica 0.5.0 · Polnočna modra in kost · Napredek v obrisu
+                  </p>
                   <PwaUpdate
                     saved={storage === "Shranjeno v tej napravi"}
                     manual

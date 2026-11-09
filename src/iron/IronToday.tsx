@@ -11,6 +11,7 @@ import {
   Leaf,
   Play,
   ShieldCheck,
+  Trophy,
 } from "lucide-react";
 import { dateLabel, localDate, weekStart, type State } from "../model";
 import {
@@ -18,7 +19,7 @@ import {
   trainingDescriptions,
   nextTrainingSuggestion,
 } from "../training";
-import { MotionSculpture } from "./MotionSculpture";
+import { BodyMotif } from "../BodyMotif";
 import { HabitRows, habitCount } from "./IronHabits";
 
 export function IronMark({ size = 48 }: { size?: number }) {
@@ -34,11 +35,11 @@ export function IronMark({ size = 48 }: { size?: number }) {
       <rect width="48" height="48" rx="11" fill="currentColor" />
       <path
         d="M9 35V13h6l9 13 9-13h6v22h-7V25l-8 11-8-11v10H9Z"
-        fill="#e5e8e8"
+        fill="#F2EEE6"
       />
       <path
         d="M33 39h6"
-        stroke="#d49a71"
+        stroke="#7D8FA8"
         strokeWidth="3"
         strokeLinecap="round"
       />
@@ -120,15 +121,18 @@ export function IronToday({
             <ArrowRight size={18} />
           </button>
         </div>
-        <MotionSculpture />
-        <div className="iron-stamp" aria-hidden="true">
-          <ArrowUpRight size={25} />
-          <span>
-            MOČ JE
-            <br />
-            DOLGA IGRA.
-          </span>
-        </div>
+        <BodyMotif />
+        {(state.profile.weeklyGoal ?? 0) > 0 &&
+          workouts.length >= (state.profile.weeklyGoal ?? 0) && (
+            <div className="achievement-stamp" role="status">
+              <Trophy size={22} />
+              <span>
+                TEDENSKI CILJ
+                <br />
+                DOSEŽEN
+              </span>
+            </div>
+          )}
         <span className="iron-hero-edge">MOČ / NAVADE / ŽIVLJENJE</span>
       </section>
       <div className="iron-stats">

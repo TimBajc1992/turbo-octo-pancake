@@ -77,9 +77,9 @@ export function MuscleMap({
       </desc>
       <defs>
         <linearGradient id={`${id}-body`} x1="0" x2="1">
-          <stop stopColor="#303f48" />
-          <stop offset=".45" stopColor="#52636b" />
-          <stop offset="1" stopColor="#293740" />
+          <stop stopColor="#D2D5D8" />
+          <stop offset=".45" stopColor="#C3CBD4" />
+          <stop offset="1" stopColor="#B8C1CB" />
         </linearGradient>
         <linearGradient id={`${id}-primary`} x1="0" y1="0" x2="1" y2="1">
           <stop stopColor="var(--anatomy-primary-light)" />
@@ -129,7 +129,7 @@ export function MuscleMap({
                   data-muscle={region}
                   data-activation={role}
                   className={`anatomy-region ${selected === region ? "is-selected" : ""}`}
-                  fill={role === "rest" ? "#52636b" : `url(#${id}-${role})`}
+                  fill={role === "rest" ? "#C3CBD4" : `url(#${id}-${role})`}
                 />
               );
             }),

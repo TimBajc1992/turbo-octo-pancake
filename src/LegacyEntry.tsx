@@ -1,13 +1,14 @@
 import App from "./LegacyApp";
 import "./style.css";
+import "./midnight-bone.css";
 export default function LegacyEntry() {
   return (
     <>
       <aside
         style={{
           padding: "10px 20px",
-          background: "#313936",
-          color: "#fff",
+          background: "#1F2A44",
+          color: "#F2EEE6",
           fontSize: 12,
           position: "relative",
           zIndex: 100,
