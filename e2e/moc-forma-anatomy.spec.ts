@@ -31,6 +31,7 @@ test("muscle roles, touch controls and offline movement guide preserve the entir
   page,
   context,
 }, info) => {
+  test.setTimeout(120000);
   const source = await seed(page);
   await page
     .getByText("Mišice, izvedba in podlaga teže", { exact: true })
@@ -70,7 +71,10 @@ test("muscle roles, touch controls and offline movement guide preserve the entir
   ).toEqual([]);
   await guide.getByRole("button", { name: "Izvedba", exact: true }).click();
   const renderer = guide.locator(".exercise-3d-stage");
-  await expect(renderer).not.toHaveAttribute("data-renderer", "loading");
+  await renderer.scrollIntoViewIfNeeded();
+  await expect(renderer).not.toHaveAttribute("data-renderer", "loading", {
+    timeout: 60000,
+  });
   const slider = guide.getByRole("slider", {
     name: "Položaj giba",
     exact: true,

@@ -1,0 +1,28 @@
+{
+  "source": "Original AI-generated anatomical surface for Moč & Forma",
+  "created": "2026-11-10",
+  "method": "Image generation on an original front/back rest-pose render of the existing CC0 athlete. A fully clothed medical training mannequin with an opaque anatomical-print surface and dark shorts; no third-party reference pixels were used.",
+  "base_model": {
+    "file": "athlete-optimized.glb",
+    "license": "CC0-1.0",
+    "sha256": "675623b52541b598639622db2e2a88fe3a69a1db1404e21cee3a444c78c1bf69",
+    "unchanged": true
+  },
+  "output": {
+    "file": "anatomy-atlas.png",
+    "width": 1586,
+    "height": 992,
+    "bytes": 908942,
+    "sha256": "02c575efe77765885eb8f56d54081bae79cb7fbe3dae141890bd8b62ebab4cfc"
+  },
+  "projection": {
+    "space": "Rest-space _anatomy coordinates carried through skinning",
+    "layout": "Front left, back right; transparent background",
+    "world_x": [-0.78, 0.78],
+    "world_y": [-0.08, 1.87],
+    "front_uv": "u=(x+0.78)/1.56*0.5; v=(y+0.08)/1.95",
+    "back_uv": "u=0.5+(1-(x+0.78)/1.56)*0.5; v=(y+0.08)/1.95"
+  },
+  "use": "Illustrative muscle fibres and fascia. Active muscle areas are selected by the existing anatomy map, not inferred from image colours. Not individual medical imaging or a body composition estimate.",
+  "posters": "All 131 exercise posters and body-anatomy.webp are rendered from the same scene and surface by scripts/render-exercise-posters.mjs with POSTER_WITH_BODY=1."
+}

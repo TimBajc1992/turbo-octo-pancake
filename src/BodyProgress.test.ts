@@ -1,9 +1,21 @@
 import { describe, expect, it } from "vitest";
 import { bodyProgress } from "./BodyProgress";
-import { bodyOutline, bodyPoint } from "./BodyMotif";
+import { bodyPoint } from "./body-shape";
 import type { Measurement } from "./model";
 
 describe("measurement-based body outline", () => {
+  it("keeps the contour ordered even when weight and waist change in opposite directions", () => {
+    for (const weight of [0.1, 0.56, 1, 1.8, 5])
+      for (const waist of [0.3, 0.7, 1, 1.35, 3]) {
+        let previous = -Infinity;
+        for (let x = 0; x <= 360; x++) {
+          const [next, y] = bodyPoint(x, 176, waist, weight);
+          expect(next).toBeGreaterThan(previous);
+          expect(y).toBe(176);
+          previous = next;
+        }
+      }
+  });
   it("uses recorded waist measurements in date order without changing the source", () => {
     const rows: Measurement[] = [
       { id: "later", date: "2026-11-08", kind: "waist", value: 90 },
@@ -31,7 +43,6 @@ describe("measurement-based body outline", () => {
       hasComparison: true,
       waist: undefined,
     });
-    expect(bodyOutline(undefined, 0.8)).not.toEqual(bodyOutline());
     expect(bodyPoint(215, 140, undefined, 0.8)[0]).toBeLessThan(215);
     expect(bodyPoint(215, 140, undefined, 1.2)[0]).toBeGreaterThan(215);
     expect(bodyPoint(200, 40, undefined, 0.8)).toEqual([200, 40]);
@@ -53,7 +64,9 @@ describe("measurement-based body outline", () => {
     expect(bodyPoint(215, 140, undefined, p.weightRatio)[0]).toBeGreaterThan(
       215,
     );
-    expect(bodyOutline(p.ratio, p.weightRatio)).not.toContain("NaN");
+    expect(
+      Number.isFinite(bodyPoint(210, 176, p.ratio, p.weightRatio)[0]),
+    ).toBe(true);
   });
   it("keeps a single waist measurement as the baseline and excludes invalid values", () => {
     const p = bodyProgress([

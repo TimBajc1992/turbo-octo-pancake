@@ -1,6 +1,6 @@
 # Prikaz mišic in izvedbe
 
-Nadgradnja nadaljuje Moč & Formo iz `main` (`924809e`). Referenca so uporabnikovi posnetki MyFitCoach. Prvotni shematski 2D prikaz je zamenjan z dejanskim skinned 3D modelom, izvirno opremo ter vijoličnimi glavnimi in zlatimi pomožnimi mišicami. Slike, modeli in animacije MyFitCoach niso uporabljeni.
+Prvotni shematski 2D prikaz je zamenjan z dejanskim skinned 3D modelom in izvirno opremo. Različica 0.6.0 nadaljuje objavljeno 0.5.0 (`d8b49a2`) ter po uporabnikovih referencah doda podrobno mišično površino, steklast zunanji sloj in oranžen poudarek glavnih mišic. Pomožne mišice so umirjeno rožnate. Slike, modeli in animacije MyFitCoach ali Glass Anatomy niso uporabljeni; lastna mišična tekstura je generirana na izrisu obstoječega modela. Podrobnosti so v [glass-anatomy.md](glass-anatomy.md).
 
 ## Uporaba
 

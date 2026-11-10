@@ -1,6 +1,7 @@
 import { BodyMotif } from "./BodyMotif";
 import { dateLabel, num, type Measurement } from "./model";
 import { ArrowUpRight } from "lucide-react";
+import { useState } from "react";
 
 export function bodyProgress(measurements: Measurement[]) {
   const rows = measurements
@@ -31,30 +32,40 @@ export function BodyProgress({
   measure: (kind: "weight" | "waist") => void;
 }) {
   const p = bodyProgress(measurements);
+  const [baseline, setBaseline] = useState(false);
   return (
     <section className="body-progress panel" aria-label="Telo in tvoje meritve">
       <div className="body-progress-figure">
-        <span className="eyebrow">TVOJA ZGODBA V OBRISU</span>
+        <span className="eyebrow">TELO SKOZI ČAS</span>
         <BodyMotif
-          ratio={p.hasWaistComparison ? p.ratio : undefined}
-          weightRatio={p.weightRatio}
+          ratio={p.hasWaistComparison ? (baseline ? 1 : p.ratio) : undefined}
+          weightRatio={baseline ? 1 : p.weightRatio}
           comparison={p.hasComparison}
+          interactive
         />
         <div className="body-progress-legend">
-          <span>
+          <button
+            type="button"
+            aria-pressed={!baseline}
+            onClick={() => setBaseline(false)}
+          >
             <i />
             Zdaj
-          </span>
+          </button>
           {p.hasComparison && (
-            <span>
+            <button
+              type="button"
+              aria-pressed={baseline}
+              onClick={() => setBaseline(true)}
+            >
               <i />
               Izhodišče
-            </span>
+            </button>
           )}
         </div>
       </div>
       <div className="body-progress-copy">
-        <span className="eyebrow">MAJHNE SPREMEMBE. TVOJ RITEM.</span>
+        <span className="eyebrow">ZADNJE MERITVE. TVOJ RITEM.</span>
         <h2>Napredek dobi obliko.</h2>
         <p>
           Meritve se spreminjajo. Vse, kar zabeležiš, ostane del tvoje zgodbe.
@@ -100,10 +111,10 @@ export function BodyProgress({
         <p className="body-progress-note">
           {p.hasComparison
             ? p.hasWaistComparison && p.hasWeightComparison
-              ? "Shematski obris sledi spremembam telesne teže in obsega pasu."
+              ? "Anatomski prikaz ponazarja spremembe teže in obsega pasu."
               : p.hasWeightComparison
-                ? "Shematski obris sledi spremembi telesne teže."
-                : "Shematski obris sledi spremembi obsega pasu."
+                ? "Anatomski prikaz ponazarja spremembo telesne teže."
+                : "Anatomski prikaz ponazarja spremembo obsega pasu."
             : "Zabeleži težo ali obseg pasu za primerjavo obrisa skozi čas."}
         </p>
       </div>

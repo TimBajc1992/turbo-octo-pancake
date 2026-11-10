@@ -28,6 +28,11 @@ try {
     { timeout: 30000 },
   );
   const exercises = await page.evaluate(() => window.exercises);
+  if (process.env.POSTER_WITH_BODY === "1") {
+    const body = await page.evaluate(() => window.renderBodyPoster());
+    await writeFile("src/assets/body-anatomy.webp", Buffer.from(body,"base64"));
+    console.log("Rendered the matching anatomical body poster.");
+  }
   await mkdir("src/assets/exercise-previews", { recursive: true });
   let rendered = 0;
   for (const [i, exercise] of exercises.entries()) {

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="sl">
+  <meta charset="utf-8" /><title>Podlaga anatomskega materiala</title
+  ><style>
+    html,
+    body {
+      margin: 0;
+      background: transparent;
+    }
+    #stage {
+      width: 720px;
+      height: 900px;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+  <div id="stage"></div>
+  <script type="module">
+    import { BodyScene } from "../../src/exercise3d/body-scene";
+    import { Athlete, athleteModel } from "../../src/exercise3d/rig";
+    const viewer = new BodyScene(document.querySelector("#stage"), true);
+    await viewer.ready;
+    viewer.scene.remove(viewer.athlete.group);
+    viewer.athlete.dispose();
+    viewer.athlete = new Athlete(await athleteModel());
+    viewer.scene.add(viewer.athlete.group);
+    viewer.floor.visible = false;
+    viewer.renderer.setSize(1440, 900, false);
+    viewer.renderer.autoClear = false;
+    viewer.renderer.setScissorTest(true);
+    viewer.camera.left = -0.78;
+    viewer.camera.right = 0.78;
+    viewer.camera.top = 0.975;
+    viewer.camera.bottom = -0.975;
+    viewer.camera.updateProjectionMatrix();
+    for (const [index, z] of [
+      [0, 4.8],
+      [1, -4.8],
+    ]) {
+      viewer.camera.position.set(0, 0.895, z);
+      viewer.camera.lookAt(0, 0.895, 0);
+      viewer.renderer.setViewport(index * 720, 0, 720, 900);
+      viewer.renderer.setScissor(index * 720, 0, 720, 900);
+      viewer.renderer.clear();
+      viewer.renderer.render(viewer.scene, viewer.camera);
+    }
+    window.atlas = viewer.renderer.domElement
+      .toDataURL("image/png")
+      .split(",")[1];
+  </script>
+</html>

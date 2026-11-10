@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="sl">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="robots" content="noindex" />
+    <title>Moč & Forma · Anatomski model</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #f2eee6;
+        color: #1f2a44;
+        font: 14px/1.5 system-ui;
+      }
+      main {
+        max-width: 1000px;
+        margin: auto;
+        padding: 26px 22px 40px;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid #d7d1c6;
+        padding-bottom: 18px;
+        gap: 20px;
+      }
+      header strong {
+        font: 24px Georgia;
+      }
+      header small {
+        font: 10px monospace;
+        text-align: right;
+      }
+      h1 {
+        font: 42px/1.1 Georgia;
+        margin: 30px 0 10px;
+      }
+      p {
+        color: #5e6776;
+      }
+      nav {
+        display: flex;
+        gap: 8px;
+        margin: 24px 0 16px;
+      }
+      button {
+        font: inherit;
+        cursor: pointer;
+        color: #1f2a44;
+        background: transparent;
+        border: 1px solid #a39e93;
+        border-radius: 7px;
+        padding: 11px 17px;
+      }
+      button[aria-pressed="true"] {
+        color: #f2eee6;
+        background: #1f2a44;
+        border-color: #1f2a44;
+      }
+      .viewer {
+        padding-top: 76px;
+        max-width: 760px;
+        margin: auto;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #52677d;
+        position: relative;
+      }
+      #stage {
+        height: 570px;
+        position: relative;
+      }
+      #stage canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        touch-action: none;
+      }
+      .label {
+        position: absolute;
+        z-index: 2;
+        top: 20px;
+        left: 23px;
+        color: #e9ebed;
+        pointer-events: none;
+      }
+      .label small {
+        font: 10px monospace;
+        letter-spacing: 1.5px;
+      }
+      .label h2 {
+        font: 30px Georgia;
+        margin: 4px 0;
+      }
+      .controls {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        padding: 16px 4px;
+        flex-wrap: wrap;
+      }
+      .controls input {
+        flex: 1;
+        min-width: 120px;
+        accent-color: #1f2a44;
+      }
+      .legend {
+        display: flex;
+        gap: 24px;
+        font: 11px monospace;
+        align-items: center;
+      }
+      .legend i {
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        background: #ff754b;
+        border-radius: 50%;
+        margin-right: 8px;
+      }
+      .legend span + span i {
+        background: #ca9488;
+      }
+      footer {
+        font: 10px/1.7 monospace;
+        color: #5e6776;
+        border-top: 1px solid #d7d1c6;
+        padding-top: 20px;
+        margin-top: 20px;
+      }
+      button:focus-visible,
+      input:focus-visible {
+        outline: 2px solid #1f2a44;
+        outline-offset: 3px;
+      }
+      @media (max-width: 600px) {
+        main {
+          padding: 20px 16px 30px;
+        }
+        h1 {
+          font-size: 35px;
+        }
+        #stage {
+          height: 470px;
+        }
+        nav button {
+          flex: 1;
+          padding: 10px 8px;
+        }
+        .label h2 {
+          font-size: 23px;
+        }
+        .legend {
+          font-size: 10px;
+          gap: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <strong>MOČ & FORMA ↗</strong
+        ><small>OBLIKOVNI PREDOGLED<br />BREZ OSEBNIH PODATKOV</small>
+      </header>
+      <h1>Anatomija v gibanju.</h1>
+      <p>Isti anatomski model za pogled napredka in prikaz izvedbe vaj.</p>
+      <nav aria-label="Izberi prikaz">
+        <button data-mode="body" aria-pressed="true">Postava</button
+        ><button data-mode="shoulders" aria-pressed="false">Ramena</button
+        ><button data-mode="chest" aria-pressed="false">Prsi</button>
+      </nav>
+      <div class="viewer">
+        <div class="label">
+          <small id="eyebrow">TVOJ NAPREDEK</small>
+          <h2 id="title">Anatomski model telesa</h2>
+        </div>
+        <div id="stage"></div>
+      </div>
+      <div class="controls">
+        <button id="play" type="button">Predvajaj</button
+        ><label for="phase" id="phase-label">Položaj giba</label
+        ><input
+          id="phase"
+          type="range"
+          min="0"
+          max="100"
+          value="40"
+          aria-label="Položaj giba"
+        />
+      </div>
+      <div class="legend">
+        <span><i></i>Glavne mišice</span><span><i></i>Pomožne mišice</span>
+      </div>
+      <footer>
+        Predogled uporablja prikazni model. Ne bere ali spreminja treningov,
+        meritev ali povezave naprav.
+      </footer>
+    </main>
+    <script type="module">
+      import { ExerciseScene } from "../../src/exercise3d/scene";
+      import { byId } from "../../src/exerciseCatalog";
+      import rig from "../../src/assets/athlete-rig.json";
+      const stage = document.querySelector("#stage");
+      const viewer = new ExerciseScene(stage, byId("dumbbell_shoulder_press"));
+      let mode = "body",
+        playing = false,
+        phase = 0.4,
+        last = 0;
+      await viewer.ready;
+      window.viewer = viewer;
+      const camera = (y, span, x = 0.8) => {
+        const aspect = stage.clientWidth / stage.clientHeight;
+        viewer.camera.left = -span * aspect;
+        viewer.camera.right = span * aspect;
+        viewer.camera.top = span;
+        viewer.camera.bottom = -span;
+        viewer.camera.position.set(x, y + 0.25, 4.8);
+        viewer.controls.target.set(0, y, 0);
+        viewer.camera.updateProjectionMatrix();
+        viewer.controls.update();
+      };
+      const labels = {
+        body: ["TVOJ NAPREDEK", "Anatomski model telesa"],
+        shoulders: ["IZVEDBA VAJE", "Potisk ročk nad glavo"],
+        chest: ["IZVEDBA VAJE", "Potisk ročk na klopi"],
+      };
+      window.renderPreview = async (next, position = 0.4) => {
+        playing = false;
+        mode = next;
+        phase = position;
+        document.querySelector("#play").textContent = "Predvajaj";
+        document
+          .querySelectorAll("[data-mode]")
+          .forEach((b) =>
+            b.setAttribute("aria-pressed", String(b.dataset.mode === mode)),
+          );
+        const [eyebrow, title] = labels[mode];
+        document.querySelector("#eyebrow").textContent = eyebrow;
+        document.querySelector("#title").textContent = title;
+        document.querySelector(".controls").style.visibility =
+          mode === "body" ? "hidden" : "visible";
+        document.querySelector(".legend").style.visibility =
+          mode === "body" ? "hidden" : "visible";
+        await viewer.changeExercise(
+          byId(
+            mode === "chest"
+              ? "dumbbell_bench_press"
+              : "dumbbell_shoulder_press",
+          ),
+          position,
+        );
+        if (mode === "body") {
+          viewer.equipment.group.visible = false;
+          viewer.athlete.highlight({ primary: [], secondary: [] });
+          viewer.athlete.pose({
+            family: "squat",
+            hip: rig.bones.root.head,
+            lean: 0,
+            spineBend: 0,
+            footPitch: 0,
+            hands: [
+              [0.32, 0.91, 0.035],
+              [-0.32, 0.91, 0.035],
+            ],
+            elbows: [
+              [0.45, 1.2, -0.06],
+              [-0.45, 1.2, -0.06],
+            ],
+            feet: [rig.bones.foot_L.head, rig.bones.foot_R.head],
+            knees: [
+              [0.16, 0.5, 0.3],
+              [-0.16, 0.5, 0.3],
+            ],
+          });
+          camera(0.91, 1.02, 0.45);
+        } else if (mode === "shoulders") camera(0.84, 1.07, 0.75);
+        else camera(0.61, 0.95, 2.1);
+        viewer.render();
+        document.querySelector("#phase").value = String(
+          Math.round(position * 100),
+        );
+        return true;
+      };
+      document
+        .querySelectorAll("[data-mode]")
+        .forEach(
+          (b) => (b.onclick = () => window.renderPreview(b.dataset.mode)),
+        );
+      document.querySelector("#phase").oninput = (e) => {
+        playing = false;
+        viewer.setProgress(Number(e.target.value) / 100);
+      };
+      document.querySelector("#play").onclick = () => {
+        playing = !playing;
+        document.querySelector("#play").textContent = playing
+          ? "Premor"
+          : "Predvajaj";
+      };
+      const animate = (time) => {
+        if (playing) {
+          if (time - last > 70) {
+            phase = (time % 5000) / 5000;
+            const p = (1 - Math.cos(phase * Math.PI * 2)) / 2;
+            viewer.setProgress(p);
+            document.querySelector("#phase").value = String(
+              Math.round(p * 100),
+            );
+            last = time;
+          }
+        }
+        requestAnimationFrame(animate);
+      };
+      requestAnimationFrame(animate);
+      await window.renderPreview("body");
+      window.previewReady = true;
+    </script>
+  </body>
+</html>

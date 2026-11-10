@@ -318,8 +318,25 @@ export function motionFor(
       );
       if (sitting) seated();
       const offset = sitting ? -0.37 : 0;
-      frame.hands = pair(lerp(0.33, 0.22, t), lerp(1.4, 1.94, t) + offset, 0.1);
-      frame.elbows = pair(0.6, 1.15 + offset, -0.12);
+      const shoulderHeightGrip = [
+        "dumbbell_shoulder_press",
+        "neutral_dumbbell_shoulder_press",
+        "standing_dumbbell_press",
+      ].includes(c.id);
+      frame.hands = pair(
+        lerp(shoulderHeightGrip ? 0.38 : 0.33, 0.22, t),
+        lerp(
+          shoulderHeightGrip ? 1.66 : 1.4,
+          shoulderHeightGrip ? 1.99 : 1.94,
+          t,
+        ) + offset,
+        0.1,
+      );
+      frame.elbows = pair(
+        0.6,
+        (shoulderHeightGrip ? 1.4 : 1.15) + offset,
+        -0.12,
+      );
       if (c.id === "arnold_press") {
         frame.hands = pair(
           lerp(0.15, 0.22, t),
