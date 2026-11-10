@@ -8,9 +8,9 @@
 
 Naslov ostaja https://timbajc1992.github.io/turbo-octo-pancake/. Safari in aplikacija, dodana na začetni zaslon, lahko uporabljata ločeni shrambi; za prvi prehod uporabi tisto obstoječo namestitev, v kateri je tvoja zgodovina. Aplikacije ne odstranjuj in ne briši podatkov brskalnika. V nastavitvah lahko izvoziš trenutno celotno varnostno kopijo ali lokalno kopijo pred prenovo. Če uporabljaš več naprav, ostane na voljo ista šifrirana povezava s Cloudflarom.
 
-## Nova podoba in obris napredka
+## Anatomski prikaz napredka
 
-Različica 0.5.0 uporablja kostno belo in polnočno modro. Zlati znak se pokaže ob doseženem tedenskem cilju. V **Napredek** vidiš zadnjo težo in pas ter primerjavo obrisa iz dejanskih meritev: teža spreminja splošni volumen, obseg posebej prilagodi pas. Obris je shematski; ne ocenjuje mišic ali maščobe. Za dosedanji graf odpri **Podroben graf meritev**. Meritve in zgodovina ostanejo shranjene.
+Različica 0.6.0 ohranja kostno belo in polnočno modro. Zlati znak se pokaže ob doseženem tedenskem cilju. V **Napredek** vidiš anatomski model ter zadnjo težo in pas: teža spreminja splošni volumen, obseg posebej prilagodi pas. Gumba **Zdaj / Izhodišče** preklopita primerjavo; telo lahko zavrtiš s potegom. Prikaz je shematski; ne ocenjuje mišic ali maščobe. Za dosedanji graf odpri **Podroben graf meritev**. Meritve in zgodovina ostanejo shranjene.
 
 ## Priprava nove vadbe
 
@@ -24,7 +24,7 @@ Različica 0.5.0 uporablja kostno belo in polnočno modro. Zlati znak se pokaže
 
 Knjižnica vsebuje 132 vaj in različic s palico, ročkami, drogom/bradljo, napravami, kabli in lastno težo. Dotakni se slike vaje, da odpreš njen prikaz; sam ogled ne doda vaje v trening. **Predvajaj** začne animacijo, drsnik spreminja položaj, poteg ali gumba Levo/Desno pa obračata pogled.
 
-Vijolična označuje glavne, zlata pomožne mišice. Dotik imena poudari predel in pokaže razlago. Zavihek **Mišice** ohranja zemljevid od spredaj in zadaj. Če brskalnik ne more odpreti 3D, ostaneta shranjena slika in zemljevid. Splošna nedoločena naprava za trup najprej potrebuje točen gib.
+Oranžen svetlobni poudarek označuje glavne, umirjeno rožnata pomožne mišice. Podrobna mišična površina in steklast sloj sta uporabljena pri vseh določenih izvedbah in pri napredku. Dotik imena poudari predel in pokaže razlago. Zavihek **Mišice** ohranja zemljevid od spredaj in zadaj. Če brskalnik ne more odpreti 3D, ostaneta shranjena slika in zemljevid. Splošna nedoločena naprava za trup najprej potrebuje točen gib.
 
 Med hitro vadbo je prikaz v podrobnostih **Mišice, izvedba in podlaga teže**. Osnovni pogled še vedno pokaže eno vajo in naslednjo serijo. Nova grafika ne preimenuje starih vaj ali spremeni shranjenih kilogramov.
 
