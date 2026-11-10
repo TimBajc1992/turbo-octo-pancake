@@ -1,5 +1,7 @@
 # Polnočna modra in kost
 
+To je opis izdaje 0.5.0. Različica 0.6.0 ohranja to temo ter obris nadomesti z anatomskim modelom; spremembe in povezava z meritvami so opisane v [glass-anatomy.md](glass-anatomy.md).
+
 Različica 0.5.0 uporablja kostno belo ozadje `#F2EEE6`, črnilno modro `#1F2A44` in matirane površine z nežno papirnato teksturo. Brez senc in kovinskih prelivov. Naslovi uporabljajo serif Georgia, številke meritev in obremenitev lokalno vključeno pisavo IBM Plex Mono. Tudi prikaz vaj, obrazci, starejši vmesnik, ikona in zaslon posodobitve sledijo svetli podobi.
 
 Zlata `#B08D57` je omejena na znak doseženega tedenskega cilja: pokaže se, ko je v tekočem tednu opravljenih vsaj toliko vadb z zabeleženo serijo, kot določa že shranjeni tedenski cilj. Navigacija, gumbi, splošna motivacija in mišice je ne uporabljajo. Grafi in anatomija uporabljajo prašno modro `#7D8FA8` ter toplo sivo `#A39E93`, besedilo pa temnejši ton za berljivost.

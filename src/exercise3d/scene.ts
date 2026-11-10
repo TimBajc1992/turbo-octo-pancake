@@ -1,10 +1,16 @@
 import * as T from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import type { Candidate } from "../exerciseCatalog";
 import { anatomyForExercise, type MuscleRegion } from "../exerciseAnatomy";
 import { athleteModel, Athlete } from "./rig";
 import { Equipment } from "./equipment";
 import { exerciseFamily, motionFor, type ExerciseFamily } from "./motions";
+import { neutralBodyPose } from "./body-pose";
 
 export class ExerciseScene {
   readonly renderer: T.WebGLRenderer;
@@ -13,6 +19,10 @@ export class ExerciseScene {
   readonly camera: T.OrthographicCamera;
   readonly controls: OrbitControls;
   private athlete?: Athlete;
+  private baseline?: Athlete;
+  private bodyWaist?: number;
+  private bodyWeight = 1;
+  private compareBody = false;
   private equipment?: Equipment;
   private family: ExerciseFamily;
   private exercise: Candidate;
@@ -23,11 +33,14 @@ export class ExerciseScene {
   private progress = 0;
   private selected?: MuscleRegion;
   private floor: T.Mesh;
+  private studio: T.Texture;
+  private composer?: EffectComposer;
   private onChange = () => this.render();
 
   constructor(
     private container: HTMLElement,
     exercise: Candidate,
+    private options: { body?: boolean; transparent?: boolean } = {},
   ) {
     const family = exerciseFamily(exercise);
     if (!family) throw new Error("Ta naprava potrebuje določeno izvedbo.");
@@ -35,17 +48,23 @@ export class ExerciseScene {
     this.exercise = exercise;
     this.renderer = new T.WebGLRenderer({
       antialias: true,
-      alpha: false,
+      alpha: options.transparent ?? false,
       preserveDrawingBuffer: true,
       powerPreference: "low-power",
     });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
-    this.renderer.setClearColor("#F2EEE6");
+    this.renderer.setClearColor("#52677D", options.transparent ? 0 : 1);
     this.renderer.outputColorSpace = T.SRGBColorSpace;
     this.renderer.toneMapping = T.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.05;
+    this.renderer.toneMappingExposure = 0.9;
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = T.PCFSoftShadowMap;
+    const room = new RoomEnvironment();
+    const pmrem = new T.PMREMGenerator(this.renderer);
+    this.studio = pmrem.fromScene(room, 0.04).texture;
+    this.scene.environment = this.studio;
+    pmrem.dispose();
+    room.dispose();
     this.renderer.domElement.setAttribute("aria-hidden", "true");
     this.renderer.domElement.className = "exercise-3d-canvas";
     container.append(this.renderer.domElement);
@@ -58,8 +77,19 @@ export class ExerciseScene {
     this.controls.minPolarAngle = 0.3;
     this.controls.maxPolarAngle = Math.PI / 2 - 0.03;
     this.controls.addEventListener("change", this.onChange);
-    this.scene.add(new T.HemisphereLight("#f0edf5", "#39303a", 1.05));
-    const key = new T.DirectionalLight("#ffe8d6", 2.6);
+    if (
+      !options.body &&
+      this.renderer.extensions.has("EXT_color_buffer_float")
+    ) {
+      this.composer = new EffectComposer(this.renderer);
+      this.composer.addPass(new RenderPass(this.scene, this.camera));
+      this.composer.addPass(
+        new UnrealBloomPass(new T.Vector2(480, 480), 0.32, 0.35, 0.75),
+      );
+      this.composer.addPass(new OutputPass());
+    }
+    this.scene.add(new T.HemisphereLight("#f0edf5", "#39303a", 0.65));
+    const key = new T.DirectionalLight("#ffe8d6", 1.5);
     key.position.set(-2.7, 4, 4);
     key.castShadow = true;
     key.shadow.mapSize.set(1024, 1024);
@@ -67,10 +97,10 @@ export class ExerciseScene {
     key.shadow.camera.right = key.shadow.camera.top = 2.2;
     key.shadow.normalBias = 0.018;
     this.scene.add(key);
-    const rim = new T.DirectionalLight("#b9c7ef", 1.5);
+    const rim = new T.DirectionalLight("#b9c7ef", 1.0);
     rim.position.set(2, 3, -3);
     this.scene.add(rim);
-    const fill = new T.DirectionalLight("#e5e0ff", 0.6);
+    const fill = new T.DirectionalLight("#e5e0ff", 0.3);
     fill.position.set(3, 1.4, 2);
     this.scene.add(fill);
     this.floor = new T.Mesh(
@@ -98,8 +128,18 @@ export class ExerciseScene {
       this.athlete = new Athlete(model);
       this.scene.add(this.athlete.group);
     }
-    this.equipment = new Equipment(this.exercise, this.family, this.athlete);
-    this.scene.add(this.equipment.group);
+    if (this.options.body) {
+      if (!this.baseline) {
+        this.baseline = new Athlete(model, true);
+        this.baseline.pose(neutralBodyPose());
+        this.scene.add(this.baseline.group);
+      }
+      this.baseline.group.visible = this.compareBody;
+      this.athlete.bodyShape(this.bodyWaist, this.bodyWeight);
+    } else {
+      this.equipment = new Equipment(this.exercise, this.family, this.athlete);
+      this.scene.add(this.equipment.group);
+    }
     this.setProgress(this.progress);
     this.highlight(this.selected);
     // Retain the existing shader programs until the replacement has acquired
@@ -127,6 +167,20 @@ export class ExerciseScene {
     this.render();
   }
   private setCamera() {
+    if (this.options.body) {
+      this.controls.target.set(0, 0.895, 0);
+      this.camera.position.set(0.45, 1.095, 4.8);
+      this.controls.minZoom = 0.85;
+      this.controls.maxZoom = 2.2;
+      this.controls.update();
+      return;
+    }
+    if (this.seatedDumbbellPress()) {
+      this.controls.target.set(0, 0.83, 0);
+      this.camera.position.set(0.8, 1.03, 4.8);
+      this.controls.update();
+      return;
+    }
     const low = [
       "bench",
       "bench-fly",
@@ -150,6 +204,7 @@ export class ExerciseScene {
     const targetY = low ? 0.54 : seated ? 0.92 : 1.08;
     this.controls.target.set(0, targetY, 0.08);
     this.camera.position.set(3.0, targetY + 1.0, 4.4);
+    if (low) this.camera.position.set(2.8, targetY + 2.2, 3.8);
     if (
       [
         "row",
@@ -180,6 +235,7 @@ export class ExerciseScene {
     const width = Math.max(1, this.container.clientWidth),
       height = Math.max(1, this.container.clientHeight);
     this.renderer.setSize(width, height, false);
+    this.composer?.setSize(width, height);
     const low = [
       "bench",
       "bench-fly",
@@ -192,7 +248,13 @@ export class ExerciseScene {
       "lying-curl",
       "leg-press",
     ].includes(this.family);
-    const span = low ? 1.05 : 1.4;
+    const span = this.options.body
+      ? 0.975
+      : this.seatedDumbbellPress()
+        ? 0.94
+        : low
+          ? 1.05
+          : 1.4;
     this.camera.left = (-span * width) / height;
     this.camera.right = (span * width) / height;
     this.camera.top = span;
@@ -202,16 +264,30 @@ export class ExerciseScene {
   }
   setProgress(progress: number) {
     this.progress = Math.max(0, Math.min(1, progress));
-    const frame = motionFor(this.exercise, this.progress);
+    const frame = this.options.body
+      ? neutralBodyPose()
+      : motionFor(this.exercise, this.progress);
     if (this.athlete && frame) {
       this.athlete.pose(frame);
       this.equipment?.update(this.progress, frame);
     }
     this.render();
   }
+  private seatedDumbbellPress() {
+    return (
+      this.family === "shoulder-press" &&
+      this.exercise.mode === "dumbbell" &&
+      this.exercise.id !== "standing_dumbbell_press"
+    );
+  }
   highlight(selected?: MuscleRegion) {
     this.selected = selected;
-    this.athlete?.highlight(anatomyForExercise(this.exercise), selected);
+    this.athlete?.highlight(
+      this.options.body
+        ? { primary: [], secondary: [] }
+        : anatomyForExercise(this.exercise),
+      selected,
+    );
     this.render();
   }
   rotate(radians: number) {
@@ -221,14 +297,37 @@ export class ExerciseScene {
     this.controls.update();
     this.render();
   }
+  setBodyShape(waist?: number, weight = 1, comparison = false) {
+    this.bodyWaist = waist;
+    this.bodyWeight = weight;
+    this.compareBody = comparison;
+    this.athlete?.bodyShape(waist, weight);
+    if (this.baseline) this.baseline.group.visible = comparison;
+    this.render();
+  }
+  bodyView(back = false) {
+    this.controls.target.set(0, 0.895, 0);
+    this.camera.position.set(back ? -0.45 : 0.45, 1.095, back ? -4.8 : 4.8);
+    this.controls.update();
+    this.render();
+  }
   render() {
-    if (!this.disposed && !this.suspended)
-      this.renderer.render(this.scene, this.camera);
+    if (!this.disposed && !this.suspended) {
+      if (this.composer) this.composer.render();
+      else this.renderer.render(this.scene, this.camera);
+    }
   }
   debug() {
     return {
       family: this.family,
       progress: this.progress,
+      body: this.options.body
+        ? {
+            waist: this.bodyWaist,
+            weight: this.bodyWeight,
+            comparison: this.compareBody,
+          }
+        : undefined,
       renderer: this.renderer
         .getContext()
         .getParameter(this.renderer.getContext().VERSION),
@@ -253,9 +352,13 @@ export class ExerciseScene {
     this.controls.removeEventListener("change", this.onChange);
     this.controls.dispose();
     this.athlete?.dispose();
+    this.baseline?.dispose();
     this.equipment?.dispose();
     this.floor.geometry.dispose();
     (this.floor.material as T.Material).dispose();
+    this.studio.dispose();
+    this.composer?.passes.forEach((pass) => pass.dispose());
+    this.composer?.dispose();
     this.renderer.dispose();
     this.renderer.forceContextLoss();
     this.renderer.domElement.remove();

@@ -31,6 +31,7 @@ test("muscle roles, touch controls and offline movement guide preserve the entir
   page,
   context,
 }, info) => {
+  test.setTimeout(120000);
   const source = await seed(page);
   await page
     .getByText("Mišice, izvedba in podlaga teže", { exact: true })

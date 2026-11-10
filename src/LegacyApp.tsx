@@ -746,7 +746,7 @@ export default function App() {
                     <ShieldCheck size={18} />
                   </div>
                   <p>
-                    Različica 0.5.0 · Polnočna modra in kost · Napredek v obrisu
+                    Različica 0.6.0 · Polnočna modra in kost · Anatomija v gibanju
                   </p>
                   <PwaUpdate
                     saved={storage === "Shranjeno v tej napravi"}

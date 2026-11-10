@@ -7,6 +7,11 @@ import rigData from "../assets/athlete-rig.json";
 import type { Anatomy, MuscleRegion } from "../exerciseAnatomy";
 import type { PoseFrame, V3 } from "./motions";
 import { MuscleTint } from "./anatomy-shader";
+import {
+  medicalMaterial,
+  athleticVertex,
+  loadAnatomyAtlas,
+} from "./medical-surface";
 import { hingeRotation, jointLimits, solveHinge } from "./kinematics";
 
 let asset: Promise<T.Group> | undefined;
@@ -21,7 +26,10 @@ const metadata = rigData.bones as Record<
 export async function athleteModel() {
   if (!asset) {
     const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
-    asset = loader.loadAsync(modelUrl).then((gltf) => gltf.scene);
+    asset = Promise.all([
+      loader.loadAsync(modelUrl),
+      loadAnatomyAtlas().catch(() => undefined),
+    ]).then(([gltf]) => gltf.scene);
     asset.catch(() => {
       asset = undefined;
     });
@@ -37,14 +45,14 @@ export class Athlete {
     { q: T.Quaternion; p: T.Vector3; world: T.Quaternion; parent: T.Quaternion }
   >();
   private materials: {
-    material: T.MeshStandardMaterial;
+    material: T.MeshStandardMaterial | T.MeshBasicMaterial;
     region: string;
     base: T.Color;
   }[] = [];
   private model: T.Object3D;
   private tint = new MuscleTint();
 
-  constructor(template: T.Group) {
+  constructor(template: T.Group, ghost = false) {
     this.model = clone(template);
     this.model.updateMatrixWorld(true);
     this.model.traverse((o) => {
@@ -62,19 +70,28 @@ export class Athlete {
       if (o instanceof T.Mesh) {
         o.geometry = o.geometry.clone();
         o.frustumCulled = false;
-        o.castShadow = o.receiveShadow = true;
+        o.castShadow = o.receiveShadow = !ghost;
+        if (ghost) o.renderOrder = -1;
         const cloneMaterial = (material: T.Material) => {
-          const m = material.clone() as T.MeshStandardMaterial;
+          const m = ghost
+            ? new T.MeshStandardMaterial({
+                name: material.name,
+                color: "#C3D0DA",
+                transparent: true,
+                opacity: 0.11,
+                depthWrite: false,
+                side: T.BackSide,
+                roughness: 1,
+              })
+            : medicalMaterial(material);
           const region = m.name.replace(/^skin_/, "");
-          if (
-            !["shorts", "hair", "eyes", "iris"].includes(region) &&
-            !region.startsWith("shorts_")
-          ) {
-            m.color.set("#bc896f");
-            m.roughness = 0.62;
-          }
           this.materials.push({ material: m, region, base: m.color.clone() });
-          if (region === "rest" || region === "shorts") this.tint.attach(m);
+          if (ghost) {
+            m.customProgramCacheKey = () => "glass-anatomy-baseline-v1";
+            m.onBeforeCompile = (shader) => {
+              shader.vertexShader = athleticVertex(shader.vertexShader);
+            };
+          } else this.tint.attach(m);
           return m;
         };
         o.material = Array.isArray(o.material)
@@ -296,6 +313,9 @@ export class Athlete {
 
   highlight(anatomy: Anatomy, selected?: MuscleRegion) {
     this.tint.update(anatomy, selected);
+  }
+  bodyShape(waist?: number, weight = 1) {
+    this.tint.bodyShape(waist, weight);
   }
 
   dispose() {

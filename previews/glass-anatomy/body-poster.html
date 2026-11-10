@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="sl">
+  <meta charset="utf-8" /><title>Anatomski model · izris nadomestne slike</title
+  ><style>
+    html,
+    body {
+      margin: 0;
+      background: transparent;
+    }
+    #stage {
+      width: 360px;
+      height: 450px;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+  <div id="stage"></div>
+  <script type="module">
+    import { BodyScene } from "../../src/exercise3d/body-scene";
+    const viewer = new BodyScene(document.querySelector("#stage"), true);
+    await viewer.ready;
+    viewer.setBodyShape(undefined, 1, false);
+    viewer.controls.target.set(0, 0.895, 0);
+    viewer.camera.position.set(0, 0.895, 4.8);
+    viewer.controls.update();
+    viewer.renderer.setSize(720, 900, false);
+    viewer.camera.left = -0.78;
+    viewer.camera.right = 0.78;
+    viewer.camera.top = 0.975;
+    viewer.camera.bottom = -0.975;
+    viewer.camera.updateProjectionMatrix();
+    viewer.render();
+    window.bodyPoster = viewer.renderer.domElement
+      .toDataURL("image/webp", 0.94)
+      .split(",")[1];
+  </script>
+</html>
