@@ -1,0 +1,1 @@
+import{E as r}from"./scene-Duz0UmcX.js";import{c as s}from"./exerciseCatalog-BqLpzvAg.js";class d extends r{constructor(e,o=!1){super(e,s("bodyweight_squat"),{body:!0,transparent:o})}}export{d as BodyScene};
