@@ -1,0 +1,1 @@
+import{ExerciseScene as r}from"./scene-ByKVM-2m.js";import{y as t}from"./style-Ca2nwhjq.js";import"./body-shape-DkZssQSZ.js";import"./index-DVtHvBXj.js";class d extends r{constructor(e,o=!1){super(e,t("bodyweight_squat"),{body:!0,transparent:o})}}export{d as BodyScene};
